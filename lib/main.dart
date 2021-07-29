@@ -51,7 +51,7 @@ class EndPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+    // TODO: implement buildsss
     return Scaffold(
       appBar: AppBar(
         title: Text('終了画面'),
