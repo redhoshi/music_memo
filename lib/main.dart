@@ -46,7 +46,7 @@ class EndPage extends StatelessWidget {
   String name;
   List e = []; //問題番号
   List text = []; //問題のテキスト
-  List re = []; //正解か不正解か
+  List re = []; //正解か不正解かaiu
   get child => null; //result
 
   @override
