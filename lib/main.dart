@@ -261,7 +261,6 @@ class _MyHomePageState extends State<MyHomePage> {
   final result = [];
   //選択肢があっているか否か
   answer(String val) async {
-    print('-----------');
     print(anslist[queli[ai]]); //urlになってるからファイル名にする
     print(val); //表示されてるのでこれとaiuで一致すれば正解みたいな感じにする
     print('66');
