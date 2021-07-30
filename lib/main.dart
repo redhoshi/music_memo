@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.indigo,
         ),
-        home: const LoginPage()); //MyHomePage67
+        home: const MyHomePage()); //MyHomePage67
   }
 }
 
@@ -127,14 +127,19 @@ class _MyHomePageState extends State<MyHomePage> {
     await FirebaseFirestore.instance.collection('users').get().then(
           (QuerySnapshot querySnapshot) => {
             querySnapshot.docs.forEach(
-              (doc) {
+              (doc) async {
                 docList.add(doc.id); //[que_1,que_2,que_3]
+                final snepshot = await FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(doc.id)
+                    .get();
               },
             ),
           },
         );
-    //ドキュメントの中身参照
+    //フィールドを参照
     for (int i = 0; i < docList.length; i++) {
+      ///再度検討
       final snepshot = await FirebaseFirestore.instance
           .collection('users')
           .doc(docList[i])
