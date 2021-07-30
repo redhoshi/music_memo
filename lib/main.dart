@@ -80,15 +80,12 @@ class EndPage extends StatelessWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   //ここで変数とか関数を定義
-  String nameString = 'noname'; //appbar
-  String nameai = 'dd';
 
   final dlist = []; //初期値設定問題文初期値を2個以上つけたらエラーでない
-  final anslist = [];
   final ans_url = []; //ansリストのurl
   final selist = []; //選択肢のリスト
   final quelist = []; //問題のリスト
-  final ans_file = []; //正解のファイル名リスト//無駄
+  final ans_file = []; //dri_tp,画像データのファイル名指定
   int ai = -1;
 
   final list = <String>[]; //audioファイルリスト
@@ -104,19 +101,15 @@ class _MyHomePageState extends State<MyHomePage> {
       aiu[j] = aiu[lottery];
       aiu[lottery] = dat;
     }
-    for (int i = 0; i < aiu.length; i++) {
-      //quelist.add(aiu[i]);
-    }
   }
 
   Future<void> QueExample() async {
-    calcurate(queli);
+    calcurate(queli); //[0,1,2]をランダムにする
   }
 
+//リストの初期化(繊維ごとに初期化)
   Future<void> Initialized() async {
-    //リストの初期化
     dlist.removeRange(0, dlist.length);
-    anslist.removeRange(0, anslist.length);
     ans_url.removeRange(0, ans_url.length);
     selist.removeRange(0, selist.length);
     list.removeRange(0, list.length);
@@ -126,15 +119,9 @@ class _MyHomePageState extends State<MyHomePage> {
     _isEnabled = false;
   }
 
-  Future<void> fetchName() async {
-    Initialized(); //初期化
-    print('問題格納リスト$queli');
-
-    //関数定義
-    //final snapshot = await FirebaseFirestore.instance.collection('users').get();
-    //nameString = snapshot.docs.first.data()['audio']; //name要素の一番最初だけ持ってくる？
-
-    //問題データ
+  //問題データ(文)と正解データ
+  AnswerName() async {
+    //問題のリスト
     await FirebaseFirestore.instance.collection('users').get().then(
           (QuerySnapshot querySnapshot) => {
             querySnapshot.docs.forEach(
@@ -144,57 +131,60 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           },
         );
+    //ドキュメントの中身参照
     for (int i = 0; i < docList.length; i++) {
       final snepshot = await FirebaseFirestore.instance
           .collection('users')
           .doc(docList[i])
           .get();
-      String que = 'snepsqhot${snepshot['que']}';
-      String ans = 'snepshota${snepshot['audio']}';
-      dlist.add(que); //[フルートの音を選択]
-      anslist.add(ans); //[dri_fl.mp3]
-      final j = ans.length - 4;
-      final uu = ans.substring(0, j); //.mp3を削除
-      ans_file.add(uu);
-      setState(() {});
-    }
+      String que = '${snepshot['que']}'; //問題文
+      String ans = '${snepshot['audio']}'; //正解のファイル名
 
-    //正解データ
-    for (int i = 0; i < anslist.length; i++) {
+      //正解データのURL取得
       final audio_data = await firebase_storage.FirebaseStorage.instance
           .ref()
           .child('audio')
-          .child(anslist[queli[ai]]) //lot
+          .child(docList[i])
+          .child(ans)
           .getDownloadURL();
-      ans_url.add(audio_data);
-    }
-    await player.setUrl(ans_url[queli[ai]]); //lot
+      ans_url.add(audio_data); //正解のurlを選択肢のところと同じところから取ってくる
 
+      //問題文リスト作成
+      dlist.add(que); //[フルートの音を選択]
+
+      //画像参照用のファイル名取得
+      final j = ans.length - 4; //ファイル名取得
+      final uu = ans.substring(0, j); //.mp3を削除
+      ans_file.add(uu); //ans_fileリストに格納
+      setState(() {});
+      //lot
+    }
+    await player.setUrl(ans_url[queli[ai]]);
     //問題データ
     soundData(docList);
-    print('documentid');
-    print(docList);
+  }
+
+  Future<void> fetchName() async {
+    Initialized(); //初期化
+    print('問題格納リスト$queli');
+    AnswerName();
     setState(() {});
   }
 
   //選択肢のファイルの名前取得　ドキュメントidのディレクトリのファイルを参照して、ファイルの名前を一部抽出
   Future<void> soundData(doc) async {
-    firebase_storage.ListResult result =
-        await firebase_storage.FirebaseStorage.instance
-            .ref()
-            .child('audio')
-            .child(doc[queli[ai]]) //0の値をよくよく変更
-            .listAll();
+    //選択肢ファイルのファイル名取得
+    firebase_storage.ListResult result = await firebase_storage
+        .FirebaseStorage.instance
+        .ref()
+        .child('audio')
+        .child(doc[queli[ai]])
+        .listAll();
     result.items.forEach((firebase_storage.Reference ref) async {
       final ji = await firebase_storage.FirebaseStorage.instance
           .ref(ref.fullPath)
           .fullPath;
-      print("file name-------");
-      print('乱数${queli[ai]}');
-      print('${doc[queli[ai]]}');
-      final j = doc[queli[ai]].length;
-      print(j);
-      final uu = ji.substring(j + 7); //ファイル名だけ抽出
+      final uu = ji.substring(doc[queli[ai]].length + 7); //ファイル名だけ抽出
       selist.add(uu);
       if (selist.length > 3) audiodata(selist, doc);
       setState(() {});
@@ -202,49 +192,31 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   //音をランダムに配置
-  final dd = <String>[];
   audiodata(aiu, eio) async {
-    //遅延回避
-    dd.removeRange(0, dd.length);
-    var dat;
-    for (int j = 0; j < aiu.length; j++) {
-      int lottery = math.Random().nextInt(j + 1);
-      dat = aiu[j];
-      aiu[j] = aiu[lottery];
-      aiu[lottery] = dat;
-    }
-    for (int i = 0; i < aiu.length; i++) {
-      dd.add(aiu[i]);
-    }
-    print('dd$dd');
+    calcurate(aiu);
     urllist(aiu, eio); //aiuがリスト
     print('aiu$aiu'); //aiuリストの中でans_urlと一致するやつが正解
   }
 
   //音のUrl取得
   Future<void> urllist(aiu, doc) async {
-    print('docdoc$doc');
-    print('aiuaiu:$aiu');
-    print('nagasa${aiu.length}');
     for (int i = 0; i < aiu.length; i++) {
       final audio_url = await firebase_storage.FirebaseStorage.instance
           .ref()
           .child('audio')
-          .child(doc[queli[ai]]) //jとかにすべき
-          .child(aiu[i])
+          .child(doc[queli[ai]]) //que_1
+          .child(aiu[i]) //dri_tp
           .getDownloadURL();
-      list.add(audio_url);
-      print(i);
-      print('aiaiai');
-      print(audio_url);
+      list.add(audio_url); //listに格納する
     }
-    _isEnabled = true;
-    setState(() {}); //描画
+    //_isEnabled = true;
+    //setState(() {}); //描画
     await player1.setUrl(list[0]);
     await player2.setUrl(list[1]);
     await player3.setUrl(list[2]);
     await player4.setUrl(list[3]);
-    //_isEnabled = true;
+    _isEnabled = true;
+    setState(() {}); //描画
   }
 
   //stop音
@@ -256,26 +228,22 @@ class _MyHomePageState extends State<MyHomePage> {
     player4.stop();
   }
 
-  int i = 0;
-  final end = [];
-  final result = [];
+  int i = 0; //問題番号カウント
+  final end = []; //問題
+  final result = []; //正解・不正解の結果
+
   //選択肢があっているか否か
   answer(String val) async {
-    print(anslist[queli[ai]]); //urlになってるからファイル名にする
-    print(val); //表示されてるのでこれとaiuで一致すれば正解みたいな感じにする
-    print('66');
-    if (anslist[queli[ai]] != val) {
+    if (ans_url[queli[ai]] != val) {
       print('不正解');
-      print(val);
-      print('docList$docList'); //
       await Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => IncorPage(ans_file, queli[ai])),
+        MaterialPageRoute(
+            builder: (context) => IncorPage(ans_file, queli[ai])), //ファイル名と引数
       );
       result.add('不正解');
     } else {
       print('正解');
-      print(i);
       await Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => CorrectPage()),
@@ -284,15 +252,12 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     i++;
     end.add(i);
-    print(i);
-    print(result);
     if (i > 2) {
       final now = new DateTime.now();
       final date =
           new DateTime(now.year, now.month, now.day, now.hour, now.minute);
       print(date);
       print(DateTime.now().day);
-      //実行する
 
       //結果をfirebasecloudfirestoreに上げる
       /*
@@ -310,8 +275,7 @@ class _MyHomePageState extends State<MyHomePage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) =>
-                EndPage('$now', end, dlist, result)), //param: '$date'
+            builder: (context) => EndPage('$now', end, dlist, result)),
       );
     } else {
       fetchName();
@@ -319,14 +283,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   //audiocacheクラスの初期化
-  //AudioCache player = AudioCache();
   AudioPlayer player = new AudioPlayer(mode: PlayerMode.LOW_LATENCY);
   AudioPlayer player1 = new AudioPlayer(mode: PlayerMode.LOW_LATENCY);
   AudioPlayer player2 = new AudioPlayer(mode: PlayerMode.LOW_LATENCY);
   AudioPlayer player3 = new AudioPlayer(mode: PlayerMode.LOW_LATENCY);
   AudioPlayer player4 = new AudioPlayer(mode: PlayerMode.LOW_LATENCY);
-  //AudioPlayer player5 = new AudioPlayer(mode: PlayerMode.LOW_LATENCY);
-  //AudioPlayer player6 = new AudioPlayer(mode: PlayerMode.LOW_LATENCY);
 
   //画面が作られたときに一度だけ呼ばれる
   @override
@@ -335,11 +296,10 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     QueExample();
     fetchName();
-    //getCsvData('assets/que.csv');
   }
 
-  String _acceptedData = 'Target'; // 受け側のデータ
-  bool _willAccepted = false; // Target範囲内かどうかのフラ
+  //String _acceptedData = 'Target'; // 受け側のデータ
+  //bool _willAccepted = false; // Target範囲内かどうかのフラ
 
   @override
   Widget build(BuildContext context) {
@@ -364,8 +324,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       style: TextStyle(fontSize: 15),
                       textAlign: TextAlign.center,
                     ),
-                  ), //error //問題混ぜる時は
-                //RaisedButton(
+                  ),
                 new SizedBox(
                   width: 100.0,
                   height: 100.0,
@@ -374,24 +333,20 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: Icon(Icons.volume_up),
                       heroTag: "btn1",
                       onPressed: !_isEnabled
-                          ? () {
-                              //print(list[lot]);
+                          ? null
+                          : () {
                               player1.stop();
                               player2.stop();
                               player3.stop();
                               player4.stop();
                               print(_isEnabled);
-                              player.play(ans_url[0]);
-
-                              //position: new Duration(milliseconds: 5)); //鳴った!
-                            }
-                          : null),
-                ), //),
+                              player.play(ans_url[queli[ai]]); //change
+                            }),
+                ),
                 Row(
                     mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly, // これを設定
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
-                      //Column(children: <Widget>[
                       FloatingActionButton(
                           backgroundColor: Colors.orangeAccent,
                           child: Icon(Icons.volume_up),
@@ -405,11 +360,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                   player3.stop();
                                   player4.stop();
                                   player1.play(list[0]);
-                                  print('------------------pp-');
                                   print(_isEnabled);
-                                }
-                          //buttonを押した時の処理
-                          ),
+                                }),
                       new SizedBox(
                         height: 50,
                         width: 230,
@@ -426,8 +378,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         BorderRadius.all(Radius.circular(10.0)),
                                   );
                                   stopsound();
-                                  print('dd:${dd[0]}');
-                                  answer(dd[0]);
+                                  answer(list[0]); //urlを返す
                                   print('select$_isEnabled');
                                 },
                           style: ElevatedButton.styleFrom(
@@ -435,12 +386,11 @@ class _MyHomePageState extends State<MyHomePage> {
                             onPrimary: Colors.white,
                           ),
                         ),
-                        //child: Text('select 1')),
                       ),
                     ]),
                 Row(
                     mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly, // これを設定
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
                       FloatingActionButton(
                         backgroundColor: Colors.orangeAccent,
@@ -456,7 +406,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 player4.stop();
                                 player2.play(list[1]);
                               }
-                            : null, //buttonを押した時の処理
+                            : null,
                       ),
                       new SizedBox(
                         height: 50,
@@ -470,8 +420,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                           Radius.circular(10.0)),
                                     );
                                     stopsound();
-                                    print('dd:${dd[1]}');
-                                    answer(dd[1]);
+                                    answer(list[1]);
                                   }
                                 : null,
                             style: ElevatedButton.styleFrom(
@@ -485,9 +434,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     ]),
                 Row(
                     mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly, // これを設定
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
-                      //Column(children: <Widget>[
                       FloatingActionButton(
                         backgroundColor: Colors.orangeAccent,
                         child: Icon(Icons.volume_up),
@@ -499,17 +447,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           player2.stop();
                           player4.stop();
                           player3.play(list[2]);
-                        }, //buttonを押した時の処理
+                        },
                       ),
-                      /*
-                      TextButton(
-                          onPressed: () {
-                            stopsound();
-                            print('dd:${dd[2]}');
-                            answer(dd[2]);
-                          },
-                          child: Text('select 3')),*/
-                      //kesitayo
                       new SizedBox(
                         height: 50,
                         width: 230,
@@ -523,8 +462,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                           Radius.circular(10.0)),
                                     );
                                     stopsound();
-                                    print('dd:${dd[2]}');
-                                    answer(dd[2]);
+                                    answer(list[2]);
                                   },
                             style: ElevatedButton.styleFrom(
                               primary: Colors.lightGreen,
@@ -537,15 +475,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     ]),
                 Row(
                     mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly, // これを設定
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
-                      //Column(children: <Widget>[
-
-                      //ドラッグする対象
-                      //Draggable(
-                      //data: list.length > 2 ? '${list[3]}' : '',
-                      //data: '${list}',
-                      //child:
                       FloatingActionButton(
                         backgroundColor: Colors.orangeAccent,
                         child: Icon(Icons.volume_up),
@@ -558,8 +489,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           player2.stop();
                           player3.stop();
                           player4.play(list[3]);
-                          //_player.play('test5.wav');
-                        }, //buttonを押した時の処理
+                        },
                       ),
                       /*feedback: FloatingActionButton(
                           backgroundColor: Colors.orangeAccent,
@@ -611,8 +541,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                           Radius.circular(10.0)),
                                     );
                                     stopsound();
-                                    print('dd:${dd[3]}');
-                                    answer(dd[3]);
+                                    answer(list[3]);
                                   },
                             style: ElevatedButton.styleFrom(
                               primary: Colors.lightGreen,
@@ -623,58 +552,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                 : Text('select 4')),
                       ),
                     ]),
-                //]),
-                /*
-                Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly, // これを設定
-                    children: <Widget>[
-                      Column(children: <Widget>[
-                        FloatingActionButton(
-                          backgroundColor: Colors.orangeAccent,
-                          child: Icon(Icons.volume_up),
-                          heroTag: "btn6",
-                          onPressed: () {
-                            print(list[4]);
-                            player5.play(list[4]);
-                          }, //buttonを押した時の処理
-                        ),
-                        TextButton(
-                            onPressed: () {
-                              answer(4);
-                            },
-                            child: Text('select 5')),
-                      ]),,,
-                      /*
-                      Column(children: <Widget>[
-                        FloatingActionButton(
-                          backgroundColor: Colors.orangeAccent,
-                          child: Icon(Icons.volume_up),
-                          heroTag: "btn7",
-                          onPressed: () {
-                            print(list[5]);
-                            player6.play(list[5]);
-                          }, //buttonを押した時の処理
-                        ),
-                        TextButton(
-                            onPressed: () {
-                              answer(5);
-                            },
-                            child: Text('select 6')),
-                      ]),*/
-                    ]),*/
-                //Stack(
-                /*Stack(alignment: AlignmentDirectional.center, children: <Widget>[
-                  Positioned(
-                    top: 30,
-                    left: 30,
-                    //width: 5.0,
-                    //height: 5.0,
-                    child: Center(
-                      child: Text('end'),
-                    ),
-                  ),
-                ]),*/
               ]),
           Center(
             child: SizedBox(
@@ -685,13 +562,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       backgroundColor: Colors.grey,
                       strokeWidth: 8.0,
                       valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
-                      //_isEnabled=true;
                     )
                   : Text(''),
             ),
           ),
         ],
       ),
-    ); //widget
+    );
   }
 }
