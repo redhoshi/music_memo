@@ -36,7 +36,7 @@ class IncorPagePage extends State<IncorPage> {
     print('photodata');
     print(photo_data);
 
-    print('${param[nu]}');
+//    print('${param[nu]}');
     print(nu);
     //_image = new Image.network(photo_data);
     final image = new Image(image: new CachedNetworkImageProvider(photo_data));
