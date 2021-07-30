@@ -5,6 +5,8 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/rendering/object.dart';
+import 'package:music_memo/first.dart';
+import 'package:music_memo/login.dart';
 
 import 'dart:math' as math;
 
@@ -29,7 +31,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.indigo,
         ),
-        home: const MyHomePage()); //MyHomePage67
+        home: const LoginPage()); //MyHomePage67
   }
 }
 
@@ -495,7 +497,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           backgroundColor: Colors.orangeAccent,
                           child: Icon(Icons.volume_up),
                           heroTag: "btn5",
-                          onPressed: () {},sss
+                          onPressed: () {},
                         ),
                       ),*/
 
