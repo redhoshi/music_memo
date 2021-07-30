@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:music_memo/first.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -20,52 +21,76 @@ class _LoginPageState extends State<LoginPage> {
       ),
       backgroundColor: NeumorphicTheme.baseColor(context),
       body: Center(
-        //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        //children: <Widget>[
         child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-          new SizedBox(
-            width: 300,
-            height: 80,
-            child: TextField(
-              controller: _userController,
-              decoration: InputDecoration(
-                labelText: 'Username',
-                hintText: 'Username',
-                icon: Icon(Icons.account_circle),
-              ),
-              autocorrect: false,
-              autofocus: true,
-              keyboardType: TextInputType.text,
-            ),
-          ),
-          new SizedBox(
-            width: 300,
-            height: 80,
-            child: TextField(
-              controller: _passwordController,
-              decoration: InputDecoration(
-                labelText: 'PassWord',
-                hintText: 'PassWord',
-                icon: Icon(Icons.security),
-              ),
-              autocorrect: false,
-              autofocus: true,
-              obscureText: true,
-              keyboardType: TextInputType.text,
-            ),
-          ),
+          Text('UserName'),
           new SizedBox(
             width: 200,
             height: 50,
             child: Neumorphic(
               style: NeumorphicStyle(depth: -5),
               child: TextField(
-                  textAlign: TextAlign.center,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
+                controller: _userController,
+                textAlign: TextAlign.center,
+                decoration: InputDecoration(
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                    color: Colors.grey,
+                    width: 2.0,
                   )),
+                  border: InputBorder.none,
+                ),
+                autocorrect: false,
+                autofocus: true,
+              ),
             ),
           ),
+          new SizedBox(
+            height: 30,
+          ),
+          Text('PassWord'),
+          new SizedBox(
+            width: 200,
+            height: 50,
+            child: Neumorphic(
+              style: NeumorphicStyle(depth: -5),
+              child: TextField(
+                controller: _passwordController,
+                textAlign: TextAlign.center,
+                decoration: InputDecoration(
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                    color: Colors.grey,
+                    width: 2.0,
+                  )),
+                  border: InputBorder.none,
+                ),
+                autocorrect: false,
+                autofocus: true,
+                obscureText: true,
+              ),
+            ),
+          ),
+          new SizedBox(
+            height: 60,
+          ),
+          new SizedBox(
+            width: 100,
+            height: 40,
+            child: NeumorphicButton(
+              child: Text(
+                '送信',
+                textAlign: TextAlign.center,
+              ),
+              onPressed: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => FirstPage(
+                          _userController.text, _passwordController.text)),
+                );
+              },
+            ),
+          )
         ]),
       ),
     );
