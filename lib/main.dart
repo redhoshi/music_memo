@@ -44,11 +44,12 @@ class MyHomePage extends StatefulWidget {
 
 //終了画面
 class EndPage extends StatelessWidget {
-  EndPage(this.name, this.e, this.text, this.re);
+  EndPage(this.name, this.e, this.text, this.re, this.val);
   String name;
   List e = []; //問題番号
   List text = []; //問題のテキスト
   List re = []; //正解か不正解かaiu
+  int val = 0;
   get child => null; //result
 
   @override
@@ -63,6 +64,36 @@ class EndPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           Text('【$name】の結果'),
+          Container(
+            width: 100,
+            height: 100,
+            decoration: BoxDecoration(
+              border: const Border(
+                left: const BorderSide(
+                  color: Colors.black,
+                  width: 3,
+                ),
+                right: const BorderSide(
+                  color: Colors.black,
+                  width: 3,
+                ),
+                top: const BorderSide(
+                  color: Colors.black,
+                  width: 3,
+                ),
+                bottom: const BorderSide(
+                  color: Colors.black,
+                  width: 3,
+                ),
+              ),
+            ),
+            child: Center(
+              child: Text(
+                '$val',
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
           Table(
             border: TableBorder.all(),
             children: [
@@ -95,8 +126,13 @@ class _MyHomePageState extends State<MyHomePage> {
   List docList = []; //ドキュメントidを取ってくる
   bool _isEnabled = false; //onbuttonを押させない
 
+  Stopwatch time_ans = Stopwatch(); //回答時間
+  Stopwatch time_lis = Stopwatch(); //音源データを聞いている時間
+  int count = 0; //音源データをタップした回数
+
+  int value = 0; //得点
   calcurate(aiu) async {
-    var dat; //乱数作成
+    var dat;
     for (int j = 0; j < aiu.length; j++) {
       int lottery = math.Random().nextInt(j + 1);
       dat = aiu[j];
@@ -166,15 +202,14 @@ class _MyHomePageState extends State<MyHomePage> {
       final uu = ans.substring(0, j); //.mp3を削除
       ans_file.add(uu); //ans_fileリストに格納
       setState(() {});
-      //lot
     }
     await player.setUrl(ans_url[queli[ai]]);
-    //問題データ
   }
 
   Future<void> fetchName() async {
     Initialized(); //初期化
     print('問題格納リスト$queli');
+
     AnswerName();
     setState(() {});
   }
@@ -198,6 +233,7 @@ class _MyHomePageState extends State<MyHomePage> {
       if (selist.length > 3) audiodata(selist, doc);
       setState(() {});
     });
+    print('${time_ans.elapsed}');
   }
 
   //音をランダムに配置
@@ -225,6 +261,7 @@ class _MyHomePageState extends State<MyHomePage> {
     await player3.setUrl(list[2]);
     await player4.setUrl(list[3]);
     _isEnabled = true;
+    time_ans.start();
     setState(() {}); //描画
   }
 
@@ -237,14 +274,23 @@ class _MyHomePageState extends State<MyHomePage> {
     player4.stop();
   }
 
+  //ストップウォッチ回答時間
+  void StopTime() {
+    time_ans.stop();
+    print('回答時間${time_ans.elapsed}');
+    time_ans.reset();
+  }
+
   int i = 0; //問題番号カウント
   final end = []; //問題
   final result = []; //正解・不正解の結果
 
   //選択肢があっているか否か
   answer(String val) async {
+    StopTime();
     if (ans_url[queli[ai]] != val) {
       print('不正解');
+      value -= 10;
       await Navigator.push(
         context,
         MaterialPageRoute(
@@ -253,6 +299,7 @@ class _MyHomePageState extends State<MyHomePage> {
       result.add('不正解');
     } else {
       print('正解');
+      value += 10;
       await Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => CorrectPage()),
@@ -280,11 +327,11 @@ class _MyHomePageState extends State<MyHomePage> {
           'que': '${docList[j]}',
         });
       }*/
-
+      print('value$value');
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => EndPage('$now', end, dlist, result)),
+            builder: (context) => EndPage('$now', end, dlist, result, value)),
       );
     } else {
       fetchName();
@@ -357,20 +404,23 @@ class _MyHomePageState extends State<MyHomePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
                       FloatingActionButton(
-                          backgroundColor: Colors.orangeAccent,
-                          child: Icon(Icons.volume_up),
-                          heroTag: "btn2",
-                          onPressed: _isEnabled
-                              ? null
-                              : () {
-                                  print(list[0]);
-                                  player.stop();
-                                  player2.stop();
-                                  player3.stop();
-                                  player4.stop();
-                                  player1.play(list[0]);
-                                  print(_isEnabled);
-                                }),
+                        backgroundColor: Colors.orangeAccent,
+                        child: Icon(Icons.volume_up),
+                        heroTag: "btn2",
+                        onPressed: _isEnabled
+                            ? () {
+                                print(list[0]);
+                                player.stop();
+                                player2.stop();
+                                player3.stop();
+                                player4.stop();
+                                //time_lis.start();
+                                //print('timestart${time_lis.elapsed}');
+                                player1.play(list[0]);
+                                print(_isEnabled);
+                              }
+                            : null,
+                      ),
                       new SizedBox(
                         height: 50,
                         width: 230,
