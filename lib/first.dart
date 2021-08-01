@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:music_memo/login.dart';
 
 class FirstPage extends StatefulWidget {
-  const FirstPage({Key? key}) : super(key: key);
+  //const FirstPage({Key? key}) : super(key: key);
+  FirstPage(this.user, this.pass);
+  String user;
+  String pass;
 
   @override
-  State<FirstPage> createState() => _FirstPageState();
+  State<FirstPage> createState() => _FirstPageState(user, pass);
 }
 
 class _FirstPageState extends State<FirstPage> {
+  _FirstPageState(this.user, this.pass);
+  String user;
+  String pass;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,7 +30,7 @@ class _FirstPageState extends State<FirstPage> {
         children: <Widget>[
           Row(children: <Widget>[
             Text(
-              'Hi shihoさん',
+              '$userさん',
               style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
