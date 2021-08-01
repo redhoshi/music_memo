@@ -95,7 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List docList = []; //ドキュメントidを取ってくる
   bool _isEnabled = false; //onbuttonを押させない
 
-  calcurate(aiu) {
+  calcurate(aiu) async {
     var dat; //乱数作成
     for (int j = 0; j < aiu.length; j++) {
       int lottery = math.Random().nextInt(j + 1);
@@ -137,6 +137,8 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           },
         );
+    soundData(docList); //5秒
+
     //フィールドを参照
     for (int i = 0; i < docList.length; i++) {
       ///再度検討
@@ -168,7 +170,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     await player.setUrl(ans_url[queli[ai]]);
     //問題データ
-    soundData(docList);
   }
 
   Future<void> fetchName() async {
@@ -186,11 +187,12 @@ class _MyHomePageState extends State<MyHomePage> {
         .ref()
         .child('audio')
         .child(doc[queli[ai]])
-        .listAll();
+        .listAll(); //que_1の中のファイル名を返す
     result.items.forEach((firebase_storage.Reference ref) async {
       final ji = await firebase_storage.FirebaseStorage.instance
           .ref(ref.fullPath)
-          .fullPath;
+          .fullPath; //パスを取得
+      print(result);
       final uu = ji.substring(doc[queli[ai]].length + 7); //ファイル名だけ抽出
       selist.add(uu);
       if (selist.length > 3) audiodata(selist, doc);
