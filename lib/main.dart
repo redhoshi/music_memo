@@ -362,7 +362,7 @@ class _MyHomePageState extends State<MyHomePage> {
     //buildの中に変数書くの良くない
     return Scaffold(
       appBar: AppBar(
-        title: Text('第${i + 1}問'),
+        title: Text('第${i + 1}}問'),
       ),
       body: Stack(
         children: [
@@ -385,19 +385,20 @@ class _MyHomePageState extends State<MyHomePage> {
                   width: 100.0,
                   height: 100.0,
                   child: FloatingActionButton(
-                      backgroundColor: Colors.orangeAccent,
-                      child: Icon(Icons.volume_up),
-                      heroTag: "btn1",
-                      onPressed: !_isEnabled
-                          ? null
-                          : () {
-                              player1.stop();
-                              player2.stop();
-                              player3.stop();
-                              player4.stop();
-                              print(_isEnabled);
-                              player.play(ans_url[queli[ai]]); //change
-                            }),
+                    onPressed: !_isEnabled
+                        ? null
+                        : () {
+                            player1.stop();
+                            player2.stop();
+                            player3.stop();
+                            player4.stop();
+                            print(_isEnabled);
+                            player.play(ans_url[queli[ai]]); //change
+                          },
+                    backgroundColor: Colors.orangeAccent,
+                    child: Icon(Icons.volume_up),
+                    heroTag: "btn1",
+                  ),
                 ),
                 Row(
                     mainAxisSize: MainAxisSize.max,
