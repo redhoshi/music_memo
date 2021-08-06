@@ -423,7 +423,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             player.onDurationChanged.listen((Duration d) {
                               print('max duration: ${d.inSeconds}');
                             });
-                            //完了イベントor
+                            //完了イベントorss
                             player.onPlayerCompletion.listen((event) {
                               print('endsound'); //終了したら
                               time_lis1.stop();
