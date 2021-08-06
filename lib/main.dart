@@ -1,3 +1,4 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/rendering/object.dart';
 import 'package:music_memo/first.dart';
+import 'package:music_memo/group.dart';
 import 'package:music_memo/login.dart';
 
 import 'dart:math' as math;
@@ -31,7 +33,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.indigo,
         ),
-        home: const MyHomePage()); //MyHomePage67
+        home: const MyHomePage()); //home: const MyHomePage
   }
 }
 
@@ -44,11 +46,12 @@ class MyHomePage extends StatefulWidget {
 
 //終了画面
 class EndPage extends StatelessWidget {
-  EndPage(this.name, this.e, this.text, this.re);
+  EndPage(this.name, this.e, this.text, this.re, this.val);
   String name;
   List e = []; //問題番号
   List text = []; //問題のテキスト
   List re = []; //正解か不正解かaiu
+  int val = 0;
   get child => null; //result
 
   @override
@@ -63,6 +66,36 @@ class EndPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           Text('【$name】の結果'),
+          Container(
+            width: 100,
+            height: 100,
+            decoration: BoxDecoration(
+              border: const Border(
+                left: const BorderSide(
+                  color: Colors.black,
+                  width: 3,
+                ),
+                right: const BorderSide(
+                  color: Colors.black,
+                  width: 3,
+                ),
+                top: const BorderSide(
+                  color: Colors.black,
+                  width: 3,
+                ),
+                bottom: const BorderSide(
+                  color: Colors.black,
+                  width: 3,
+                ),
+              ),
+            ),
+            child: Center(
+              child: Text(
+                '$val',
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
           Table(
             border: TableBorder.all(),
             children: [
@@ -95,8 +128,13 @@ class _MyHomePageState extends State<MyHomePage> {
   List docList = []; //ドキュメントidを取ってくる
   bool _isEnabled = false; //onbuttonを押させない
 
+  Stopwatch time_ans = Stopwatch(); //回答時間
+  Stopwatch time_lis = Stopwatch(); //音源データを聞いている時間
+  int count = 0; //音源データをタップした回数
+
+  int value = 0; //得点
   calcurate(aiu) async {
-    var dat; //乱数作成
+    var dat;
     for (int j = 0; j < aiu.length; j++) {
       int lottery = math.Random().nextInt(j + 1);
       dat = aiu[j];
@@ -121,7 +159,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _isEnabled = false;
   }
 
-  //問題データ(文)と正解データ
+  //問題データ(文)と正解データ---1回読み込めば良いデータ
   AnswerName() async {
     //問題のリスト
     await FirebaseFirestore.instance.collection('users').get().then(
@@ -129,16 +167,19 @@ class _MyHomePageState extends State<MyHomePage> {
             querySnapshot.docs.forEach(
               (doc) async {
                 docList.add(doc.id); //[que_1,que_2,que_3]
+
+                /*
                 final snepshot = await FirebaseFirestore.instance
                     .collection('users')
                     .doc(doc.id)
-                    .get();
+                    .get();*/
               },
             ),
           },
         );
+    print('doclist$docList');
     soundData(docList); //5秒
-
+    //print('sounddata$docList');
     //フィールドを参照
     for (int i = 0; i < docList.length; i++) {
       ///再度検討
@@ -166,10 +207,9 @@ class _MyHomePageState extends State<MyHomePage> {
       final uu = ans.substring(0, j); //.mp3を削除
       ans_file.add(uu); //ans_fileリストに格納
       setState(() {});
-      //lot
     }
+    print('setstateato$docList');
     await player.setUrl(ans_url[queli[ai]]);
-    //問題データ
   }
 
   Future<void> fetchName() async {
@@ -198,6 +238,7 @@ class _MyHomePageState extends State<MyHomePage> {
       if (selist.length > 3) audiodata(selist, doc);
       setState(() {});
     });
+    print('${time_ans.elapsed}');
   }
 
   //音をランダムに配置
@@ -225,6 +266,7 @@ class _MyHomePageState extends State<MyHomePage> {
     await player3.setUrl(list[2]);
     await player4.setUrl(list[3]);
     _isEnabled = true;
+    time_ans.start();
     setState(() {}); //描画
   }
 
@@ -237,14 +279,23 @@ class _MyHomePageState extends State<MyHomePage> {
     player4.stop();
   }
 
+  //ストップウォッチ回答時間
+  void StopTime() {
+    time_ans.stop();
+    print('回答時間${time_ans.elapsed}');
+    time_ans.reset();
+  }
+
   int i = 0; //問題番号カウント
   final end = []; //問題
   final result = []; //正解・不正解の結果
 
   //選択肢があっているか否か
   answer(String val) async {
+    StopTime();
     if (ans_url[queli[ai]] != val) {
       print('不正解');
+      value -= 10;
       await Navigator.push(
         context,
         MaterialPageRoute(
@@ -253,6 +304,7 @@ class _MyHomePageState extends State<MyHomePage> {
       result.add('不正解');
     } else {
       print('正解');
+      value += 10;
       await Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => CorrectPage()),
@@ -280,14 +332,15 @@ class _MyHomePageState extends State<MyHomePage> {
           'que': '${docList[j]}',
         });
       }*/
-
+      print('value$value');
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => EndPage('$now', end, dlist, result)),
+            builder: (context) => EndPage('$now', end, dlist, result, value)),
       );
     } else {
-      fetchName();
+      //soundData();ここでdocListを取れば良いと思う
+      fetchName(); //ここで呼んでる
     }
   }
 
@@ -305,6 +358,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     QueExample();
     fetchName();
+    //AnswerName(); //一回読む
   }
 
   //String _acceptedData = 'Target'; // 受け側のデータ
@@ -338,39 +392,51 @@ class _MyHomePageState extends State<MyHomePage> {
                   width: 100.0,
                   height: 100.0,
                   child: FloatingActionButton(
-                      backgroundColor: Colors.orangeAccent,
-                      child: Icon(Icons.volume_up),
-                      heroTag: "btn1",
-                      onPressed: !_isEnabled
-                          ? null
-                          : () {
-                              player1.stop();
-                              player2.stop();
-                              player3.stop();
-                              player4.stop();
-                              print(_isEnabled);
-                              player.play(ans_url[queli[ai]]); //change
-                            }),
+                    onPressed: !_isEnabled
+                        ? null
+                        : () {
+                            player1.stop();
+                            player2.stop();
+                            player3.stop();
+                            player4.stop();
+                            print(_isEnabled);
+                            //後で見る
+                            player.play(ans_url[queli[ai]]); //change
+                            if (player.state == PlayerState.PLAYING) {
+                              player.stop();
+                            }
+                            print('${player.state}');
+                            if (player.state == PlayerState.STOPPED) {
+                              player.play(ans_url[queli[ai]]);
+                            }
+                          },
+                    backgroundColor: Colors.orangeAccent,
+                    child: Icon(Icons.volume_up),
+                    heroTag: "btn1",
+                  ),
                 ),
                 Row(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
                       FloatingActionButton(
-                          backgroundColor: Colors.orangeAccent,
-                          child: Icon(Icons.volume_up),
-                          heroTag: "btn2",
-                          onPressed: _isEnabled
-                              ? null
-                              : () {
-                                  print(list[0]);
-                                  player.stop();
-                                  player2.stop();
-                                  player3.stop();
-                                  player4.stop();
-                                  player1.play(list[0]);
-                                  print(_isEnabled);
-                                }),
+                        backgroundColor: Colors.orangeAccent,
+                        child: Icon(Icons.volume_up),
+                        heroTag: "btn2",
+                        onPressed: _isEnabled
+                            ? () {
+                                print(list[0]);
+                                player.stop();
+                                player2.stop();
+                                player3.stop();
+                                player4.stop();
+                                //time_lis.start();
+                                //print('timestart${time_lis.elapsed}');
+                                player1.play(list[0]);
+                                print(_isEnabled);
+                              }
+                            : null,
+                      ),
                       new SizedBox(
                         height: 50,
                         width: 230,
@@ -562,6 +628,29 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ]),
               ]),
+          Center(
+            child: !_isEnabled
+                ? Container(
+                    color: Color(0xFFE4E6F1),
+                  )
+                : Text(''),
+          ),
+          Positioned(
+            top: 200,
+            left: 160,
+            child: DefaultTextStyle(
+              style: const TextStyle(
+                  fontSize: 25.0,
+                  fontFamily: 'Horizon',
+                  color: Colors.black,
+                  fontWeight: FontWeight.w100),
+              child: !_isEnabled
+                  ? AnimatedTextKit(
+                      animatedTexts: [FadeAnimatedText('Loading....')],
+                    )
+                  : Text(''),
+            ),
+          ),
           Center(
             child: SizedBox(
               width: 50,

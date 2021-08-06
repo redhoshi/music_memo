@@ -29,6 +29,7 @@ class _FirstPageState extends State<FirstPage> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           Row(children: <Widget>[
+            //if (user.isEmpty)
             Text(
               '$userさん',
               style: TextStyle(
