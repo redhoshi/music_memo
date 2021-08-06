@@ -1,3 +1,4 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/rendering/object.dart';
 import 'package:music_memo/first.dart';
+import 'package:music_memo/group.dart';
 import 'package:music_memo/login.dart';
 
 import 'dart:math' as math;
@@ -31,7 +33,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.indigo,
         ),
-        home: const MyHomePage()); //MyHomePage67
+        home: const MyHomePage()); //home: const MyHomePage
   }
 }
 
@@ -157,7 +159,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _isEnabled = false;
   }
 
-  //問題データ(文)と正解データ
+  //問題データ(文)と正解データ---1回読み込めば良いデータ
   AnswerName() async {
     //問題のリスト
     await FirebaseFirestore.instance.collection('users').get().then(
@@ -165,16 +167,19 @@ class _MyHomePageState extends State<MyHomePage> {
             querySnapshot.docs.forEach(
               (doc) async {
                 docList.add(doc.id); //[que_1,que_2,que_3]
+
+                /*
                 final snepshot = await FirebaseFirestore.instance
                     .collection('users')
                     .doc(doc.id)
-                    .get();
+                    .get();*/
               },
             ),
           },
         );
+    print('doclist$docList');
     soundData(docList); //5秒
-
+    //print('sounddata$docList');
     //フィールドを参照
     for (int i = 0; i < docList.length; i++) {
       ///再度検討
@@ -203,13 +208,13 @@ class _MyHomePageState extends State<MyHomePage> {
       ans_file.add(uu); //ans_fileリストに格納
       setState(() {});
     }
+    print('setstateato$docList');
     await player.setUrl(ans_url[queli[ai]]);
   }
 
   Future<void> fetchName() async {
     Initialized(); //初期化
     print('問題格納リスト$queli');
-
     AnswerName();
     setState(() {});
   }
@@ -334,7 +339,8 @@ class _MyHomePageState extends State<MyHomePage> {
             builder: (context) => EndPage('$now', end, dlist, result, value)),
       );
     } else {
-      fetchName();
+      //soundData();ここでdocListを取れば良いと思う
+      fetchName(); //ここで呼んでる
     }
   }
 
@@ -352,6 +358,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     QueExample();
     fetchName();
+    //AnswerName(); //一回読む
   }
 
   //String _acceptedData = 'Target'; // 受け側のデータ
@@ -362,7 +369,7 @@ class _MyHomePageState extends State<MyHomePage> {
     //buildの中に変数書くの良くない
     return Scaffold(
       appBar: AppBar(
-        title: Text('第${i + 1}}問'),
+        title: Text('第${i + 1}問'),
       ),
       body: Stack(
         children: [
@@ -393,7 +400,15 @@ class _MyHomePageState extends State<MyHomePage> {
                             player3.stop();
                             player4.stop();
                             print(_isEnabled);
+                            //後で見る
                             player.play(ans_url[queli[ai]]); //change
+                            if (player.state == PlayerState.PLAYING) {
+                              player.stop();
+                            }
+                            print('${player.state}');
+                            if (player.state == PlayerState.STOPPED) {
+                              player.play(ans_url[queli[ai]]);
+                            }
                           },
                     backgroundColor: Colors.orangeAccent,
                     child: Icon(Icons.volume_up),
@@ -613,6 +628,29 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ]),
               ]),
+          Center(
+            child: !_isEnabled
+                ? Container(
+                    color: Color(0xFFE4E6F1),
+                  )
+                : Text(''),
+          ),
+          Positioned(
+            top: 200,
+            left: 160,
+            child: DefaultTextStyle(
+              style: const TextStyle(
+                  fontSize: 25.0,
+                  fontFamily: 'Horizon',
+                  color: Colors.black,
+                  fontWeight: FontWeight.w100),
+              child: !_isEnabled
+                  ? AnimatedTextKit(
+                      animatedTexts: [FadeAnimatedText('Loading....')],
+                    )
+                  : Text(''),
+            ),
+          ),
           Center(
             child: SizedBox(
               width: 50,
