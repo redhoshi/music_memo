@@ -116,6 +116,7 @@ class EndPage extends StatelessWidget {
 class _MyHomePageState extends State<MyHomePage> {
   //ここで変数とか関数を定義
 
+  //問題と正解データを格納するリスト
   final dlist = []; //初期値設定問題文初期値を2個以上つけたらエラーでない
   final ans_url = []; //ansリストのurl
   final selist = []; //選択肢のリスト
@@ -123,16 +124,33 @@ class _MyHomePageState extends State<MyHomePage> {
   final ans_file = []; //dri_tp,画像データのファイル名指定
   int ai = -1;
 
+  //選択肢データを格納するリスト
   final list = <String>[]; //audioファイルリスト
   final queli = List<int>.generate(3, (i) => i + 0);
   List docList = []; //ドキュメントidを取ってくる
   bool _isEnabled = false; //onbuttonを押させない
 
+  //ログデータを取得するためのリスト
   Stopwatch time_ans = Stopwatch(); //回答時間
-  Stopwatch time_lis = Stopwatch(); //音源データを聞いている時間
-  int count = 0; //音源データをタップした回数
+  Stopwatch time_lis1 = Stopwatch(); //音源データを聞いている時間
 
+  //音源ボタンを押した回数
+  int count1 = 0; //音源データをタップした回数
+  int count2 = 0;
+  int count3 = 0;
+  int count4 = 0;
+  int count5 = 0;
+
+  int tap1 = 0; //btn1をタップした回数
+  int tap2 = 0;
+  int tap3 = 0;
+  int tap4 = 0;
+  int tap5 = 0;
+  final tapping = [0, 0, 0, 0, 0];
+
+  //答えの画面で表示するリスト
   int value = 0; //得点
+
   calcurate(aiu) async {
     var dat;
     for (int j = 0; j < aiu.length; j++) {
@@ -395,19 +413,35 @@ class _MyHomePageState extends State<MyHomePage> {
                     onPressed: !_isEnabled
                         ? null
                         : () {
+                            count1++;
                             player1.stop();
                             player2.stop();
                             player3.stop();
                             player4.stop();
                             print(_isEnabled);
-                            //後で見る
-                            player.play(ans_url[queli[ai]]); //change
+                            // player.play(ans_url[queli[ai]]);
+                            player.onDurationChanged.listen((Duration d) {
+                              print('max duration: ${d.inSeconds}');
+                            });
+                            //完了イベントorss
+                            player.onPlayerCompletion.listen((event) {
+                              print('endsound'); //終了したら
+                              time_lis1.stop();
+                              print(time_lis1.elapsed);
+                              player.state =
+                                  PlayerState.STOPPED; //completeさせないようにする
+                            });
                             if (player.state == PlayerState.PLAYING) {
                               player.stop();
+                              print('stop');
+                              time_lis1.stop();
+                              print(time_lis1.elapsed);
                             }
                             print('${player.state}');
                             if (player.state == PlayerState.STOPPED) {
                               player.play(ans_url[queli[ai]]);
+                              time_lis1.start();
+                              print(time_lis1.elapsed);
                             }
                           },
                     backgroundColor: Colors.orangeAccent,
@@ -434,6 +468,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 //print('timestart${time_lis.elapsed}');
                                 player1.play(list[0]);
                                 print(_isEnabled);
+                                count2++;
                               }
                             : null,
                       ),
@@ -480,6 +515,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 player3.stop();
                                 player4.stop();
                                 player2.play(list[1]);
+                                count3++;
                               }
                             : null,
                       ),
@@ -522,6 +558,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           player2.stop();
                           player4.stop();
                           player3.play(list[2]);
+                          count4++;
                         },
                       ),
                       new SizedBox(
@@ -564,45 +601,9 @@ class _MyHomePageState extends State<MyHomePage> {
                           player2.stop();
                           player3.stop();
                           player4.play(list[3]);
+                          count5++;
                         },
                       ),
-                      /*feedback: FloatingActionButton(
-                          backgroundColor: Colors.orangeAccent,
-                          child: Icon(Icons.volume_up),
-                          heroTag: "btn5",
-                          onPressed: () {},
-                        ),
-                      ),*/
-
-                      /*DragTarget(
-                        builder: (context, accepted, rejected) {
-                          return Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: _willAccepted ? Colors.orange : Colors.grey,
-                                width: _willAccepted ? 5 : 1,
-                              ),
-                            ),
-                            width: 200,
-                            height: 200,
-                            child: Center(
-                                child: Text(_acceptedData,
-                                    style: TextStyle(fontSize: 50))),
-                          );
-                        },
-                        onWillAccept: (data) {
-                          print('onWillAccept - $data');
-                          // ドラッグ操作を受け入れる場合はここでtrueを返す
-                          return true;
-                        }, // DragTargetにドラッグされた時に呼ばれる
-                        onAccept: (data) {
-                          print('onAccept - $data');
-                        }, // DragTarget の範囲から離れた時に呼ばれる
-                        onLeave: (data) {
-                          print('onLeave - $data');
-                        },
-                      ),*/
-                      //kesitayo
                       new SizedBox(
                         height: 50,
                         width: 230,
