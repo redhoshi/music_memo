@@ -185,6 +185,7 @@ class _MyHomePageState extends State<MyHomePage> {
     time_lis3.reset();
     time_lis4.reset();
     time_lis5.reset();
+    time_ans.reset(); //回答時間の初期化
 
     //ボタンカウンタの初期化
     count1 = 0;
@@ -244,7 +245,12 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {});
     }
     print('setstateato$docList');
-    await player1.setUrl(ans_url[queli[ai]]);
+    QueSound(ans_url[queli[ai]]);
+    //
+  }
+
+  Future<void> QueSound(que) async {
+    await player1.setUrl(que);
   }
 
   Future<void> fetchName() async {
@@ -294,23 +300,42 @@ class _MyHomePageState extends State<MyHomePage> {
           .getDownloadURL();
       list.add(audio_url); //listに格納する
     }
-
+    for (int i = 0; i < 4; i++) {
+      SetUrl(i);
+    }
+/*
     await player1.setUrl(list[0]); //awaitせずにasyncで非同期処理にすると早くなる。
     await player2.setUrl(list[1]);
     await player3.setUrl(list[2]);
-    await player4.setUrl(list[3]);
+    await player4.setUrl(list[3]);*/
     _isEnabled = true;
     time_ans.start();
     setState(() {}); //描画
   }
 
-/*
+  //asyncで早くなる?
   Future<void> SetUrl(n) async {
+    int i = 0;
     switch (n) {
       case 0:
-        player1.setUrl(list[0]);
+        await player1.setUrl(list[0]);
+        i++;
+        break;
+      case 1:
+        await player2.setUrl(list[1]);
+        i++;
+        break;
+      case 2:
+        await player3.setUrl(list[2]);
+        i++;
+        break;
+      case 3:
+        await player4.setUrl(list[3]);
+        i++;
+        break;
     }
-  }*/
+    print(i);
+  }
 
   //stop音
   stopsound() async {
@@ -325,7 +350,6 @@ class _MyHomePageState extends State<MyHomePage> {
   void StopTime() {
     time_ans.stop();
     print('回答時間${time_ans.elapsed}');
-    time_ans.reset();
   }
 
   int i = 0; //問題番号カウント
@@ -353,6 +377,7 @@ class _MyHomePageState extends State<MyHomePage> {
       );
       result.add('正解');
     }
+
     final now = new DateTime.now();
     final date =
         new DateTime(now.year, now.month, now.day, now.hour, now.minute);
@@ -462,7 +487,6 @@ class _MyHomePageState extends State<MyHomePage> {
     QueExample();
     fetchName();
     PlayTime();
-    //playerがplayingかstoppedorcompleteか
   }
 
   @override
@@ -506,41 +530,6 @@ class _MyHomePageState extends State<MyHomePage> {
                             print(serviceTime);
                             print(_isEnabled);
                             player1.play(ans_url[queli[ai]]);
-                            /*
-                            player.onDurationChanged.listen((Duration d) {
-                              print('max duration: ${d.inSeconds}');
-                            });*/
-                            //完了イベント
-                            /*
-                            player.onPlayerCompletion.listen((event) {
-                              print('endsound'); //終了したら
-                              time_lis1.stop();
-                              print('time=lis${time_lis1.elapsed}');
-                              player.state =
-                                  PlayerState.STOPPED; //completeさせないようにする
-                            });*/
-                            //再生中だったら
-                            /*
-                            if (player.state == PlayerState.PLAYING) {
-                              player.stop();
-                              print('stop');
-                              time_lis1.stop();
-                              print(time_lis1.elapsed);
-                            }
-                            //listenのeventが変わったタイミングを教えてくれる。stopかcomplete
-                            //playingの時にstartがstopかstopかcomplaeteストップウォッチをストップ
-                            //一回だけ
-                            /*
-                            player.onPlayerStateChanged.listen((event) {
-                              print('Event$event');
-                            });*/
-                            //print('${player.state}'); //statusの確認
-                            //再生停止してたら
-                            if (player.state == PlayerState.STOPPED) {
-                              player.play(ans_url[queli[ai]]);
-                              time_lis1.start();
-                              print(time_lis1.elapsed);
-                            }*/
                           },
                     backgroundColor: Colors.orangeAccent,
                     child: Icon(Icons.volume_up),
