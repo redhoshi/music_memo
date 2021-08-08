@@ -131,8 +131,15 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _isEnabled = false; //onbuttonを押させない
 
   //ログデータを取得するためのリスト
-  Stopwatch time_ans = Stopwatch(); //回答時間
-  Stopwatch time_lis1 = Stopwatch(); //音源データを聞いている時間
+  //回答時間
+  Stopwatch time_ans = Stopwatch();
+
+  //音源データを聞いている時間
+  Stopwatch time_lis1 = Stopwatch();
+  Stopwatch time_lis2 = Stopwatch();
+  Stopwatch time_lis3 = Stopwatch();
+  Stopwatch time_lis4 = Stopwatch();
+  Stopwatch time_lis5 = Stopwatch();
 
   //音源ボタンを押した回数
   int count1 = 0; //音源データをタップした回数
@@ -141,12 +148,8 @@ class _MyHomePageState extends State<MyHomePage> {
   int count4 = 0;
   int count5 = 0;
 
-  int tap1 = 0; //btn1をタップした回数
-  int tap2 = 0;
-  int tap3 = 0;
-  int tap4 = 0;
-  int tap5 = 0;
-  final tapping = [0, 0, 0, 0, 0];
+  //いつどのボタンを押したかのタイムスタンプ
+  final List<Map<String, dynamic>> serviceTime = [];
 
   //答えの画面で表示するリスト
   int value = 0; //得点
@@ -175,6 +178,20 @@ class _MyHomePageState extends State<MyHomePage> {
     ans_file.removeRange(0, ans_file.length); //無駄
     ai += 1;
     _isEnabled = false;
+
+    //ストップウォッチの初期化
+    time_lis1.reset();
+    time_lis2.reset();
+    time_lis3.reset();
+    time_lis4.reset();
+    time_lis5.reset();
+
+    //ボタンカウンタの初期化
+    count1 = 0;
+    count2 = 0;
+    count3 = 0;
+    count4 = 0;
+    count5 = 0;
   }
 
   //問題データ(文)と正解データ---1回読み込めば良いデータ
@@ -227,7 +244,7 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {});
     }
     print('setstateato$docList');
-    await player.setUrl(ans_url[queli[ai]]);
+    await player1.setUrl(ans_url[queli[ai]]);
   }
 
   Future<void> fetchName() async {
@@ -277,9 +294,8 @@ class _MyHomePageState extends State<MyHomePage> {
           .getDownloadURL();
       list.add(audio_url); //listに格納する
     }
-    //_isEnabled = true;
-    //setState(() {}); //描画
-    await player1.setUrl(list[0]);
+
+    await player1.setUrl(list[0]); //awaitせずにasyncで非同期処理にすると早くなる。
     await player2.setUrl(list[1]);
     await player3.setUrl(list[2]);
     await player4.setUrl(list[3]);
@@ -288,13 +304,21 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {}); //描画
   }
 
+/*
+  Future<void> SetUrl(n) async {
+    switch (n) {
+      case 0:
+        player1.setUrl(list[0]);
+    }
+  }*/
+
   //stop音
   stopsound() async {
-    player.stop();
     player1.stop();
     player2.stop();
     player3.stop();
     player4.stop();
+    player5.stop();
   }
 
   //ストップウォッチ回答時間
@@ -329,27 +353,33 @@ class _MyHomePageState extends State<MyHomePage> {
       );
       result.add('正解');
     }
+    final now = new DateTime.now();
+    final date =
+        new DateTime(now.year, now.month, now.day, now.hour, now.minute);
+    print(date);
+    print(DateTime.now().day);
+    print('result${result[0]}');
+    print(i);
+    //ログデータの書き込み
+    await FirebaseFirestore.instance
+        .collection('results') // コレクションID--->名前入力でも良いかもね
+        .doc('$now') // ここは空欄だと自動でIDが付く
+        .set({
+      'que': '${docList[i]}',
+      'ans': '${result[i]}',
+      'btn': ['$count1', '$count2', '$count2', '$count3', '$count4'],
+      'soundtime': [
+        '${time_lis1.elapsed}',
+        '${time_lis2.elapsed}',
+        '${time_lis3.elapsed}',
+        '${time_lis4.elapsed}',
+        '${time_lis5.elapsed}'
+      ],
+      'time_ans': '${time_ans.elapsed}',
+    });
     i++;
     end.add(i);
     if (i > 2) {
-      final now = new DateTime.now();
-      final date =
-          new DateTime(now.year, now.month, now.day, now.hour, now.minute);
-      print(date);
-      print(DateTime.now().day);
-
-      //結果をfirebasecloudfirestoreに上げる
-      /*
-      for (int j = 0; j < result.length; j++) {
-        final now = DateTime.now();
-        await FirebaseFirestore.instance
-            .collection('results') // コレクションID--->名前入力でも良いかもね
-            .doc('$now') // ここは空欄だと自動でIDが付く
-            .set({
-          'ans': '${result[j]}',
-          'que': '${docList[j]}',
-        });
-      }*/
       print('value$value');
       Navigator.push(
         context,
@@ -363,11 +393,66 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   //audiocacheクラスの初期化
-  AudioPlayer player = new AudioPlayer(mode: PlayerMode.LOW_LATENCY);
   AudioPlayer player1 = new AudioPlayer(mode: PlayerMode.LOW_LATENCY);
   AudioPlayer player2 = new AudioPlayer(mode: PlayerMode.LOW_LATENCY);
   AudioPlayer player3 = new AudioPlayer(mode: PlayerMode.LOW_LATENCY);
   AudioPlayer player4 = new AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+  AudioPlayer player5 = new AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+
+  //playしている時間
+  Future<void> PlayTime() async {
+    //問題データのplayorstop
+    player1.onPlayerStateChanged.listen((event) {
+      if (player1.state == PlayerState.PLAYING) {
+        time_lis1.start();
+        print('player1:start${time_lis1.elapsed}');
+      }
+      if (player1.state == PlayerState.STOPPED ||
+          player1.state == PlayerState.COMPLETED) {
+        time_lis1.stop();
+        print('player1:stop${time_lis1.elapsed}');
+      }
+      print('Event:player1:$event');
+    });
+    //player1がplyaing,stoppedorcomplete
+    player2.onPlayerStateChanged.listen((event) {
+      if (player2.state == PlayerState.PLAYING) {
+        time_lis2.start();
+        print('player2:start${time_lis2.elapsed}');
+      }
+      if (player2.state == PlayerState.STOPPED ||
+          player2.state == PlayerState.COMPLETED) {
+        time_lis2.stop();
+        print('player2:stop:${time_lis2.elapsed}');
+      }
+      print('Event2$event');
+    });
+    //player1がplyaing,stoppedorcomplete
+    player3.onPlayerStateChanged.listen((event) {
+      if (player3.state == PlayerState.PLAYING) {
+        time_lis3.start();
+        print('player3:start${time_lis3.elapsed}');
+      }
+      if (player3.state == PlayerState.STOPPED ||
+          player3.state == PlayerState.COMPLETED) {
+        time_lis3.stop();
+        print('player3:stop:${time_lis3.elapsed}');
+      }
+      print('Event1$event');
+    });
+    player4.onPlayerStateChanged.listen((event) {
+      if (player4.state == PlayerState.PLAYING) {
+        time_lis4.start();
+        print('player4:start:${time_lis4.elapsed}');
+      }
+      if (player4.state == PlayerState.STOPPED ||
+          player4.state == PlayerState.COMPLETED) {
+        time_lis4.stop();
+        print('player4:stop:${time_lis4.elapsed}');
+      }
+      print('Event1$event');
+    });
+  }
 
   //画面が作られたときに一度だけ呼ばれる
   @override
@@ -376,11 +461,9 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     QueExample();
     fetchName();
-    //AnswerName(); //一回読む
+    PlayTime();
+    //playerがplayingかstoppedorcompleteか
   }
-
-  //String _acceptedData = 'Target'; // 受け側のデータ
-  //bool _willAccepted = false; // Target範囲内かどうかのフラ
 
   @override
   Widget build(BuildContext context) {
@@ -413,36 +496,51 @@ class _MyHomePageState extends State<MyHomePage> {
                     onPressed: !_isEnabled
                         ? null
                         : () {
-                            count1++;
+                            final now = new DateTime.now(); //いつボタン押したか。
+                            serviceTime.add({'btn1': '$now'});
+                            count1++; //何回押したか
                             player1.stop();
                             player2.stop();
                             player3.stop();
                             player4.stop();
+                            print(serviceTime);
                             print(_isEnabled);
-                            // player.play(ans_url[queli[ai]]);
+                            player1.play(ans_url[queli[ai]]);
+                            /*
                             player.onDurationChanged.listen((Duration d) {
                               print('max duration: ${d.inSeconds}');
-                            });
-                            //完了イベントorss
+                            });*/
+                            //完了イベント
+                            /*
                             player.onPlayerCompletion.listen((event) {
                               print('endsound'); //終了したら
                               time_lis1.stop();
-                              print(time_lis1.elapsed);
+                              print('time=lis${time_lis1.elapsed}');
                               player.state =
                                   PlayerState.STOPPED; //completeさせないようにする
-                            });
+                            });*/
+                            //再生中だったら
+                            /*
                             if (player.state == PlayerState.PLAYING) {
                               player.stop();
                               print('stop');
                               time_lis1.stop();
                               print(time_lis1.elapsed);
                             }
-                            print('${player.state}');
+                            //listenのeventが変わったタイミングを教えてくれる。stopかcomplete
+                            //playingの時にstartがstopかstopかcomplaeteストップウォッチをストップ
+                            //一回だけ
+                            /*
+                            player.onPlayerStateChanged.listen((event) {
+                              print('Event$event');
+                            });*/
+                            //print('${player.state}'); //statusの確認
+                            //再生停止してたら
                             if (player.state == PlayerState.STOPPED) {
                               player.play(ans_url[queli[ai]]);
                               time_lis1.start();
                               print(time_lis1.elapsed);
-                            }
+                            }*/
                           },
                     backgroundColor: Colors.orangeAccent,
                     child: Icon(Icons.volume_up),
@@ -460,13 +558,13 @@ class _MyHomePageState extends State<MyHomePage> {
                         onPressed: _isEnabled
                             ? () {
                                 print(list[0]);
-                                player.stop();
-                                player2.stop();
+                                player1.stop();
                                 player3.stop();
                                 player4.stop();
+                                player5.stop();
                                 //time_lis.start();
                                 //print('timestart${time_lis.elapsed}');
-                                player1.play(list[0]);
+                                player2.play(list[0]);
                                 print(_isEnabled);
                                 count2++;
                               }
@@ -510,11 +608,11 @@ class _MyHomePageState extends State<MyHomePage> {
                             ? () {
                                 print("pre2"); //音を鳴らす
                                 print(list[1]);
-                                player.stop();
                                 player1.stop();
-                                player3.stop();
+                                player2.stop();
                                 player4.stop();
-                                player2.play(list[1]);
+                                player5.stop();
+                                player3.play(list[1]);
                                 count3++;
                               }
                             : null,
@@ -553,11 +651,11 @@ class _MyHomePageState extends State<MyHomePage> {
                         heroTag: "btn4",
                         onPressed: () {
                           print(list[2]);
-                          player.stop();
                           player1.stop();
                           player2.stop();
+                          player3.stop();
                           player4.stop();
-                          player3.play(list[2]);
+                          player4.play(list[2]);
                           count4++;
                         },
                       ),
@@ -596,11 +694,11 @@ class _MyHomePageState extends State<MyHomePage> {
                         onPressed: () {
                           print(list[3]);
                           print(list);
-                          player.stop();
                           player1.stop();
                           player2.stop();
                           player3.stop();
-                          player4.play(list[3]);
+                          player4.stop();
+                          player5.play(list[3]);
                           count5++;
                         },
                       ),
