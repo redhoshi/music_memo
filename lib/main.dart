@@ -315,10 +315,10 @@ class _MyHomePageState extends State<MyHomePage> {
   //stop音
   stopsound() async {
     player1.stop();
-    player1.stop();
     player2.stop();
     player3.stop();
     player4.stop();
+    player5.stop();
   }
 
   //ストップウォッチ回答時間
@@ -353,30 +353,32 @@ class _MyHomePageState extends State<MyHomePage> {
       );
       result.add('正解');
     }
-    i++;
-    end.add(i);
     final now = new DateTime.now();
     final date =
         new DateTime(now.year, now.month, now.day, now.hour, now.minute);
     print(date);
     print(DateTime.now().day);
-    //結果をfirebasecloudfirestoreに上げtaiけどlistにしても良いし後で考える
-    /*
-    print(count1);
-    for (int j = 0; j < result.length; j++) {
-      final now = DateTime.now();
-      await FirebaseFirestore.instance
-          .collection('results') // コレクションID--->名前入力でも良いかもね
-          .doc('$now') // ここは空欄だと自動でIDが付く
-          .set({
-        'que': '${docList[j]}',
-        'ans': '${result[j]}',
-        'btn': ['$count1', '$count2', '$count2', '$count3', '$count4'],
-        'playtime': ['${time_lis1.elapsed}'],
-        'time_ans': '${time_ans.elapsed}',
-      });
-    }*/
-
+    print('result${result[0]}');
+    print(i);
+    //ログデータの書き込み
+    await FirebaseFirestore.instance
+        .collection('results') // コレクションID--->名前入力でも良いかもね
+        .doc('$now') // ここは空欄だと自動でIDが付く
+        .set({
+      'que': '${docList[i]}',
+      'ans': '${result[i]}',
+      'btn': ['$count1', '$count2', '$count2', '$count3', '$count4'],
+      'soundtime': [
+        '${time_lis1.elapsed}',
+        '${time_lis2.elapsed}',
+        '${time_lis3.elapsed}',
+        '${time_lis4.elapsed}',
+        '${time_lis5.elapsed}'
+      ],
+      'time_ans': '${time_ans.elapsed}',
+    });
+    i++;
+    end.add(i);
     if (i > 2) {
       print('value$value');
       Navigator.push(
