@@ -31,7 +31,7 @@ class IncorPagePage extends State<IncorPage> {
     final photo_data = await firebase_storage.FirebaseStorage.instance //url
         .ref()
         .child('photo') //que_1とか
-        .child('${param[nu]}.jpeg') //lot
+        .child('${param[nu]}.png') //lot
         .getDownloadURL();
     print('photodata');
     print(photo_data);

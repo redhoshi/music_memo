@@ -126,8 +126,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   //選択肢データを格納するリスト
   final list = <String>[]; //audioファイルリスト
-  final queli = List<int>.generate(3, (i) => i + 0);
+  final queli = List<int>.generate(5, (i) => i + 0);
   List docList = []; //ドキュメントidを取ってくる
+  final docuList = new List.generate(10, (index) => ''); //可変長？
   bool _isEnabled = false; //onbuttonを押させない
 
   //ログデータを取得するためのリスト
@@ -153,6 +154,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
   //答えの画面で表示するリスト
   int value = 0; //得点
+
+  //docListのカウント
+  int counta = 0;
+  //順位ソートに用いる
+  int sort = 0;
+  //sort初期化を防ぐ
+  int counts = 0;
+  //test
+  final ada = [0, 0, 0, 0];
+  final adb = [];
 
   calcurate(aiu) async {
     var dat;
@@ -193,51 +204,59 @@ class _MyHomePageState extends State<MyHomePage> {
     count3 = 0;
     count4 = 0;
     count5 = 0;
+
+    //sort
+    counts = 0;
   }
 
   //問題データ(文)と正解データ---1回読み込めば良いデータ
-  AnswerName() async {
+  Future<void> AnswerName() async {
     //問題のリスト
-    await FirebaseFirestore.instance.collection('users').get().then(
+    //**変更：usersからquestion */
+    int i = 0;
+    ada[2] = 3;
+
+    await FirebaseFirestore.instance.collection('question').get().then(
           (QuerySnapshot querySnapshot) => {
             querySnapshot.docs.forEach(
               (doc) async {
                 docList.add(doc.id); //[que_1,que_2,que_3]
-
-                /*
-                final snepshot = await FirebaseFirestore.instance
-                    .collection('users')
-                    .doc(doc.id)
-                    .get();*/
               },
             ),
           },
         );
-    print('doclist$docList');
-    soundData(docList); //5秒
+    counta = (docList.length / 2).toInt(); //この値から始める
+    counts = counta + sort;
+    print('counta$sort');
+    print('doclist--1$counts');
+
+    soundData(docList); //que_1のみ
+    print('doclist--2$docList');
     //print('sounddata$docList');
     //フィールドを参照
     for (int i = 0; i < docList.length; i++) {
       ///再度検討
       final snepshot = await FirebaseFirestore.instance
-          .collection('users')
+          .collection('question') /*変更：users->question */
           .doc(docList[i])
           .get();
       String que = '${snepshot['que']}'; //問題文
       String ans = '${snepshot['audio']}'; //正解のファイル名
 
+      print('que$que');
+      print('ans$ans');
       //正解データのURL取得
       final audio_data = await firebase_storage.FirebaseStorage.instance
           .ref()
-          .child('audio')
+          .child('sound') /*audio->sound */
           .child(docList[i])
           .child(ans)
           .getDownloadURL();
       ans_url.add(audio_data); //正解のurlを選択肢のところと同じところから取ってくる
-
+      print('count----$i');
       //問題文リスト作成
       dlist.add(que); //[フルートの音を選択]
-      print(dlist);
+      print('dlist$dlist');
 
       //画像参照用のファイル名取得
       final j = ans.length - 4; //ファイル名取得
@@ -245,41 +264,47 @@ class _MyHomePageState extends State<MyHomePage> {
       ans_file.add(uu); //ans_fileリストに格納
       setState(() {});
     }
-    print('setstateato$docList');
-    QueSound(ans_url[queli[ai]]);
+    print('setstateato$docList'); //[que1,que2]
+    await player1.setUrl(ans_url[queli[ai]]); //正解urlをseturl
   }
 
-  Future<void> QueSound(que) async {
-    await player1.setUrl(que);
+  Future<void> PassDoc() async {
+    // print('よくわからん$doc');
+    ada[1] = 1;
+    adb.add(1);
   }
 
   Future<void> fetchName() async {
     Initialized(); //初期化
     print('問題格納リスト$queli');
+    print('fetchNameの中のDoclist$docuList');
+    print('rensyu$ada');
     AnswerName();
+
+    //print('fetchNameの中のDoclist$docList');
     setState(() {});
   }
 
   //選択肢のファイルの名前取得　ドキュメントidのディレクトリのファイルを参照して、ファイルの名前を一部抽出
   Future<void> soundData(doc) async {
     //選択肢ファイルのファイル名取得
-    firebase_storage.ListResult result = await firebase_storage
-        .FirebaseStorage.instance
-        .ref()
-        .child('audio')
-        .child(doc[queli[ai]])
-        .listAll(); //que_1の中のファイル名を返す
+    firebase_storage.ListResult result =
+        await firebase_storage.FirebaseStorage.instance
+            .ref()
+            .child('sound') /*audio->sound */
+            .child(doc[queli[ai]])
+            .listAll(); //que_1の中のファイル名を返す
     result.items.forEach((firebase_storage.Reference ref) async {
       final ji = await firebase_storage.FirebaseStorage.instance
           .ref(ref.fullPath)
           .fullPath; //パスを取得
-      print(result);
+
       final uu = ji.substring(doc[queli[ai]].length + 7); //ファイル名だけ抽出
-      selist.add(uu);
+      selist.add(uu); //usse_org.mp3
       if (selist.length > 3) audiodata(selist, doc);
       setState(() {});
     });
-    print('${time_ans.elapsed}');
+    // print('${time_ans.elapsed}');
   }
 
   //音をランダムに配置
@@ -294,12 +319,13 @@ class _MyHomePageState extends State<MyHomePage> {
     for (int i = 0; i < aiu.length; i++) {
       final audio_url = await firebase_storage.FirebaseStorage.instance
           .ref()
-          .child('audio')
+          .child('sound') /*audio->sound */
           .child(doc[queli[ai]]) //que_1
           .child(aiu[i]) //dri_tp
           .getDownloadURL();
       list.add(audio_url); //listに格納する
     }
+    print('urllist$list');
     for (int i = 0; i < 4; i++) {
       SetUrl(i);
     }
@@ -368,6 +394,7 @@ class _MyHomePageState extends State<MyHomePage> {
             builder: (context) => IncorPage(ans_file, queli[ai])), //ファイル名と引数
       );
       result.add('不正解');
+      sort--;
     } else {
       print('正解');
       value += 10;
@@ -376,6 +403,7 @@ class _MyHomePageState extends State<MyHomePage> {
         MaterialPageRoute(builder: (context) => CorrectPage()),
       );
       result.add('正解');
+      sort++;
     }
 
     final now = new DateTime.now();
@@ -485,6 +513,9 @@ class _MyHomePageState extends State<MyHomePage> {
     // TODO: implement initState
     super.initState();
     QueExample();
+    Initialized();
+    //追加
+    PassDoc();
     fetchName();
     PlayTime();
   }
@@ -508,7 +539,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     width: 500.0,
                     height: 20.0,
                     child: Text(
-                      dlist[queli[ai]],
+                      dlist.length > 4 ? dlist[queli[ai]] : '', //これが一番遅いかな
                       style: TextStyle(fontSize: 15),
                       textAlign: TextAlign.center,
                     ),
