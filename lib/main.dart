@@ -237,6 +237,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
       //問題文リスト作成
       dlist.add(que); //[フルートの音を選択]
+      print(dlist);
 
       //画像参照用のファイル名取得
       final j = ans.length - 4; //ファイル名取得
@@ -246,7 +247,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     print('setstateato$docList');
     QueSound(ans_url[queli[ai]]);
-    //
   }
 
   Future<void> QueSound(que) async {
