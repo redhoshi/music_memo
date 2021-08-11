@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -10,19 +11,33 @@ Future<void> main() async {
 }
 
 class IncorPage extends StatefulWidget {
-  IncorPage(this.e, this.i); //渡したい
+  IncorPage(this.e, this.i, this.o, this.k); //渡したい
   List e = [];
   int i;
+  List o = [];
+  String k = '';
 
-  IncorPagePage createState() => IncorPagePage(e, i);
+  IncorPagePage createState() => IncorPagePage(e, i, o, k);
 }
 
 class IncorPagePage extends State<IncorPage> {
-  IncorPagePage(this.param, this.nu);
+  IncorPagePage(this.param, this.nu, this.selurl, this.corurl);
   List param;
   int nu;
+  List selurl;
+  String corurl;
+
+  //audioplayer
+  AudioPlayer player1 = new AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+  AudioPlayer player2 = new AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+
   GlobalKey _globalKey = GlobalKey();
   Image? _image; //宣言後に初期化されるnon-nullable変数の宣言ここでバグ
+
+  Future<void> SetUrl() async {
+    await player1.setUrl(selurl[nu]);
+    await player2.setUrl(corurl);
+  }
 
   firebase_storage.FirebaseStorage storage =
       firebase_storage.FirebaseStorage.instance;
@@ -35,6 +50,8 @@ class IncorPagePage extends State<IncorPage> {
         .getDownloadURL();
     print('photodata');
     print(photo_data);
+    print('soundurl${selurl[nu]}');
+    print('selectans$corurl');
 
 //    print('${param[nu]}');
     print(nu);
@@ -50,6 +67,7 @@ class IncorPagePage extends State<IncorPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    SetUrl();
     //image初期化？
     PhotoData().whenComplete(() {
       setState(() {});
@@ -67,21 +85,57 @@ class IncorPagePage extends State<IncorPage> {
       body: Column(
         children: [
           _image ?? SizedBox(),
+          new SizedBox(
+            height: 30,
+          ),
           //nullならsizedboxを入れる
           Row(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly, // これを設定
               children: <Widget>[
-                FloatingActionButton(
-                    heroTag: null,
-                    onPressed: () {
-                      print('aiu'); //url流す
-                    }),
-                FloatingActionButton(
-                    heroTag: null,
-                    onPressed: () {
-                      print('aiu'); //url流す
-                    })
+                Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Text('正解の音'),
+                      new SizedBox(
+                        height: 30,
+                      ),
+                      new SizedBox(
+                        width: 80,
+                        height: 80,
+                        child: FloatingActionButton(
+                          heroTag: null,
+                          onPressed: () {
+                            player1.play(selurl[nu]);
+                            player2.stop();
+                            print('play${selurl[nu]}'); //url流す
+                          },
+                          child: Icon(Icons.volume_up),
+                        ),
+                      ),
+                    ]),
+                Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Text('あなたが選択した音'),
+                      new SizedBox(
+                        height: 30,
+                      ),
+                      new SizedBox(
+                          width: 80,
+                          height: 80,
+                          child: FloatingActionButton(
+                            heroTag: null,
+                            onPressed: () {
+                              player2.play(corurl);
+                              player1.stop();
+                              print('play${corurl}'); //url流す
+                            },
+                            child: Icon(Icons.volume_up),
+                          )),
+                    ]),
               ]),
         ],
       ),

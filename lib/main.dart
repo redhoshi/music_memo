@@ -265,11 +265,15 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {});
     }
     print('setstateato$docList'); //[que1,que2]
-    await player1.setUrl(ans_url[queli[ai]]); //正解urlをseturl
+    SoundSet(ans_url[queli[ai]]);
   }
 
+  Future<void> SoundSet(ans) async {
+    await player1.setUrl(ans);
+  }
+
+  //試作用
   Future<void> PassDoc() async {
-    // print('よくわからん$doc');
     ada[1] = 1;
     adb.add(1);
   }
@@ -277,23 +281,19 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> fetchName() async {
     Initialized(); //初期化
     print('問題格納リスト$queli');
-    print('fetchNameの中のDoclist$docuList');
-    print('rensyu$ada');
     AnswerName();
-
-    //print('fetchNameの中のDoclist$docList');
     setState(() {});
   }
 
   //選択肢のファイルの名前取得　ドキュメントidのディレクトリのファイルを参照して、ファイルの名前を一部抽出
   Future<void> soundData(doc) async {
     //選択肢ファイルのファイル名取得
-    firebase_storage.ListResult result =
-        await firebase_storage.FirebaseStorage.instance
-            .ref()
-            .child('sound') /*audio->sound */
-            .child(doc[queli[ai]])
-            .listAll(); //que_1の中のファイル名を返す
+    firebase_storage.ListResult result = await firebase_storage
+        .FirebaseStorage.instance
+        .ref()
+        .child('sound')
+        .child(doc[queli[ai]])
+        .listAll(); //que_1の中のファイル名を返す
     result.items.forEach((firebase_storage.Reference ref) async {
       final ji = await firebase_storage.FirebaseStorage.instance
           .ref(ref.fullPath)
@@ -391,7 +391,8 @@ class _MyHomePageState extends State<MyHomePage> {
       await Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => IncorPage(ans_file, queli[ai])), //ファイル名と引数
+            builder: (context) =>
+                IncorPage(ans_file, queli[ai], ans_url, val)), //ファイル名と引数
       );
       result.add('不正解');
       sort--;
