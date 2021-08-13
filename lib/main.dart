@@ -6,14 +6,15 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/rendering/object.dart';
+import 'package:music_memo/correctend/end_page.dart';
 import 'package:music_memo/first.dart';
 import 'package:music_memo/group.dart';
 import 'package:music_memo/login.dart';
 
 import 'dart:math' as math;
 
-import 'package:music_memo/next_page.dart';
-import 'package:music_memo/incorrect_page.dart';
+import 'package:music_memo/correctend/next_page.dart';
+import 'package:music_memo/correctend/incorrect_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,6 +46,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 //終了画面
+/*
 class EndPage extends StatelessWidget {
   EndPage(this.name, this.e, this.text, this.re, this.val);
   String name;
@@ -111,7 +113,7 @@ class EndPage extends StatelessWidget {
       ),
     );
   }
-}
+}*/
 
 class _MyHomePageState extends State<MyHomePage> {
   //ここで変数とか関数を定義
@@ -122,12 +124,14 @@ class _MyHomePageState extends State<MyHomePage> {
   final selist = []; //選択肢のリスト
   final quelist = []; //問題のリスト
   final ans_file = []; //dri_tp,画像データのファイル名指定
+  final countslist = []; //問題データ格納用
   int ai = -1;
 
   //選択肢データを格納するリスト
   final list = <String>[]; //audioファイルリスト
-  final queli = List<int>.generate(3, (i) => i + 0);
+  final queli = List<int>.generate(6, (i) => i + 0);
   List docList = []; //ドキュメントidを取ってくる
+  final docuList = new List.generate(10, (index) => ''); //可変長？
   bool _isEnabled = false; //onbuttonを押させない
 
   //ログデータを取得するためのリスト
@@ -153,6 +157,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
   //答えの画面で表示するリスト
   int value = 0; //得点
+
+  //docListのカウント
+  int counta = 0;
+  //順位ソートに用いる
+  int sort = 0;
+  //sort初期化を防ぐ
+  int counts = 0;
+  //test
+  final ada = [0, 0, 0, 0];
+  final adb = [];
 
   calcurate(aiu) async {
     var dat;
@@ -185,6 +199,7 @@ class _MyHomePageState extends State<MyHomePage> {
     time_lis3.reset();
     time_lis4.reset();
     time_lis5.reset();
+    time_ans.reset(); //回答時間の初期化
 
     //ボタンカウンタの初期化
     count1 = 0;
@@ -192,50 +207,58 @@ class _MyHomePageState extends State<MyHomePage> {
     count3 = 0;
     count4 = 0;
     count5 = 0;
+
+    //sort
+    counts = 0;
   }
 
   //問題データ(文)と正解データ---1回読み込めば良いデータ
-  AnswerName() async {
+  Future<void> AnswerName() async {
     //問題のリスト
-    await FirebaseFirestore.instance.collection('users').get().then(
+    //**変更：usersからquestion */
+    int i = 0;
+    ada[2] = 3;
+
+    await FirebaseFirestore.instance.collection('question').get().then(
           (QuerySnapshot querySnapshot) => {
             querySnapshot.docs.forEach(
               (doc) async {
                 docList.add(doc.id); //[que_1,que_2,que_3]
-
-                /*
-                final snepshot = await FirebaseFirestore.instance
-                    .collection('users')
-                    .doc(doc.id)
-                    .get();*/
               },
             ),
           },
         );
-    print('doclist$docList');
-    soundData(docList); //5秒
-    //print('sounddata$docList');
+    counta = (docList.length / 2).toInt(); //問題レベル中間からスタート
+    counts = counta + sort; //3
+    print('counta$sort');
+    print('doclist--1$counts');
+    //docListがawaitするからそれ以降の中身がfetchNameに渡されない
+    soundData(docList); //que_1のみ
+    print('doclist--2$docList');
     //フィールドを参照
     for (int i = 0; i < docList.length; i++) {
       ///再度検討
       final snepshot = await FirebaseFirestore.instance
-          .collection('users')
+          .collection('question')
           .doc(docList[i])
           .get();
       String que = '${snepshot['que']}'; //問題文
       String ans = '${snepshot['audio']}'; //正解のファイル名
 
+      print('que$que');
+      print('ans$ans');
       //正解データのURL取得
       final audio_data = await firebase_storage.FirebaseStorage.instance
           .ref()
-          .child('audio')
+          .child('sound')
           .child(docList[i])
           .child(ans)
           .getDownloadURL();
       ans_url.add(audio_data); //正解のurlを選択肢のところと同じところから取ってくる
-
+      print('count----$i');
       //問題文リスト作成
       dlist.add(que); //[フルートの音を選択]
+      print('dlist$dlist');
 
       //画像参照用のファイル名取得
       final j = ans.length - 4; //ファイル名取得
@@ -243,13 +266,26 @@ class _MyHomePageState extends State<MyHomePage> {
       ans_file.add(uu); //ans_fileリストに格納
       setState(() {});
     }
-    print('setstateato$docList');
-    await player1.setUrl(ans_url[queli[ai]]);
+    //問題文リストから難易度別のリストに並べた
+    countslist.add(dlist[counts]); //countsのlistを提示
+    print('countlist$countslist');
+    print('setstateato$docList'); //[que1,que2]
+    SoundSet(ans_url[counts]); //queli[aio]
+  }
+
+  Future<void> SoundSet(ans) async {
+    await player1.setUrl(ans);
+  }
+
+  //試作用
+  Future<void> PassDoc() async {
+    ada[1] = 1;
+    adb.add(1);
   }
 
   Future<void> fetchName() async {
     Initialized(); //初期化
-    print('問題格納リスト$queli');
+    print('問題格納リスト$queli'); //機能しない
     AnswerName();
     setState(() {});
   }
@@ -260,20 +296,20 @@ class _MyHomePageState extends State<MyHomePage> {
     firebase_storage.ListResult result = await firebase_storage
         .FirebaseStorage.instance
         .ref()
-        .child('audio')
-        .child(doc[queli[ai]])
+        .child('sound')
+        .child(doc[counts])
         .listAll(); //que_1の中のファイル名を返す
     result.items.forEach((firebase_storage.Reference ref) async {
       final ji = await firebase_storage.FirebaseStorage.instance
           .ref(ref.fullPath)
           .fullPath; //パスを取得
-      print(result);
-      final uu = ji.substring(doc[queli[ai]].length + 7); //ファイル名だけ抽出
-      selist.add(uu);
+
+      final uu = ji.substring(doc[counts].length + 7); //ファイル名だけ抽出
+      selist.add(uu); //usse_org.mp3
       if (selist.length > 3) audiodata(selist, doc);
       setState(() {});
     });
-    print('${time_ans.elapsed}');
+    // print('${time_ans.elapsed}');
   }
 
   //音をランダムに配置
@@ -288,29 +324,49 @@ class _MyHomePageState extends State<MyHomePage> {
     for (int i = 0; i < aiu.length; i++) {
       final audio_url = await firebase_storage.FirebaseStorage.instance
           .ref()
-          .child('audio')
-          .child(doc[queli[ai]]) //que_1
+          .child('sound') /*audio->sound */
+          .child(doc[counts]) //que_1
           .child(aiu[i]) //dri_tp
           .getDownloadURL();
       list.add(audio_url); //listに格納する
     }
-
+    print('urllist$list');
+    for (int i = 0; i < 4; i++) {
+      SetUrl(i);
+    }
+/*
     await player1.setUrl(list[0]); //awaitせずにasyncで非同期処理にすると早くなる。
     await player2.setUrl(list[1]);
     await player3.setUrl(list[2]);
-    await player4.setUrl(list[3]);
+    await player4.setUrl(list[3]);*/
     _isEnabled = true;
     time_ans.start();
     setState(() {}); //描画
   }
 
-/*
+  //asyncで早くなる
   Future<void> SetUrl(n) async {
+    int i = 0;
     switch (n) {
       case 0:
-        player1.setUrl(list[0]);
+        await player1.setUrl(list[0]);
+        i++;
+        break;
+      case 1:
+        await player2.setUrl(list[1]);
+        i++;
+        break;
+      case 2:
+        await player3.setUrl(list[2]);
+        i++;
+        break;
+      case 3:
+        await player4.setUrl(list[3]);
+        i++;
+        break;
     }
-  }*/
+    print(i);
+  }
 
   //stop音
   stopsound() async {
@@ -325,7 +381,6 @@ class _MyHomePageState extends State<MyHomePage> {
   void StopTime() {
     time_ans.stop();
     print('回答時間${time_ans.elapsed}');
-    time_ans.reset();
   }
 
   int i = 0; //問題番号カウント
@@ -335,15 +390,17 @@ class _MyHomePageState extends State<MyHomePage> {
   //選択肢があっているか否か
   answer(String val) async {
     StopTime();
-    if (ans_url[queli[ai]] != val) {
+    if (ans_url[counts] != val) {
       print('不正解');
       value -= 10;
       await Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => IncorPage(ans_file, queli[ai])), //ファイル名と引数
+            builder: (context) =>
+                IncorPage(ans_file, counts, ans_url, val)), //ファイル名と引数
       );
       result.add('不正解');
+      sort--;
     } else {
       print('正解');
       value += 10;
@@ -352,7 +409,9 @@ class _MyHomePageState extends State<MyHomePage> {
         MaterialPageRoute(builder: (context) => CorrectPage()),
       );
       result.add('正解');
+      sort++;
     }
+
     final now = new DateTime.now();
     final date =
         new DateTime(now.year, now.month, now.day, now.hour, now.minute);
@@ -384,7 +443,8 @@ class _MyHomePageState extends State<MyHomePage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => EndPage('$now', end, dlist, result, value)),
+            builder: (context) =>
+                EndPage('$now', end, countslist, result, value)),
       );
     } else {
       //soundData();ここでdocListを取れば良いと思う
@@ -460,9 +520,11 @@ class _MyHomePageState extends State<MyHomePage> {
     // TODO: implement initState
     super.initState();
     QueExample();
+    Initialized();
+    //追加
+    PassDoc();
     fetchName();
     PlayTime();
-    //playerがplayingかstoppedorcompleteか
   }
 
   @override
@@ -484,7 +546,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     width: 500.0,
                     height: 20.0,
                     child: Text(
-                      dlist[queli[ai]],
+                      dlist.length > 5 ? dlist[counts] : '', //これが一番遅いかな
                       style: TextStyle(fontSize: 15),
                       textAlign: TextAlign.center,
                     ),
@@ -505,42 +567,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             player4.stop();
                             print(serviceTime);
                             print(_isEnabled);
-                            player1.play(ans_url[queli[ai]]);
-                            /*
-                            player.onDurationChanged.listen((Duration d) {
-                              print('max duration: ${d.inSeconds}');
-                            });*/
-                            //完了イベント
-                            /*
-                            player.onPlayerCompletion.listen((event) {
-                              print('endsound'); //終了したら
-                              time_lis1.stop();
-                              print('time=lis${time_lis1.elapsed}');
-                              player.state =
-                                  PlayerState.STOPPED; //completeさせないようにする
-                            });*/
-                            //再生中だったら
-                            /*
-                            if (player.state == PlayerState.PLAYING) {
-                              player.stop();
-                              print('stop');
-                              time_lis1.stop();
-                              print(time_lis1.elapsed);
-                            }
-                            //listenのeventが変わったタイミングを教えてくれる。stopかcomplete
-                            //playingの時にstartがstopかstopかcomplaeteストップウォッチをストップ
-                            //一回だけ
-                            /*
-                            player.onPlayerStateChanged.listen((event) {
-                              print('Event$event');
-                            });*/
-                            //print('${player.state}'); //statusの確認
-                            //再生停止してたら
-                            if (player.state == PlayerState.STOPPED) {
-                              player.play(ans_url[queli[ai]]);
-                              time_lis1.start();
-                              print(time_lis1.elapsed);
-                            }*/
+                            player1.play(ans_url[counts]);
                           },
                     backgroundColor: Colors.orangeAccent,
                     child: Icon(Icons.volume_up),
