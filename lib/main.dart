@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/rendering/object.dart';
+import 'package:music_memo/correctend/end_page.dart';
 import 'package:music_memo/first.dart';
 import 'package:music_memo/group.dart';
 import 'package:music_memo/login.dart';
@@ -45,6 +46,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 //終了画面
+/*
 class EndPage extends StatelessWidget {
   EndPage(this.name, this.e, this.text, this.re, this.val);
   String name;
@@ -111,7 +113,7 @@ class EndPage extends StatelessWidget {
       ),
     );
   }
-}
+}*/
 
 class _MyHomePageState extends State<MyHomePage> {
   //ここで変数とか関数を定義

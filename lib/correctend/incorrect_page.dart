@@ -96,11 +96,10 @@ class IncorPagePage extends State<IncorPage> {
         ),
         body: Column(
           children: <Widget>[
-            /*
             _image ?? SizedBox(),
             new SizedBox(
               height: 30,
-            ),*/
+            ),
             //nullならsizedboxを入れる
             Row(
                 mainAxisSize: MainAxisSize.max,
@@ -111,7 +110,6 @@ class IncorPagePage extends State<IncorPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
                         Text('正解の音'),
-                        /*
                         new SizedBox(
                           height: 30,
                         ),
@@ -127,9 +125,8 @@ class IncorPagePage extends State<IncorPage> {
                             },
                             child: Icon(Icons.volume_up),
                           ),
-                        ),*/
+                        ),
                       ]),
-                  /*
                   Column(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -150,7 +147,7 @@ class IncorPagePage extends State<IncorPage> {
                               },
                               child: Icon(Icons.volume_up),
                             )),
-                      ]),*/
+                      ]),
                 ]),
             /*
             PieChartSample2(),
