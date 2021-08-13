@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:music_memo/pie_chart/pie.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -62,6 +63,11 @@ class IncorPagePage extends State<IncorPage> {
     });
   }
 
+  Future<void> SoundStop() async {
+    player1.stop();
+    player2.stop();
+  }
+
   //画面が作られたときに一度だけ呼ばれる
   @override
   void initState() {
@@ -77,69 +83,83 @@ class IncorPagePage extends State<IncorPage> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return Scaffold(
-      key: _globalKey,
-      appBar: AppBar(
-        title: Text('不正解'),
-      ),
-      body: Column(
-        children: [
-          _image ?? SizedBox(),
-          new SizedBox(
-            height: 30,
-          ),
-          //nullならsizedboxを入れる
-          Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly, // これを設定
-              children: <Widget>[
-                Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      Text('正解の音'),
-                      new SizedBox(
-                        height: 30,
-                      ),
-                      new SizedBox(
-                        width: 80,
-                        height: 80,
-                        child: FloatingActionButton(
-                          heroTag: null,
-                          onPressed: () {
-                            player1.play(selurl[nu]);
-                            player2.stop();
-                            print('play${selurl[nu]}'); //url流す
-                          },
-                          child: Icon(Icons.volume_up),
+    return WillPopScope(
+      onWillPop: () {
+        Navigator.of(context).pop();
+        SoundStop(); //戻るボタンで音鳴らし続けるのを防ぐ
+        return Future.value(false);
+      },
+      child: Scaffold(
+        key: _globalKey,
+        appBar: AppBar(
+          title: Text('不正解'),
+        ),
+        body: Column(
+          children: <Widget>[
+            /*
+            _image ?? SizedBox(),
+            new SizedBox(
+              height: 30,
+            ),*/
+            //nullならsizedboxを入れる
+            Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly, // これを設定
+                children: <Widget>[
+                  Column(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        Text('正解の音'),
+                        /*
+                        new SizedBox(
+                          height: 30,
                         ),
-                      ),
-                    ]),
-                Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      Text('あなたが選択した音'),
-                      new SizedBox(
-                        height: 30,
-                      ),
-                      new SizedBox(
+                        new SizedBox(
                           width: 80,
                           height: 80,
                           child: FloatingActionButton(
                             heroTag: null,
                             onPressed: () {
-                              player2.play(corurl);
-                              player1.stop();
-                              print('play${corurl}'); //url流す
+                              player1.play(selurl[nu]);
+                              player2.stop();
+                              print('play${selurl[nu]}'); //url流す
                             },
                             child: Icon(Icons.volume_up),
-                          )),
-                    ]),
-              ]),
-        ],
-      ),
-      /*
+                          ),
+                        ),*/
+                      ]),
+                  /*
+                  Column(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        Text('あなたが選択した音'),
+                        new SizedBox(
+                          height: 30,
+                        ),
+                        new SizedBox(
+                            width: 80,
+                            height: 80,
+                            child: FloatingActionButton(
+                              heroTag: null,
+                              onPressed: () {
+                                player2.play(corurl);
+                                player1.stop();
+                                print('play${corurl}'); //url流す
+                              },
+                              child: Icon(Icons.volume_up),
+                            )),
+                      ]),*/
+                ]),
+            /*
+            PieChartSample2(),
+            const SizedBox(
+              height: 12,
+            )*/
+          ],
+        ),
+        /*
         Container(
           margin: EdgeInsets.fromLTRB(10, 20, 30, 40),
           padding: EdgeInsets.fromLTRB(10, 20, 50, 80),
@@ -154,6 +174,7 @@ class IncorPagePage extends State<IncorPage> {
             ),
           ),
         ),*/
+      ),
     );
   }
 }

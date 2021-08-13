@@ -12,8 +12,8 @@ import 'package:music_memo/login.dart';
 
 import 'dart:math' as math;
 
-import 'package:music_memo/next_page.dart';
-import 'package:music_memo/incorrect_page.dart';
+import 'package:music_memo/correctend/next_page.dart';
+import 'package:music_memo/correctend/incorrect_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -122,11 +122,12 @@ class _MyHomePageState extends State<MyHomePage> {
   final selist = []; //選択肢のリスト
   final quelist = []; //問題のリスト
   final ans_file = []; //dri_tp,画像データのファイル名指定
+  final countslist = []; //問題データ格納用
   int ai = -1;
 
   //選択肢データを格納するリスト
   final list = <String>[]; //audioファイルリスト
-  final queli = List<int>.generate(5, (i) => i + 0);
+  final queli = List<int>.generate(6, (i) => i + 0);
   List docList = []; //ドキュメントidを取ってくる
   final docuList = new List.generate(10, (index) => ''); //可変長？
   bool _isEnabled = false; //onbuttonを押させない
@@ -225,19 +226,18 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           },
         );
-    counta = (docList.length / 2).toInt(); //この値から始める
-    counts = counta + sort;
+    counta = (docList.length / 2).toInt(); //問題レベル中間からスタート
+    counts = counta + sort; //3
     print('counta$sort');
     print('doclist--1$counts');
-
+    //docListがawaitするからそれ以降の中身がfetchNameに渡されない
     soundData(docList); //que_1のみ
     print('doclist--2$docList');
-    //print('sounddata$docList');
     //フィールドを参照
     for (int i = 0; i < docList.length; i++) {
       ///再度検討
       final snepshot = await FirebaseFirestore.instance
-          .collection('question') /*変更：users->question */
+          .collection('question')
           .doc(docList[i])
           .get();
       String que = '${snepshot['que']}'; //問題文
@@ -248,7 +248,7 @@ class _MyHomePageState extends State<MyHomePage> {
       //正解データのURL取得
       final audio_data = await firebase_storage.FirebaseStorage.instance
           .ref()
-          .child('sound') /*audio->sound */
+          .child('sound')
           .child(docList[i])
           .child(ans)
           .getDownloadURL();
@@ -264,8 +264,11 @@ class _MyHomePageState extends State<MyHomePage> {
       ans_file.add(uu); //ans_fileリストに格納
       setState(() {});
     }
+    //問題文リストから難易度別のリストに並べた
+    countslist.add(dlist[counts]); //countsのlistを提示
+    print('countlist$countslist');
     print('setstateato$docList'); //[que1,que2]
-    SoundSet(ans_url[queli[ai]]);
+    SoundSet(ans_url[counts]); //queli[aio]
   }
 
   Future<void> SoundSet(ans) async {
@@ -280,7 +283,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> fetchName() async {
     Initialized(); //初期化
-    print('問題格納リスト$queli');
+    print('問題格納リスト$queli'); //機能しない
     AnswerName();
     setState(() {});
   }
@@ -292,14 +295,14 @@ class _MyHomePageState extends State<MyHomePage> {
         .FirebaseStorage.instance
         .ref()
         .child('sound')
-        .child(doc[queli[ai]])
+        .child(doc[counts])
         .listAll(); //que_1の中のファイル名を返す
     result.items.forEach((firebase_storage.Reference ref) async {
       final ji = await firebase_storage.FirebaseStorage.instance
           .ref(ref.fullPath)
           .fullPath; //パスを取得
 
-      final uu = ji.substring(doc[queli[ai]].length + 7); //ファイル名だけ抽出
+      final uu = ji.substring(doc[counts].length + 7); //ファイル名だけ抽出
       selist.add(uu); //usse_org.mp3
       if (selist.length > 3) audiodata(selist, doc);
       setState(() {});
@@ -320,7 +323,7 @@ class _MyHomePageState extends State<MyHomePage> {
       final audio_url = await firebase_storage.FirebaseStorage.instance
           .ref()
           .child('sound') /*audio->sound */
-          .child(doc[queli[ai]]) //que_1
+          .child(doc[counts]) //que_1
           .child(aiu[i]) //dri_tp
           .getDownloadURL();
       list.add(audio_url); //listに格納する
@@ -339,7 +342,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {}); //描画
   }
 
-  //asyncで早くなる?
+  //asyncで早くなる
   Future<void> SetUrl(n) async {
     int i = 0;
     switch (n) {
@@ -385,14 +388,14 @@ class _MyHomePageState extends State<MyHomePage> {
   //選択肢があっているか否か
   answer(String val) async {
     StopTime();
-    if (ans_url[queli[ai]] != val) {
+    if (ans_url[counts] != val) {
       print('不正解');
       value -= 10;
       await Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) =>
-                IncorPage(ans_file, queli[ai], ans_url, val)), //ファイル名と引数
+                IncorPage(ans_file, counts, ans_url, val)), //ファイル名と引数
       );
       result.add('不正解');
       sort--;
@@ -438,7 +441,8 @@ class _MyHomePageState extends State<MyHomePage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => EndPage('$now', end, dlist, result, value)),
+            builder: (context) =>
+                EndPage('$now', end, countslist, result, value)),
       );
     } else {
       //soundData();ここでdocListを取れば良いと思う
@@ -540,7 +544,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     width: 500.0,
                     height: 20.0,
                     child: Text(
-                      dlist.length > 4 ? dlist[queli[ai]] : '', //これが一番遅いかな
+                      dlist.length > 5 ? dlist[counts] : '', //これが一番遅いかな
                       style: TextStyle(fontSize: 15),
                       textAlign: TextAlign.center,
                     ),
@@ -561,7 +565,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             player4.stop();
                             print(serviceTime);
                             print(_isEnabled);
-                            player1.play(ans_url[queli[ai]]);
+                            player1.play(ans_url[counts]);
                           },
                     backgroundColor: Colors.orangeAccent,
                     child: Icon(Icons.volume_up),
