@@ -28,18 +28,19 @@ class EndPagePage extends State<EndPage> {
   get child => null; //result
   Future<void> PerChange() async {
     for (int i = 0; i < re.length; i++) {
-      if (re[i] != '正解') {
+      if (re[i] == '正解') {
         per_c++;
       } else {
         per_i++;
       }
     }
+    //percet
     per_c1 = (per_c / (per_c + per_i));
     per_i1 = (per_i / (per_c + per_i));
     per_c1 *= 100;
     per_i1 *= 100;
     print('per_c$per_c1');
-    print('per_i$per_i');
+    print('per_i$per_i1');
     // PieChartSample2(e: per_c, o: per_i);
   }
 
@@ -68,6 +69,7 @@ class EndPagePage extends State<EndPage> {
           const SizedBox(
             height: 12,
           ),
+          /*
           Container(
             width: 100,
             height: 100,
@@ -97,7 +99,7 @@ class EndPagePage extends State<EndPage> {
                 textAlign: TextAlign.center,
               ),
             ),
-          ),
+          ),*/
           Table(
             border: TableBorder.all(),
             children: [

@@ -9,12 +9,13 @@ import 'package:flutter/src/rendering/object.dart';
 import 'package:music_memo/correctend/end_page.dart';
 import 'package:music_memo/first.dart';
 import 'package:music_memo/group.dart';
-import 'package:music_memo/login.dart';
+import 'package:music_memo/Login/login.dart';
 
 import 'dart:math' as math;
 
 import 'package:music_memo/correctend/next_page.dart';
 import 'package:music_memo/correctend/incorrect_page.dart';
+import 'package:music_memo/tutorial.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.indigo,
         ),
-        home: const MyHomePage()); //home: const MyHomePage
+        home: const LoginPage()); //home: const MyHomePage
   }
 }
 
@@ -44,76 +45,6 @@ class MyHomePage extends StatefulWidget {
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
-
-//終了画面
-/*
-class EndPage extends StatelessWidget {
-  EndPage(this.name, this.e, this.text, this.re, this.val);
-  String name;
-  List e = []; //問題番号
-  List text = []; //問題のテキスト
-  List re = []; //正解か不正解かaiu
-  int val = 0;
-  get child => null; //result
-
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement buildsss
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('終了画面'),
-      ),
-      body: Column(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          Text('【$name】の結果'),
-          Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              border: const Border(
-                left: const BorderSide(
-                  color: Colors.black,
-                  width: 3,
-                ),
-                right: const BorderSide(
-                  color: Colors.black,
-                  width: 3,
-                ),
-                top: const BorderSide(
-                  color: Colors.black,
-                  width: 3,
-                ),
-                bottom: const BorderSide(
-                  color: Colors.black,
-                  width: 3,
-                ),
-              ),
-            ),
-            child: Center(
-              child: Text(
-                '$val',
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-          Table(
-            border: TableBorder.all(),
-            children: [
-              for (int i = 0; i < e.length; i++)
-                TableRow(children: [
-                  Text('第${e[i]}問'),
-                  Text('${text[i]}'),
-                  Text('${re[i]}')
-                ]),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}*/
 
 class _MyHomePageState extends State<MyHomePage> {
   //ここで変数とか関数を定義
@@ -561,10 +492,10 @@ class _MyHomePageState extends State<MyHomePage> {
                             final now = new DateTime.now(); //いつボタン押したか。
                             serviceTime.add({'btn1': '$now'});
                             count1++; //何回押したか
-                            player1.stop();
                             player2.stop();
                             player3.stop();
                             player4.stop();
+                            player5.stop();
                             print(serviceTime);
                             print(_isEnabled);
                             player1.play(ans_url[counts]);
@@ -681,7 +612,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           player1.stop();
                           player2.stop();
                           player3.stop();
-                          player4.stop();
+                          player5.stop();
                           player4.play(list[2]);
                           count4++;
                         },

@@ -37,27 +37,27 @@ class PieChart2State extends State {
               aspectRatio: 1,
               child: PieChart(
                 PieChartData(
-                    /*
-                      pieTouchData:
-                          PieTouchData(touchCallback: (pieTouchResponse) {
-                        setState(() {
-                          final desiredTouch = pieTouchResponse.touchInput
-                                  is! PointerExitEvent &&
-                              pieTouchResponse.touchInput is! PointerUpEvent;
-                          if (desiredTouch &&
-                              pieTouchResponse.touchedSection != null) {
-                            touchedIndex = pieTouchResponse
-                                .touchedSection!.touchedSectionIndex;
-                          } else {
-                            touchedIndex = -1;
-                          }
-                        });
-                      }),*/
+                    pieTouchData:
+                        PieTouchData(touchCallback: (pieTouchResponse) {
+                      setState(() {
+                        final desiredTouch =
+                            pieTouchResponse.touchInput is! PointerExitEvent &&
+                                pieTouchResponse.touchInput is! PointerUpEvent;
+                        if (desiredTouch &&
+                            pieTouchResponse.touchedSection != null) {
+                          touchedIndex = pieTouchResponse
+                              .touchedSection!.touchedSectionIndex;
+                        } else {
+                          touchedIndex = -1;
+                        }
+                      });
+                    }),
+                    startDegreeOffset: -90, //最初の角度の変更
                     borderData: FlBorderData(
                       show: false,
                     ),
                     sectionsSpace: 0,
-                    centerSpaceRadius: 40, //輪の太さ
+                    centerSpaceRadius: 0, //輪の太さ
                     sections: showingSections()),
               ),
             ),
@@ -68,7 +68,7 @@ class PieChart2State extends State {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Indicator(
-                color: Color(0xff0293ee),
+                color: Color(0xffff5252),
                 text: '正解',
                 isSquare: true,
               ),
@@ -76,7 +76,7 @@ class PieChart2State extends State {
                 height: 4,
               ),
               Indicator(
-                color: Color(0xfff8b250),
+                color: Color(0xff0293ee),
                 text: '不正解',
                 isSquare: true,
               ),
@@ -98,13 +98,13 @@ class PieChart2State extends State {
     return List.generate(2, (i) {
       final isTouched = i == touchedIndex;
       final fontSize = isTouched ? 25.0 : 16.0;
-      final radius = isTouched ? 60.0 : 50.0;
+      final radius = isTouched ? 110.0 : 100.0;
       switch (i) {
         case 0:
           return PieChartSectionData(
-            color: Color(0xff0293ee),
+            color: Color(0xffff5252),
             value: cor,
-            title: '${cor.toInt()}',
+            title: '${cor.toInt()}%',
             radius: radius,
             titleStyle: TextStyle(
                 fontSize: fontSize,
@@ -113,9 +113,9 @@ class PieChart2State extends State {
           );
         case 1:
           return PieChartSectionData(
-            color: const Color(0xfff8b250),
+            color: const Color(0xff0293ee),
             value: incor,
-            title: '${incor.toInt()}',
+            title: '${incor.toInt()}%',
             radius: radius,
             titleStyle: TextStyle(
                 fontSize: fontSize,

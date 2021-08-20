@@ -12,6 +12,26 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   var _userController = TextEditingController();
   var _passwordController = TextEditingController();
+  bool user_id = false;
+  int press_id = 0;
+
+  Future<void> CheckPoint(_user) async {
+    final result = new RegExp(r'^s[0-9]').hasMatch(_user);
+    if (result != true) {
+      print('useridが正しくない');
+      user_id = false;
+    } else {
+      print('正しい');
+      user_id = true;
+    }
+  }
+
+  Future<void> TextApeal(press_id) async {
+    press_id > 0
+        ? Text('正しい値を入力せよ', textAlign: TextAlign.right)
+        : Text('$press_id');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,15 +102,27 @@ class _LoginPageState extends State<LoginPage> {
                 textAlign: TextAlign.center,
               ),
               onPressed: () async {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => FirstPage(
-                          _userController.text, _passwordController.text)),
-                );
+                CheckPoint(_userController.text);
+                print(user_id);
+                user_id != true
+                    ? setState(() {
+                        press_id++;
+                      })
+                    //press_id += 1
+                    : await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => FirstPage(
+                                _userController.text,
+                                _passwordController.text)),
+                      );
+                print('presss_id:$press_id');
               },
             ),
-          )
+          ),
+          press_id > 0
+              ? Text('正しい値を入力せよ', textAlign: TextAlign.right)
+              : Text('$press_id'),
         ]),
       ),
     );
