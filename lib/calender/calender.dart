@@ -7,17 +7,26 @@ import 'package:intl/intl.dart';
 import 'package:music_memo/calender/resultresearch.dart';
 
 class CalenderExample extends StatefulWidget {
-  const CalenderExample({Key? key}) : super(key: key);
+  //const CalenderExample({Key? key}) : super(key: key);
+  CalenderExample(this.user);
+  String user;
 
   @override
+  State<CalenderExample> createState() => _CalenderExampleState(user);
+  /*
   State<StatefulWidget> createState() {
     return _CalenderExampleState();
-  }
+  }*/
 }
 
 class _CalenderExampleState extends State<CalenderExample> {
+  //userメイト
+  _CalenderExampleState(this.user);
+  String user;
+
   //カレンダーに表示する用
-  final _currentDate = DateTime.now();
+  DateTime _currentDate = DateTime.now();
+
   //検索する用
   final now = DateTime.now();
 
@@ -28,16 +37,21 @@ class _CalenderExampleState extends State<CalenderExample> {
     setState(() {});
   }
 
-  Future<void> onDayPressed(DateTime date, List<Event> events) async {
-    //this.setState(() => _currentDate = date);
-    DateFormat outputFormat = DateFormat('yyyy-MM-dd');
-    String date = outputFormat.format(_currentDate);
+  Future<void> onDayPressed(final date, List<Event> events) async {
+    this.setState(() => _currentDate = date);
     print(date);
+    String ya = date.toString().substring(0, 10);
+    print('${ya}');
+    /*
+    DateFormat outputFormat = DateFormat('yyyy-MM-dd');
+    print(_currentDate);
+    String date = outputFormat.format(_currentDate);
+    print(date);*/
 
     await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ResultPage(date), //ファイル名と引数
+          builder: (context) => ResultPage(ya), //ファイル名と引数
         ));
   }
 
@@ -54,8 +68,12 @@ class _CalenderExampleState extends State<CalenderExample> {
         appBar: AppBar(
           title: Text("Calender Example"),
         ),
-        body: Container(
-          child: CalendarCarousel<Event>(
+        body: Column(children: <Widget>[
+          SizedBox(
+            height: 100,
+            child: Text('ようこそ ユーザーID$userさん'),
+          ),
+          CalendarCarousel<Event>(
               onDayPressed: onDayPressed,
               weekendTextStyle: TextStyle(color: Colors.red),
               thisMonthDayBorderColor: Colors.grey,
@@ -74,6 +92,6 @@ class _CalenderExampleState extends State<CalenderExample> {
               },
               todayBorderColor: Colors.green,
               markedDateMoreShowTotal: false),
-        ));
+        ]));
   }
 }

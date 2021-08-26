@@ -2,6 +2,7 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:music_memo/calender/calender.dart';
 import 'package:music_memo/first.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -162,9 +163,8 @@ class _LoginPageState extends State<LoginPage> {
                     : await Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => FirstPage(
-                                _userController.text,
-                                _passwordController.text)),
+                            builder: (context) =>
+                                CalenderExample(_userController.text)),
                       );
                 print('presss_id:$press_id');
               },
@@ -189,7 +189,7 @@ class _LoginPageState extends State<LoginPage> {
                         RotateAnimatedText('DIFFERENT'),
                       ])))*/
               Text('正しい値を入力してください', textAlign: TextAlign.right)
-              : Text('$press_id'),
+              : Text(''), //press_id
         ]),
       ),
     );

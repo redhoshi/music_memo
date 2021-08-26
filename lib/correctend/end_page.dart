@@ -51,18 +51,19 @@ class EndPagePage extends State<EndPage> {
     per_i1 *= 100;
     print('per_c$per_c1');
     print('per_i$per_i1');
-    InputData(per_c1);
+    InputData(per_c1, per_c, per_i);
   }
 
   //cloudfirestoreにデータを格納
-  Future<void> InputData(per) async {
+  Future<void> InputData(per, perc, peri) async {
     final now = new DateTime.now();
     DateFormat outputFormat = DateFormat('yyyy-MM-dd');
     String date = outputFormat.format(now);
-    await FirebaseFirestore.instance
-        .collection('userre')
-        .doc('$date')
-        .set({'correct': '$per'});
+    await FirebaseFirestore.instance.collection('userre').doc('$date').set({
+      'correct': '$per',
+      '正解': '$perc',
+      '不正解': '$peri',
+    });
   }
 
   //画面が作られたときに一度だけ呼ばれる
