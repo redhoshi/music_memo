@@ -1,8 +1,16 @@
 import 'dart:ui';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:music_memo/pie_chart/pie.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+}
 
 class EndPage extends StatefulWidget {
   EndPage(this.a, this.i, this.u, this.e, this.o);
@@ -26,6 +34,8 @@ class EndPagePage extends State<EndPage> {
   double per_c1 = 0.0;
   double per_i1 = 0.0;
   get child => null; //result
+
+  //円グラフの正解・不正解の割合を求める
   Future<void> PerChange() async {
     for (int i = 0; i < re.length; i++) {
       if (re[i] == '正解') {
@@ -41,7 +51,18 @@ class EndPagePage extends State<EndPage> {
     per_i1 *= 100;
     print('per_c$per_c1');
     print('per_i$per_i1');
-    // PieChartSample2(e: per_c, o: per_i);
+    InputData(per_c1);
+  }
+
+  //cloudfirestoreにデータを格納
+  Future<void> InputData(per) async {
+    final now = new DateTime.now();
+    DateFormat outputFormat = DateFormat('yyyy-MM-dd');
+    String date = outputFormat.format(now);
+    await FirebaseFirestore.instance
+        .collection('userre')
+        .doc('$date')
+        .set({'correct': '$per'});
   }
 
   //画面が作られたときに一度だけ呼ばれる
@@ -50,6 +71,7 @@ class EndPagePage extends State<EndPage> {
     // TODO: implement initState
     super.initState();
     PerChange();
+    //InputData();正答率出すのならperchangeから呼び出す
   }
 
   @override

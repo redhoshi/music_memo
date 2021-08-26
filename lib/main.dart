@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/rendering/object.dart';
+import 'package:intl/intl.dart';
 import 'package:music_memo/correctend/end_page.dart';
 import 'package:music_memo/first.dart';
 import 'package:music_memo/group.dart';
@@ -16,6 +17,8 @@ import 'dart:math' as math;
 import 'package:music_memo/correctend/next_page.dart';
 import 'package:music_memo/correctend/incorrect_page.dart';
 import 'package:music_memo/tutorial.dart';
+
+import 'calender/calender.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -344,10 +347,11 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     final now = new DateTime.now();
-    final date =
-        new DateTime(now.year, now.month, now.day, now.hour, now.minute);
-    print(date);
-    print(DateTime.now().day);
+    //DateFormat outputFormat = DateFormat('yyyy-MM-dd');
+    //String date = outputFormat.format(now);
+
+    //print(DateTime.now().day);
+    //print('$date');
     print('result${result[0]}');
     print(i);
     //ログデータの書き込み
@@ -355,6 +359,7 @@ class _MyHomePageState extends State<MyHomePage> {
         .collection('results') // コレクションID--->名前入力でも良いかもね
         .doc('$now') // ここは空欄だと自動でIDが付く
         .set({
+      'hour': '${now.hour}/${now.minute}/${now.second}',
       'que': '${docList[i]}',
       'ans': '${result[i]}',
       'btn': ['$count1', '$count2', '$count2', '$count3', '$count4'],
