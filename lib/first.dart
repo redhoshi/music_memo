@@ -4,18 +4,18 @@ import 'package:music_memo/Login/login.dart';
 
 class FirstPage extends StatefulWidget {
   //const FirstPage({Key? key}) : super(key: key);
-  FirstPage(this.user, this.pass);
+  FirstPage(this.user);
   String user;
-  String pass;
+//String pass;
 
   @override
-  State<FirstPage> createState() => _FirstPageState(user, pass);
+  State<FirstPage> createState() => _FirstPageState(user);
 }
 
 class _FirstPageState extends State<FirstPage> {
-  _FirstPageState(this.user, this.pass);
+  _FirstPageState(this.user);
   String user;
-  String pass;
+  //String pass;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
