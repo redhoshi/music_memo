@@ -1,7 +1,9 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:music_memo/first.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -56,20 +58,17 @@ class _LoginPageState extends State<LoginPage> {
         user_id = false;
       }
     }
-
-    setState(() {});
   }
 
-//正規表現
-  Future<void> CheckPoint(_user) async {
-    final result = new RegExp(r'^s[0-9]').hasMatch(_user);
-    if (result != true) {
-      print('useridが正しくない');
-      user_id = false;
-    } else {
-      print('正しい');
-      user_id = true;
-    }
+  //shared_preferencesを使ってみる
+
+  Future<void> SharedPre(_user) async {
+    //instancを取得
+    // final SharedPreferences prefs = await SharedPreferences.getInstance();
+    //保存
+    //prefs.setString('userid', _user);
+    //読み込み
+    ///¥a1prefs.getString('userid') ?? '';
   }
 
   //画面が作られたときに一度だけ呼ばれる
@@ -146,12 +145,12 @@ class _LoginPageState extends State<LoginPage> {
             height: 40,
             child: NeumorphicButton(
               child: Text(
-                '送信',
+                'ログイン',
                 textAlign: TextAlign.center,
               ),
               onPressed: () async {
-                //CheckPoint(_userController.text);
                 CheckPass(_userController.text, _passwordController.text);
+                //SharedPre(_userController.text);
                 print(user_id);
                 print(
                     'user:${_userController.text}pass:${_passwordController.text}');
@@ -160,7 +159,6 @@ class _LoginPageState extends State<LoginPage> {
                     ? setState(() {
                         press_id++;
                       })
-                    //press_id += 1
                     : await Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -172,8 +170,25 @@ class _LoginPageState extends State<LoginPage> {
               },
             ),
           ),
+          new SizedBox(
+            height: 30,
+          ),
           press_id > 0
-              ? Text('正しい値を入力せよ', textAlign: TextAlign.right)
+              ?
+              /*SizedBox(
+                  width: 150,
+                  height: 100,
+                  child: DefaultTextStyle(
+                      style: const TextStyle(
+                        fontSize: 20.0,
+                        fontFamily: 'Horizon',
+                      ),
+                      child: AnimatedTextKit(animatedTexts: [
+                        RotateAnimatedText('AWESOME'),
+                        RotateAnimatedText('OPTIMISTIC'),
+                        RotateAnimatedText('DIFFERENT'),
+                      ])))*/
+              Text('正しい値を入力してください', textAlign: TextAlign.right)
               : Text('$press_id'),
         ]),
       ),
