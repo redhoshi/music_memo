@@ -27,8 +27,9 @@ class _LineChartSample2State extends State<LineChartSample2> {
   final j = []; //真ん中
   int f = 5;
 
+  //ドキュメントid取得
   Future<void> Dataset() async {
-    await FirebaseFirestore.instance.collection('userre').get().then(
+    await FirebaseFirestore.instance.collection('rensyu').get().then(
           (QuerySnapshot querySnapshot) => {
             querySnapshot.docs.forEach(
               (doc) async {
@@ -37,9 +38,10 @@ class _LineChartSample2State extends State<LineChartSample2> {
             ),
           },
         );
+    //フィールド値取得
     for (int i = 0; i < date.length; i++) {
       final snepshot = await FirebaseFirestore.instance
-          .collection('userre')
+          .collection('rensyu')
           .doc(date[i])
           .get();
       corr.add(snepshot['correct']);
@@ -49,6 +51,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
     Separate(date, corr);
   }
 
+  //横軸のデータ+縦軸のデータを揃える
   Future<void> Separate(dat, cor) async {
     j.add((dat.length / 2).toInt());
     //データがなにもない時

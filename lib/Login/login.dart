@@ -14,8 +14,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  var _userController = TextEditingController();
-  var _passwordController = TextEditingController();
+  var _userController = TextEditingController(text: '');
+  var _passwordController = TextEditingController(text: '');
   bool user_id = false;
   int press_id = 0;
   final docList = [];
@@ -40,6 +40,7 @@ class _LoginPageState extends State<LoginPage> {
       password.add('${snepshot['password']}');
     }
     print('password:$password');
+    // print('usercontroller$_userController');
   }
 
   //Firebase上のパスワードとの一致
@@ -63,14 +64,35 @@ class _LoginPageState extends State<LoginPage> {
 
   //shared_preferencesを使ってみる
 
-  Future<void> SharedPre(_user) async {
+  Future<void> SharedPre(String _user) async {
+    int i = 0;
+    String m = 'aiu';
+
     //instancを取得
-    // final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     //保存
-    //prefs.setString('userid', _user);
-    //読み込み
-    ///¥a1prefs.getString('userid') ?? '';
+    prefs.setString('userid', _user);
+    print('user:$_user');
+    setState(() {});
   }
+
+  Future<void> read() async {
+    //instancを取得
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.get(
+      'userid',
+    );
+    _userController.text = prefs.getString(
+          'userid',
+        ) ??
+        '';
+    setState(() {});
+  }
+/*
+  Future<void> Init() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    _userController = new TextEditingController(text: '');
+  }*/
 
   //画面が作られたときに一度だけ呼ばれる
   @override
@@ -78,6 +100,8 @@ class _LoginPageState extends State<LoginPage> {
     // TODO: implement initState
     super.initState();
     User();
+    read();
+    //Init();
   }
 
   @override
@@ -151,7 +175,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               onPressed: () async {
                 CheckPass(_userController.text, _passwordController.text);
-                //SharedPre(_userController.text);
+                SharedPre(_userController.text);
                 print(user_id);
                 print(
                     'user:${_userController.text}pass:${_passwordController.text}');
