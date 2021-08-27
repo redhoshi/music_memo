@@ -5,6 +5,7 @@ import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart'
     show CalendarCarousel;
 import 'package:intl/intl.dart';
 import 'package:music_memo/calender/resultresearch.dart';
+import 'package:music_memo/line_chart/line_chart.dart';
 
 class CalenderExample extends StatefulWidget {
   //const CalenderExample({Key? key}) : super(key: key);
@@ -42,12 +43,6 @@ class _CalenderExampleState extends State<CalenderExample> {
     print(date);
     String ya = date.toString().substring(0, 10);
     print('${ya}');
-    /*
-    DateFormat outputFormat = DateFormat('yyyy-MM-dd');
-    print(_currentDate);
-    String date = outputFormat.format(_currentDate);
-    print(date);*/
-
     await Navigator.push(
         context,
         MaterialPageRoute(
@@ -70,8 +65,8 @@ class _CalenderExampleState extends State<CalenderExample> {
         ),
         body: Column(children: <Widget>[
           SizedBox(
-            height: 100,
-            child: Text('ようこそ ユーザーID$userさん'),
+            height: 20,
+            child: Text('ようこそ ユーザー$userさん'),
           ),
           CalendarCarousel<Event>(
               onDayPressed: onDayPressed,
@@ -92,6 +87,10 @@ class _CalenderExampleState extends State<CalenderExample> {
               },
               todayBorderColor: Colors.green,
               markedDateMoreShowTotal: false),
+          new SizedBox(
+            height: 20,
+          ),
+          LineChartSample2(),
         ]));
   }
 }

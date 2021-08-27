@@ -31,7 +31,7 @@ class ResultPagePage extends State<ResultPage> {
     print('param$param');
 
     final snapshot = await FirebaseFirestore.instance
-        .collection('userre')
+        .collection('rensyu')
         .doc(param)
         .get()
         .then((param) => {
@@ -44,7 +44,7 @@ class ResultPagePage extends State<ResultPage> {
     if (docid == true) {
       //配列に追加
       final snepshot = await FirebaseFirestore.instance
-          .collection('userre')
+          .collection('rensyu')
           .doc(param)
           .get();
       cor.add('${snepshot['correct']}');

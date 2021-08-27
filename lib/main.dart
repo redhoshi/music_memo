@@ -16,7 +16,7 @@ import 'dart:math' as math;
 
 import 'package:music_memo/correctend/next_page.dart';
 import 'package:music_memo/correctend/incorrect_page.dart';
-import 'package:music_memo/tutorial.dart';
+import 'package:music_memo/tutorial/tutorial.dart';
 
 import 'calender/calender.dart';
 
