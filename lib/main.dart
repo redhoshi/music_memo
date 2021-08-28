@@ -1,5 +1,6 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:avatar_glow/avatar_glow.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
@@ -17,6 +18,7 @@ import 'dart:math' as math;
 import 'package:music_memo/correctend/next_page.dart';
 import 'package:music_memo/correctend/incorrect_page.dart';
 import 'package:music_memo/tutorial/tutorial.dart';
+import 'package:music_memo/wave/wave.dart';
 
 import 'calender/calender.dart';
 
@@ -38,7 +40,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.indigo,
         ),
-        home: const LoginPage()); //home: const MyHomePage
+        home: const MyHomePage()); //home: const MyHomePage
   }
 }
 
@@ -347,11 +349,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     final now = new DateTime.now();
-    //DateFormat outputFormat = DateFormat('yyyy-MM-dd');
-    //String date = outputFormat.format(now);
-
-    //print(DateTime.now().day);
-    //print('$date');
     print('result${result[0]}');
     print(i);
     //ログデータの書き込み
@@ -438,7 +435,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     player4.onPlayerStateChanged.listen((event) {
       if (player4.state == PlayerState.PLAYING) {
-        time_lis4.start();
+        time_lis4.stop();
         print('player4:start:${time_lis4.elapsed}');
       }
       if (player4.state == PlayerState.STOPPED ||
@@ -472,6 +469,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Stack(
         children: [
+          WavePage(),
           Column(
               //縦
               mainAxisSize: MainAxisSize.max,
@@ -480,7 +478,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 if (dlist.length > 2)
                   new SizedBox(
                     width: 500.0,
-                    height: 20.0,
+                    height: 18.0,
                     child: Text(
                       dlist.length > 5 ? dlist[counts] : '', //これが一番遅いかな
                       style: TextStyle(fontSize: 15),
@@ -488,8 +486,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                 new SizedBox(
-                  width: 100.0,
-                  height: 100.0,
+                  width: 110.0,
+                  height: 110.0,
                   child: FloatingActionButton(
                     onPressed: !_isEnabled
                         ? null
@@ -506,35 +504,42 @@ class _MyHomePageState extends State<MyHomePage> {
                             player1.play(ans_url[counts]);
                           },
                     backgroundColor: Colors.orangeAccent,
-                    child: Icon(Icons.volume_up),
+                    child: Icon(
+                      Icons.volume_up,
+                      size: 40.0,
+                    ),
                     heroTag: "btn1",
                   ),
                 ),
                 Row(
-                    mainAxisSize: MainAxisSize.max,
+                    // mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
-                      FloatingActionButton(
-                        backgroundColor: Colors.orangeAccent,
-                        child: Icon(Icons.volume_up),
-                        heroTag: "btn2",
-                        onPressed: _isEnabled
-                            ? () {
-                                print(list[0]);
-                                player1.stop();
-                                player3.stop();
-                                player4.stop();
-                                player5.stop();
-                                //time_lis.start();
-                                //print('timestart${time_lis.elapsed}');
-                                player2.play(list[0]);
-                                print(_isEnabled);
-                                count2++;
-                              }
-                            : null,
+                      new SizedBox(
+                        width: 80.0,
+                        height: 80.0,
+                        child: FloatingActionButton(
+                          backgroundColor: Colors.orangeAccent,
+                          child: Icon(Icons.volume_up),
+                          heroTag: "btn2",
+                          onPressed: _isEnabled
+                              ? () {
+                                  print(list[0]);
+                                  player1.stop();
+                                  player3.stop();
+                                  player4.stop();
+                                  player5.stop();
+                                  //time_lis.start();
+                                  //print('timestart${time_lis.elapsed}');
+                                  player2.play(list[0]);
+                                  print(_isEnabled);
+                                  count2++;
+                                }
+                              : null,
+                        ),
                       ),
                       new SizedBox(
-                        height: 50,
+                        height: 60,
                         width: 230,
                         child: ElevatedButton(
                           child: ans_url.length > 2
@@ -563,22 +568,29 @@ class _MyHomePageState extends State<MyHomePage> {
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
-                      FloatingActionButton(
-                        backgroundColor: Colors.orangeAccent,
-                        child: Icon(Icons.volume_up),
-                        heroTag: "btn3",
-                        onPressed: ans_url.length > 2
-                            ? () {
-                                print("pre2"); //音を鳴らす
-                                print(list[1]);
-                                player1.stop();
-                                player2.stop();
-                                player4.stop();
-                                player5.stop();
-                                player3.play(list[1]);
-                                count3++;
-                              }
-                            : null,
+                      new SizedBox(
+                        width: 80.0,
+                        height: 80.0,
+                        child: FloatingActionButton(
+                          backgroundColor: Colors.orangeAccent,
+                          child: Icon(
+                            Icons.volume_up,
+                            size: 35.0,
+                          ),
+                          heroTag: "btn3",
+                          onPressed: ans_url.length > 2
+                              ? () {
+                                  print("pre2"); //音を鳴らす
+                                  print(list[1]);
+                                  player1.stop();
+                                  player2.stop();
+                                  player4.stop();
+                                  player5.stop();
+                                  player3.play(list[1]);
+                                  count3++;
+                                }
+                              : null,
+                        ),
                       ),
                       new SizedBox(
                         height: 50,
