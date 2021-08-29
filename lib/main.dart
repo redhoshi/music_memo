@@ -392,6 +392,10 @@ class _MyHomePageState extends State<MyHomePage> {
   AudioPlayer player4 = new AudioPlayer(mode: PlayerMode.LOW_LATENCY);
   AudioPlayer player5 = new AudioPlayer(mode: PlayerMode.LOW_LATENCY);
 
+  //waveの位置
+  final wave = [100, 100, 30, 50];
+  final state = [false, false, false, false, false].cast<bool>();
+
   //playしている時間
   Future<void> PlayTime() async {
     //問題データのplayorstop
@@ -399,24 +403,36 @@ class _MyHomePageState extends State<MyHomePage> {
       if (player1.state == PlayerState.PLAYING) {
         time_lis1.start();
         print('player1:start${time_lis1.elapsed}');
+        setState(() {
+          state[0] = true;
+        });
       }
       if (player1.state == PlayerState.STOPPED ||
           player1.state == PlayerState.COMPLETED) {
         time_lis1.stop();
         print('player1:stop${time_lis1.elapsed}');
+        setState(() {
+          state[0] = false;
+        });
       }
-      print('Event:player1:$event');
+      print('Event:player1:$state');
     });
     //player1がplyaing,stoppedorcomplete
     player2.onPlayerStateChanged.listen((event) {
       if (player2.state == PlayerState.PLAYING) {
         time_lis2.start();
         print('player2:start${time_lis2.elapsed}');
+        setState(() {
+          state[1] = true;
+        });
       }
       if (player2.state == PlayerState.STOPPED ||
           player2.state == PlayerState.COMPLETED) {
         time_lis2.stop();
         print('player2:stop:${time_lis2.elapsed}');
+        setState(() {
+          state[1] = false;
+        });
       }
       print('Event2$event');
     });
@@ -425,11 +441,17 @@ class _MyHomePageState extends State<MyHomePage> {
       if (player3.state == PlayerState.PLAYING) {
         time_lis3.start();
         print('player3:start${time_lis3.elapsed}');
+        setState(() {
+          state[2] = true;
+        });
       }
       if (player3.state == PlayerState.STOPPED ||
           player3.state == PlayerState.COMPLETED) {
         time_lis3.stop();
         print('player3:stop:${time_lis3.elapsed}');
+        setState(() {
+          state[2] = false;
+        });
       }
       print('Event1$event');
     });
@@ -437,11 +459,17 @@ class _MyHomePageState extends State<MyHomePage> {
       if (player4.state == PlayerState.PLAYING) {
         time_lis4.stop();
         print('player4:start:${time_lis4.elapsed}');
+        setState(() {
+          state[3] = true;
+        });
       }
       if (player4.state == PlayerState.STOPPED ||
           player4.state == PlayerState.COMPLETED) {
         time_lis4.stop();
         print('player4:stop:${time_lis4.elapsed}');
+        setState(() {
+          state[3] = false;
+        });
       }
       print('Event1$event');
     });
@@ -469,7 +497,13 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Stack(
         children: [
-          WavePage(),
+          //別の値を入れる。配列に元から場所入れておく。
+
+          for (int i = 0; i < state.length; i++)
+            if (state[i] == true) //wave[i]
+              //WavePage(),
+              Text('$i${state[i]}'),
+
           Column(
               //縦
               mainAxisSize: MainAxisSize.max,
