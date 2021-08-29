@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.indigo,
         ),
-        home: const MyHomePage()); //home: const MyHomePage
+        home: const LoginPage()); //home: const MyHomePage
   }
 }
 
@@ -393,16 +393,19 @@ class _MyHomePageState extends State<MyHomePage> {
   AudioPlayer player5 = new AudioPlayer(mode: PlayerMode.LOW_LATENCY);
 
   //waveの位置
-  final wave = [100, 100, 30, 50];
+  final wave = [-400.0, -110.0, 150.0, 300.0, 450.0].cast<double>(); //縦軸
+  final beside = []; //横軸
   final state = [false, false, false, false, false].cast<bool>();
 
   //playしている時間
   Future<void> PlayTime() async {
     //問題データのplayorstop
     player1.onPlayerStateChanged.listen((event) {
+      print('0000000000000000000000000000');
       if (player1.state == PlayerState.PLAYING) {
         time_lis1.start();
         print('player1:start${time_lis1.elapsed}');
+        //print('-------${state[0]}');
         setState(() {
           state[0] = true;
         });
@@ -411,6 +414,7 @@ class _MyHomePageState extends State<MyHomePage> {
           player1.state == PlayerState.COMPLETED) {
         time_lis1.stop();
         print('player1:stop${time_lis1.elapsed}');
+        // print('-------${state[0]}');
         setState(() {
           state[0] = false;
         });
@@ -422,43 +426,53 @@ class _MyHomePageState extends State<MyHomePage> {
       if (player2.state == PlayerState.PLAYING) {
         time_lis2.start();
         print('player2:start${time_lis2.elapsed}');
+        // print('-------${state[1]}');
         setState(() {
           state[1] = true;
         });
+        //print('-------${state[1]}');
       }
       if (player2.state == PlayerState.STOPPED ||
           player2.state == PlayerState.COMPLETED) {
         time_lis2.stop();
         print('player2:stop:${time_lis2.elapsed}');
+        //print('-------${state[1]}');
         setState(() {
           state[1] = false;
         });
+        //  print('-------${state[1]}');
       }
-      print('Event2$event');
+      print('Event2${state}');
     });
     //player1がplyaing,stoppedorcomplete
     player3.onPlayerStateChanged.listen((event) {
       if (player3.state == PlayerState.PLAYING) {
         time_lis3.start();
-        print('player3:start${time_lis3.elapsed}');
+
+        ///        print('player3:start${time_lis3.elapsed}');
+        //      print('-------${state[2]}');
         setState(() {
           state[2] = true;
         });
+        //   print('-------${state[2]}');
       }
       if (player3.state == PlayerState.STOPPED ||
           player3.state == PlayerState.COMPLETED) {
         time_lis3.stop();
-        print('player3:stop:${time_lis3.elapsed}');
+        //       print('player3:stop:${time_lis3.elapsed}');
+        //       print('-------${state[2]}');
         setState(() {
           state[2] = false;
         });
+        //     print('-------${state}');
       }
-      print('Event1$event');
+      //    print('Event1$event');
     });
     player4.onPlayerStateChanged.listen((event) {
       if (player4.state == PlayerState.PLAYING) {
         time_lis4.stop();
-        print('player4:start:${time_lis4.elapsed}');
+        //       print('player4:start:${time_lis4.elapsed}');
+        //   print('-------${state[3]}');
         setState(() {
           state[3] = true;
         });
@@ -466,12 +480,13 @@ class _MyHomePageState extends State<MyHomePage> {
       if (player4.state == PlayerState.STOPPED ||
           player4.state == PlayerState.COMPLETED) {
         time_lis4.stop();
-        print('player4:stop:${time_lis4.elapsed}');
+        //      print('player4:stop:${time_lis4.elapsed}');
+        //   print('-------${state[3]}');
         setState(() {
           state[3] = false;
         });
       }
-      print('Event1$event');
+      // print('Event4:event${state}');
     });
   }
 
@@ -499,10 +514,14 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           //別の値を入れる。配列に元から場所入れておく。
 
-          for (int i = 0; i < state.length; i++)
-            if (state[i] == true) //wave[i]
-              //WavePage(),
-              Text('$i${state[i]}'),
+          //for (int i = 0; i < state.length; i++)
+          // if (state[i] == true) //wave[i]
+          if (player1.state == PlayerState.PLAYING) WavePage(wave[0]),
+          if (player2.state == PlayerState.PLAYING) WavePage(wave[1]),
+          if (state[2] == true) WavePage(wave[2]),
+          if (state[3] == true) WavePage(wave[3]),
+          if (state[4] == true) WavePage(wave[4]),
+          //Text('$i${wave[i]}'),
 
           Column(
               //縦

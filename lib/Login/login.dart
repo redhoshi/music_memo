@@ -198,21 +198,7 @@ class _LoginPageState extends State<LoginPage> {
             height: 30,
           ),
           press_id > 0
-              ?
-              /*SizedBox(
-                  width: 150,
-                  height: 100,
-                  child: DefaultTextStyle(
-                      style: const TextStyle(
-                        fontSize: 20.0,
-                        fontFamily: 'Horizon',
-                      ),
-                      child: AnimatedTextKit(animatedTexts: [
-                        RotateAnimatedText('AWESOME'),
-                        RotateAnimatedText('OPTIMISTIC'),
-                        RotateAnimatedText('DIFFERENT'),
-                      ])))*/
-              Text('正しい値を入力してください', textAlign: TextAlign.right)
+              ? Text('正しい値を入力してください', textAlign: TextAlign.right)
               : Text(''), //press_id
         ]),
       ),

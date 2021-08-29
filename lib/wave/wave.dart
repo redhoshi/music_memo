@@ -2,16 +2,16 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 class WavePage extends StatefulWidget {
-  //WavePage({required Key key, required this.title}) : super(key: key);
-  //final String title;
-
+  double h;
+  WavePage(this.h);
   @override
-  _WavePageState createState() => _WavePageState();
+  _WavePageState createState() => _WavePageState(h);
 }
 
 class _WavePageState extends State<WavePage> with TickerProviderStateMixin {
+  _WavePageState(this.tall);
+  double tall;
   late AnimationController _animationController;
-
   @override
   void initState() {
     super.initState();
@@ -37,11 +37,13 @@ class _WavePageState extends State<WavePage> with TickerProviderStateMixin {
         child: CustomPaint(
           painter: SpritePainter(
             _animationController,
+            tall,
           ),
           child: SizedBox(
             //widthは大きさが変わるheightは何も変わらん
             width: 300.0,
             height: 300.0,
+            child: Text('$tall'),
           ),
         ),
       ),
@@ -50,9 +52,9 @@ class _WavePageState extends State<WavePage> with TickerProviderStateMixin {
 }
 
 class SpritePainter extends CustomPainter {
+  double ta;
   final Animation<double> _animation;
-
-  SpritePainter(this._animation) : super(repaint: _animation);
+  SpritePainter(this._animation, this.ta) : super(repaint: _animation);
 
   void circle(Canvas canvas, Rect rect, double value) {
     double opacity = (1.0 - (value / 4.0)).clamp(0.0, 1.0); // 透明度の設定
@@ -70,7 +72,7 @@ class SpritePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     Rect rect = Rect.fromLTRB(
-        14.0, -110.0, size.width, size.height); //LTWH,left,top,width,height
+        14.0, ta, size.width, size.height); //LTWH,left,top,width,height
 
     for (int wave = 3; wave >= 0; wave--) {
       circle(canvas, rect, wave + _animation.value);
