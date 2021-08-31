@@ -17,6 +17,7 @@ import 'dart:math' as math;
 
 import 'package:music_memo/correctend/next_page.dart';
 import 'package:music_memo/correctend/incorrect_page.dart';
+import 'package:music_memo/judge/judge.dart';
 import 'package:music_memo/tutorial/tutorial.dart';
 import 'package:music_memo/wave/wave.dart';
 
@@ -40,7 +41,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.indigo,
         ),
-        home: const LoginPage()); //home: const MyHomePage
+        home: JudgePage()); //home: const MyHomePage
   }
 }
 
