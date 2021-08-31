@@ -104,6 +104,7 @@ class FunkyOverlayState extends State<FunkyOverlay>
                       color: Colors.red, size: 300.0),
                 ),
               ),
+              //閉じるボタンを作成
             ],
           ),
         ),
