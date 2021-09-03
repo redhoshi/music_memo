@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -71,6 +73,18 @@ class FunkyOverlayState extends State<FunkyOverlay>
     });
 
     controller.forward();
+  }
+
+  void _onPressed() {
+    setState(() {
+      var _overlayEntry = OverlayEntry(
+        builder: (BuildContext context) {
+          return FunkyOverlay();
+        },
+      );
+      Navigator.of(context).overlay!.insert(_overlayEntry);
+      Timer(Duration(seconds: 1), () => _overlayEntry.remove());
+    });
   }
 
   @override

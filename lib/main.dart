@@ -18,6 +18,7 @@ import 'dart:math' as math;
 import 'package:music_memo/correctend/next_page.dart';
 import 'package:music_memo/correctend/incorrect_page.dart';
 import 'package:music_memo/judge/judge.dart';
+import 'package:music_memo/judge/judge2.dart';
 import 'package:music_memo/tutorial/tutorial.dart';
 import 'package:music_memo/wave/wave.dart';
 
@@ -41,7 +42,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.indigo,
         ),
-        home: JudgePage()); //home: const MyHomePage
+        home: const MyHomePage()); //home: const MyHomePage
   }
 }
 
@@ -70,6 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List docList = []; //ドキュメントidを取ってくる
   final docuList = new List.generate(10, (index) => ''); //可変長？
   bool _isEnabled = false; //onbuttonを押させない
+  bool _preEnabled = false;
 
   //ログデータを取得するためのリスト
   //回答時間
@@ -104,6 +106,10 @@ class _MyHomePageState extends State<MyHomePage> {
   //test
   final ada = [0, 0, 0, 0];
   final adb = [];
+  //showdialog用のbool
+  bool show = false;
+  //dialog用のint
+//  int show = 0;
 
   calcurate(aiu) async {
     var dat;
@@ -277,6 +283,7 @@ class _MyHomePageState extends State<MyHomePage> {
     await player3.setUrl(list[2]);
     await player4.setUrl(list[3]);*/
     _isEnabled = true;
+
     time_ans.start();
     setState(() {}); //描画
   }
@@ -326,25 +333,36 @@ class _MyHomePageState extends State<MyHomePage> {
 
   //選択肢があっているか否か
   answer(String val) async {
+    bool cor = false;
     StopTime();
     if (ans_url[counts] != val) {
       print('不正解');
       value -= 10;
+      /*
       await Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) =>
                 IncorPage(ans_file, counts, ans_url, val)), //ファイル名と引数
-      );
+      );*/
+      show = false; //不正解のshowdialog
+      Text('false-');
+      setState(() {});
       result.add('不正解');
       sort--;
     } else {
       print('正解');
       value += 10;
+      /*
       await Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => CorrectPage()),
-      );
+      );*/
+      show = true;
+      //s JudgePage2(cor);
+      setState(() {});
+      Text('true-');
+      print('$cor');
       result.add('正解');
       sort++;
     }
@@ -382,7 +400,7 @@ class _MyHomePageState extends State<MyHomePage> {
       );
     } else {
       //soundData();ここでdocListを取れば良いと思う
-      fetchName(); //ここで呼んでる
+      //fetchName(); //ここでreloadをする
     }
   }
 
@@ -555,6 +573,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             player5.stop();
                             print(serviceTime);
                             print(_isEnabled);
+
                             player1.play(ans_url[counts]);
                           },
                     backgroundColor: Colors.orangeAccent,
@@ -602,6 +621,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           onPressed: !_isEnabled
                               ? null
                               : () {
+                                  //elevatedbutton表示の話
                                   shape:
                                   OutlineInputBorder(
                                     borderRadius:
@@ -609,7 +629,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                   );
                                   stopsound();
                                   answer(list[0]); //urlを返す
+                                  print('正解または不正解$show');
                                   print('select$_isEnabled');
+                                  _preEnabled = true;
+                                  return showAlert(context, show); //showdialog
                                 },
                           style: ElevatedButton.styleFrom(
                             primary: Colors.lightGreen,
@@ -659,6 +682,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                     );
                                     stopsound();
                                     answer(list[1]);
+                                    print('正解または不正解$show');
+                                    _preEnabled = true;
+                                    return showAlert(
+                                        context, show); //showdialog
                                   }
                                 : null,
                             style: ElevatedButton.styleFrom(
@@ -702,6 +729,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                     );
                                     stopsound();
                                     answer(list[2]);
+                                    _preEnabled = true;
+                                    return showAlert(context, show);
                                   },
                             style: ElevatedButton.styleFrom(
                               primary: Colors.lightGreen,
@@ -745,6 +774,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                     );
                                     stopsound();
                                     answer(list[3]);
+                                    _preEnabled = true;
+                                    return showAlert(context, show);
                                   },
                             style: ElevatedButton.styleFrom(
                               primary: Colors.lightGreen,
@@ -796,4 +827,36 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+}
+
+//dialogshowalertの
+void showAlert(BuildContext context, bool show) async {
+  showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          //title: Text('Aの動作の確認'),
+          title: Stack(children: <Widget>[
+            show
+                ? Center(
+                    child: Stack(children: <Widget>[
+                      Icon(Icons.brightness_1_outlined,
+                          color: Colors.red, size: 300.0),
+                      Text('不正解',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 30)),
+                    ]),
+                  )
+                : Center(
+                    child: Stack(children: <Widget>[
+                      Icon(Icons.remove_circle_outline,
+                          color: Colors.blue, size: 300.0),
+                      Text('不正解',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 30)),
+                    ]),
+                  )
+          ]),
+        );
+      });
 }
