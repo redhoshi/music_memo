@@ -1,28 +1,16 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:avatar_glow/avatar_glow.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/rendering/object.dart';
-import 'package:intl/intl.dart';
 import 'package:music_memo/correctend/end_page.dart';
-import 'package:music_memo/first.dart';
-import 'package:music_memo/group.dart';
-import 'package:music_memo/Login/login.dart';
 
 import 'dart:math' as math;
 
-import 'package:music_memo/correctend/next_page.dart';
-import 'package:music_memo/correctend/incorrect_page.dart';
-import 'package:music_memo/judge/judge.dart';
-import 'package:music_memo/judge/judge2.dart';
-import 'package:music_memo/tutorial/tutorial.dart';
 import 'package:music_memo/wave/wave.dart';
-
-import 'calender/calender.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -71,7 +59,6 @@ class _MyHomePageState extends State<MyHomePage> {
   List docList = []; //ドキュメントidを取ってくる
   final docuList = new List.generate(10, (index) => ''); //可変長？
   bool _isEnabled = false; //onbuttonを押させない
-  bool _preEnabled = false;
 
   //ログデータを取得するためのリスト
   //回答時間
@@ -100,16 +87,18 @@ class _MyHomePageState extends State<MyHomePage> {
   //docListのカウント
   int counta = 0;
   //順位ソートに用いる
-  int sort = 0;
+  int sort = -1;
   //sort初期化を防ぐ
   int counts = 0;
   //test
   final ada = [0, 0, 0, 0];
   final adb = [];
+
   //showdialog用のbool
   bool show = false;
-  //dialog用のint
-//  int show = 0;
+  bool _diaEnabled = false; //onbuttonしたらtrue
+
+  final ansjudge = []; //最初から実行
 
   calcurate(aiu) async {
     var dat;
@@ -199,6 +188,7 @@ class _MyHomePageState extends State<MyHomePage> {
           .getDownloadURL();
       ans_url.add(audio_data); //正解のurlを選択肢のところと同じところから取ってくる
       print('count----$i');
+      print('ans_url---$ans_url');
       //問題文リスト作成
       dlist.add(que); //[フルートの音を選択]
       print('dlist$dlist');
@@ -277,6 +267,7 @@ class _MyHomePageState extends State<MyHomePage> {
     for (int i = 0; i < 4; i++) {
       SetUrl(i);
     }
+    passans(list);
 /*
     await player1.setUrl(list[0]); //awaitせずにasyncで非同期処理にすると早くなる。
     await player2.setUrl(list[1]);
@@ -331,6 +322,16 @@ class _MyHomePageState extends State<MyHomePage> {
   final end = []; //問題
   final result = []; //正解・不正解の結果
 
+//正解不正解のicon表示用のlist取得
+  deteans(String val) async {
+    if (ans_url[counts] != val) {
+      ansjudge.add(false);
+    } else {
+      ansjudge.add(true);
+    }
+    print('nnnnnnnnnnnansjudge:$ansjudge');
+  }
+
   //選択肢があっているか否か
   answer(String val) async {
     bool cor = false;
@@ -347,9 +348,9 @@ class _MyHomePageState extends State<MyHomePage> {
       );*/
       show = false; //不正解のshowdialog
       Text('false-');
-      setState(() {});
       result.add('不正解');
       sort--;
+      return show;
     } else {
       print('正解');
       value += 10;
@@ -359,7 +360,7 @@ class _MyHomePageState extends State<MyHomePage> {
         MaterialPageRoute(builder: (context) => CorrectPage()),
       );*/
       show = true;
-      //s JudgePage2(cor);
+      return show;
       setState(() {});
       Text('true-');
       print('$cor');
@@ -509,6 +510,13 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Future<void> passans(final list) async {
+    for (int i = 0; i < list.length; i++) {
+      deteans(list[i]); //ansの配列を作る
+    }
+    setState(() {});
+  }
+
   //画面が作られたときに一度だけ呼ばれる
   @override
   void initState() {
@@ -611,35 +619,44 @@ class _MyHomePageState extends State<MyHomePage> {
                               : null,
                         ),
                       ),
-                      new SizedBox(
-                        height: 60,
-                        width: 230,
-                        child: ElevatedButton(
-                          child: ans_url.length > 2
-                              ? Text('select1')
-                              : Text('loading'),
-                          onPressed: !_isEnabled
-                              ? null
-                              : () {
-                                  //elevatedbutton表示の話
-                                  shape:
-                                  OutlineInputBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10.0)),
-                                  );
-                                  stopsound();
-                                  answer(list[0]); //urlを返す
-                                  print('正解または不正解$show');
-                                  print('select$_isEnabled');
-                                  _preEnabled = true;
-                                  return showAlert(context, show); //showdialog
-                                },
-                          style: ElevatedButton.styleFrom(
-                            primary: Colors.lightGreen,
-                            onPrimary: Colors.white,
-                          ),
-                        ),
-                      ),
+                      !_diaEnabled
+                          ? new SizedBox(
+                              height: 60,
+                              width: 230,
+                              child: ElevatedButton(
+                                child: ans_url.length > 2
+                                    ? Text('select1')
+                                    : Text('loading'),
+                                onPressed: !_isEnabled
+                                    ? null
+                                    : () {
+                                        //elevatedbutton表示の話
+                                        shape:
+                                        OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10.0)),
+                                        );
+                                        stopsound();
+                                        answer(list[0]); //urlを返す
+                                        print('正解または不正解$show');
+                                        print('select$_isEnabled');
+                                        _diaEnabled = true;
+                                        setState(() {});
+                                        return showAlert(
+                                            context, show); //showdialog
+                                      },
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.lightGreen,
+                                  onPrimary: Colors.white,
+                                ),
+                              ),
+                            )
+                          : new SizedBox(
+                              child: ansjudge[0]
+                                  ? Icon(Icons.brightness_1_outlined,
+                                      color: Colors.red, size: 100.0)
+                                  : Icon(Icons.remove_circle_outline,
+                                      color: Colors.blue, size: 100.0))
                     ]),
                 Row(
                     mainAxisSize: MainAxisSize.max,
@@ -669,33 +686,50 @@ class _MyHomePageState extends State<MyHomePage> {
                               : null,
                         ),
                       ),
-                      new SizedBox(
-                        height: 50,
-                        width: 230,
-                        child: ElevatedButton(
-                            onPressed: ans_url.length > 2
-                                ? () {
-                                    shape:
-                                    OutlineInputBorder(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10.0)),
-                                    );
-                                    stopsound();
-                                    answer(list[1]);
-                                    print('正解または不正解$show');
-                                    _preEnabled = true;
-                                    return showAlert(
-                                        context, show); //showdialog
-                                  }
-                                : null,
-                            style: ElevatedButton.styleFrom(
-                              primary: Colors.lightGreen,
-                              onPrimary: Colors.white,
-                            ),
-                            child: ans_url.length > 2
-                                ? Text('select 2')
-                                : Text('loading')),
-                      ),
+                      !_diaEnabled
+                          ? new SizedBox(
+                              height: 50,
+                              width: 230,
+                              child: ElevatedButton(
+                                onPressed: ans_url.length > 2
+                                    ? () {
+                                        shape:
+                                        OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10.0)),
+                                        );
+                                        stopsound();
+                                        answer(list[1]);
+                                        print('正解または不正解$show');
+                                        _diaEnabled = true;
+                                        setState(() {});
+                                        print('${ansjudge[1]}');
+                                        return showAlert(
+                                            context, show); //showdialog
+                                      }
+                                    : null,
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.lightGreen,
+                                  onPrimary: Colors.white,
+                                ),
+                                child: (ans_url.length > 2
+                                    ? Text('select 2')
+                                    : Text('loading')),
+                              ),
+                            )
+                          : new SizedBox(
+                              child: ansjudge[1]
+                                  ? Icon(Icons.brightness_1_outlined,
+                                      color: Colors.red, size: 100.0)
+                                  : Icon(Icons.remove_circle_outline,
+                                      color: Colors.blue, size: 100.0),
+                            )
+                      //Text('${ansjudge(list[1])}') //ここに書く
+                      // ? Text('')
+                      // : Icon(Icons.remove_circle_outline,
+                      //   color: Colors.blue, size: 300.0),
+
+                      //child: show ? Text('$show b') : Text('$show a'))
                     ]),
                 Row(
                     mainAxisSize: MainAxisSize.max,
@@ -715,31 +749,40 @@ class _MyHomePageState extends State<MyHomePage> {
                           count4++;
                         },
                       ),
-                      new SizedBox(
-                        height: 50,
-                        width: 230,
-                        child: ElevatedButton(
-                            onPressed: !_isEnabled
-                                ? null
-                                : () {
-                                    shape:
-                                    OutlineInputBorder(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10.0)),
-                                    );
-                                    stopsound();
-                                    answer(list[2]);
-                                    _preEnabled = true;
-                                    return showAlert(context, show);
-                                  },
-                            style: ElevatedButton.styleFrom(
-                              primary: Colors.lightGreen,
-                              onPrimary: Colors.white,
+                      !_diaEnabled
+                          ? new SizedBox(
+                              height: 50,
+                              width: 230,
+                              child: ElevatedButton(
+                                  onPressed: !_isEnabled
+                                      ? null
+                                      : () {
+                                          shape:
+                                          OutlineInputBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(10.0)),
+                                          );
+                                          stopsound();
+                                          answer(list[2]);
+                                          print('正解または不正解$show');
+                                          _diaEnabled = true;
+                                          return showAlert(context, show);
+                                        },
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Colors.lightGreen,
+                                    onPrimary: Colors.white,
+                                  ),
+                                  child: ans_url.length > 2
+                                      ? Text('select 3')
+                                      : Text('loading')),
+                            )
+                          : new SizedBox(
+                              child: ansjudge[2]
+                                  ? Icon(Icons.brightness_1_outlined,
+                                      color: Colors.red, size: 100.0)
+                                  : Icon(Icons.remove_circle_outline,
+                                      color: Colors.blue, size: 100.0),
                             ),
-                            child: ans_url.length > 2
-                                ? Text('select 3')
-                                : Text('loading')),
-                      ),
                     ]),
                 Row(
                     mainAxisSize: MainAxisSize.max,
@@ -760,31 +803,39 @@ class _MyHomePageState extends State<MyHomePage> {
                           count5++;
                         },
                       ),
-                      new SizedBox(
-                        height: 50,
-                        width: 230,
-                        child: ElevatedButton(
-                            onPressed: !_isEnabled
-                                ? null
-                                : () {
-                                    shape:
-                                    OutlineInputBorder(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10.0)),
-                                    );
-                                    stopsound();
-                                    answer(list[3]);
-                                    _preEnabled = true;
-                                    return showAlert(context, show);
-                                  },
-                            style: ElevatedButton.styleFrom(
-                              primary: Colors.lightGreen,
-                              onPrimary: Colors.white,
+                      !_diaEnabled
+                          ? new SizedBox(
+                              height: 50,
+                              width: 230,
+                              child: ElevatedButton(
+                                  onPressed: !_isEnabled
+                                      ? null
+                                      : () {
+                                          shape:
+                                          OutlineInputBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(10.0)),
+                                          );
+                                          stopsound();
+                                          answer(list[3]);
+                                          _diaEnabled = true;
+                                          return showAlert(context, show);
+                                        },
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Colors.lightGreen,
+                                    onPrimary: Colors.white,
+                                  ),
+                                  child: !_isEnabled
+                                      ? Text('loading')
+                                      : Text('select 4')),
+                            )
+                          : new SizedBox(
+                              child: ansjudge[3]
+                                  ? Icon(Icons.brightness_1_outlined,
+                                      color: Colors.red, size: 100.0)
+                                  : Icon(Icons.remove_circle_outline,
+                                      color: Colors.blue, size: 100.0),
                             ),
-                            child: !_isEnabled
-                                ? Text('loading')
-                                : Text('select 4')),
-                      ),
                     ]),
               ]),
           Center(
@@ -842,7 +893,7 @@ void showAlert(BuildContext context, bool show) async {
                     child: Stack(children: <Widget>[
                       Icon(Icons.brightness_1_outlined,
                           color: Colors.red, size: 300.0),
-                      Text('不正解',
+                      Text('正解',
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 30)),
                     ]),
