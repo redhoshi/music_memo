@@ -1,27 +1,18 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:avatar_glow/avatar_glow.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/rendering/object.dart';
-import 'package:intl/intl.dart';
 import 'package:music_memo/correctend/end_page.dart';
-import 'package:music_memo/first.dart';
-import 'package:music_memo/group.dart';
-import 'package:music_memo/Login/login.dart';
 
 import 'dart:math' as math;
 
-import 'package:music_memo/correctend/next_page.dart';
-import 'package:music_memo/correctend/incorrect_page.dart';
-import 'package:music_memo/judge/judge.dart';
-import 'package:music_memo/tutorial/tutorial.dart';
 import 'package:music_memo/wave/wave.dart';
 
-import 'calender/calender.dart';
+import 'correctend/incorrect_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,7 +32,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.indigo,
         ),
-        home: JudgePage()); //home: const MyHomePage
+        home: const MyHomePage()); //home: const MyHomePage
   }
 }
 
@@ -105,6 +96,12 @@ class _MyHomePageState extends State<MyHomePage> {
   final ada = [0, 0, 0, 0];
   final adb = [];
 
+  //showdialog用のbool
+  bool show = false;
+  bool _diaEnabled = false; //onbuttonしたらtrue
+
+  final ansjudge = []; //最初から実行
+
   calcurate(aiu) async {
     var dat;
     for (int j = 0; j < aiu.length; j++) {
@@ -128,6 +125,7 @@ class _MyHomePageState extends State<MyHomePage> {
     docList.removeRange(0, docList.length); //回数分ロードするから無駄
     ans_file.removeRange(0, ans_file.length); //無駄
     ai += 1;
+    sort -= 1;
     _isEnabled = false;
 
     //ストップウォッチの初期化
@@ -146,7 +144,7 @@ class _MyHomePageState extends State<MyHomePage> {
     count5 = 0;
 
     //sort
-    counts = 0;
+    counts += 1;
   }
 
   //問題データ(文)と正解データ---1回読み込めば良いデータ
@@ -166,7 +164,7 @@ class _MyHomePageState extends State<MyHomePage> {
           },
         );
     counta = (docList.length / 2).toInt(); //問題レベル中間からスタート
-    counts = counta + sort; //3
+    //counts = counta + sort; //3
     print('counta$sort');
     print('doclist--1$counts');
     //docListがawaitするからそれ以降の中身がfetchNameに渡されない
@@ -193,6 +191,8 @@ class _MyHomePageState extends State<MyHomePage> {
           .getDownloadURL();
       ans_url.add(audio_data); //正解のurlを選択肢のところと同じところから取ってくる
       print('count----$i');
+      print('doclistのlength${docList.length}');
+      print('ans_url---$ans_url');
       //問題文リスト作成
       dlist.add(que); //[フルートの音を選択]
       print('dlist$dlist');
@@ -271,12 +271,14 @@ class _MyHomePageState extends State<MyHomePage> {
     for (int i = 0; i < 4; i++) {
       SetUrl(i);
     }
+    passans(list);
 /*
     await player1.setUrl(list[0]); //awaitせずにasyncで非同期処理にすると早くなる。
     await player2.setUrl(list[1]);
     await player3.setUrl(list[2]);
     await player4.setUrl(list[3]);*/
     _isEnabled = true;
+
     time_ans.start();
     setState(() {}); //描画
   }
@@ -324,27 +326,48 @@ class _MyHomePageState extends State<MyHomePage> {
   final end = []; //問題
   final result = []; //正解・不正解の結果
 
+//正解不正解のicon表示用のlist取得
+  deteans(String val) async {
+    if (ans_url[counts] != val) {
+      ansjudge.add(false);
+    } else {
+      ansjudge.add(true);
+    }
+    print('nnnnnnnnnnnansjudge:$ansjudge');
+  }
+
   //選択肢があっているか否か
   answer(String val) async {
+    bool cor = false;
     StopTime();
     if (ans_url[counts] != val) {
       print('不正解');
       value -= 10;
+      /*
       await Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) =>
                 IncorPage(ans_file, counts, ans_url, val)), //ファイル名と引数
-      );
+      );*/
+      show = false; //不正解のshowdialog
+      Text('false-');
       result.add('不正解');
       sort--;
+      return show;
     } else {
       print('正解');
       value += 10;
+      /*
       await Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => CorrectPage()),
-      );
+      );*/
+      show = true;
+      return show;
+      setState(() {});
+      Text('true-');
+      print('$cor');
       result.add('正解');
       sort++;
     }
@@ -374,15 +397,16 @@ class _MyHomePageState extends State<MyHomePage> {
     end.add(i);
     if (i > 2) {
       print('value$value');
+      /*作動しない
       Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) =>
                 EndPage('$now', end, countslist, result, value)),
-      );
+      );*/
     } else {
       //soundData();ここでdocListを取れば良いと思う
-      fetchName(); //ここで呼んでる
+      //fetchName(); //ここでreloadをする
     }
   }
 
@@ -403,7 +427,7 @@ class _MyHomePageState extends State<MyHomePage> {
     //問題データのplayorstop
     player1.onPlayerStateChanged.listen((event) {
       print('0000000000000000000000000000');
-      if (player1.state == PlayerState.PLAYING) {
+      if (event == PlayerState.PLAYING) {
         time_lis1.start();
         print('player1:start${time_lis1.elapsed}');
         //print('-------${state[0]}');
@@ -411,8 +435,7 @@ class _MyHomePageState extends State<MyHomePage> {
           state[0] = true;
         });
       }
-      if (player1.state == PlayerState.STOPPED ||
-          player1.state == PlayerState.COMPLETED) {
+      if (event == PlayerState.STOPPED || event == PlayerState.COMPLETED) {
         time_lis1.stop();
         print('player1:stop${time_lis1.elapsed}');
         // print('-------${state[0]}');
@@ -424,7 +447,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     //player1がplyaing,stoppedorcomplete
     player2.onPlayerStateChanged.listen((event) {
-      if (player2.state == PlayerState.PLAYING) {
+      if (event == PlayerState.PLAYING) {
         time_lis2.start();
         print('player2:start${time_lis2.elapsed}');
         // print('-------${state[1]}');
@@ -433,8 +456,7 @@ class _MyHomePageState extends State<MyHomePage> {
         });
         //print('-------${state[1]}');
       }
-      if (player2.state == PlayerState.STOPPED ||
-          player2.state == PlayerState.COMPLETED) {
+      if (event == PlayerState.STOPPED || event == PlayerState.COMPLETED) {
         time_lis2.stop();
         print('player2:stop:${time_lis2.elapsed}');
         //print('-------${state[1]}');
@@ -447,7 +469,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     //player1がplyaing,stoppedorcomplete
     player3.onPlayerStateChanged.listen((event) {
-      if (player3.state == PlayerState.PLAYING) {
+      if (event == PlayerState.PLAYING) {
         time_lis3.start();
 
         ///        print('player3:start${time_lis3.elapsed}');
@@ -457,8 +479,7 @@ class _MyHomePageState extends State<MyHomePage> {
         });
         //   print('-------${state[2]}');
       }
-      if (player3.state == PlayerState.STOPPED ||
-          player3.state == PlayerState.COMPLETED) {
+      if (event == PlayerState.STOPPED || event == PlayerState.COMPLETED) {
         time_lis3.stop();
         //       print('player3:stop:${time_lis3.elapsed}');
         //       print('-------${state[2]}');
@@ -470,7 +491,7 @@ class _MyHomePageState extends State<MyHomePage> {
       //    print('Event1$event');
     });
     player4.onPlayerStateChanged.listen((event) {
-      if (player4.state == PlayerState.PLAYING) {
+      if (event == PlayerState.PLAYING) {
         time_lis4.stop();
         //       print('player4:start:${time_lis4.elapsed}');
         //   print('-------${state[3]}');
@@ -478,8 +499,7 @@ class _MyHomePageState extends State<MyHomePage> {
           state[3] = true;
         });
       }
-      if (player4.state == PlayerState.STOPPED ||
-          player4.state == PlayerState.COMPLETED) {
+      if (event == PlayerState.STOPPED || event == PlayerState.COMPLETED) {
         time_lis4.stop();
         //      print('player4:stop:${time_lis4.elapsed}');
         //   print('-------${state[3]}');
@@ -489,6 +509,13 @@ class _MyHomePageState extends State<MyHomePage> {
       }
       // print('Event4:event${state}');
     });
+  }
+
+  Future<void> passans(final list) async {
+    for (int i = 0; i < list.length; i++) {
+      deteans(list[i]); //ansの配列を作る
+    }
+    setState(() {});
   }
 
   //画面が作られたときに一度だけ呼ばれる
@@ -517,11 +544,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
           //for (int i = 0; i < state.length; i++)
           // if (state[i] == true) //wave[i]
-          if (player1.state == PlayerState.PLAYING) WavePage(wave[0]),
-          if (player2.state == PlayerState.PLAYING) WavePage(wave[1]),
-          if (state[2] == true) WavePage(wave[2]),
-          if (state[3] == true) WavePage(wave[3]),
-          if (state[4] == true) WavePage(wave[4]),
+          /*
+          if (state[0] == true) WavePage(key: Key('0'), h: wave[0]),
+          if (state[1] == true) WavePage(key: Key('1'), h: wave[1]),
+          if (state[2] == true) WavePage(key: Key('2'), h: wave[2]),
+          if (state[3] == true) WavePage(key: Key('3'), h: wave[3]),*/
+          // if (state[4] == true) WavePage(key: Key('4'), h: wave[4]),
           //Text('$i${wave[i]}'),
 
           Column(
@@ -539,84 +567,114 @@ class _MyHomePageState extends State<MyHomePage> {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                new SizedBox(
-                  width: 110.0,
-                  height: 110.0,
-                  child: FloatingActionButton(
-                    onPressed: !_isEnabled
-                        ? null
-                        : () {
-                            final now = new DateTime.now(); //いつボタン押したか。
-                            serviceTime.add({'btn1': '$now'});
-                            count1++; //何回押したか
-                            player2.stop();
-                            player3.stop();
-                            player4.stop();
-                            player5.stop();
-                            print(serviceTime);
-                            print(_isEnabled);
-                            player1.play(ans_url[counts]);
-                          },
-                    backgroundColor: Colors.orangeAccent,
-                    child: Icon(
-                      Icons.volume_up,
-                      size: 40.0,
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    if (state[0] == true) WavePage(key: Key('0'), h: 0),
+                    SizedBox(
+                      height: 100,
+                      width: 100,
+                      child: FloatingActionButton(
+                        onPressed: !_isEnabled
+                            ? null
+                            : () {
+                                final now = new DateTime.now(); //いつボタン押したか。
+                                serviceTime.add({'btn1': '$now'});
+                                count1++; //何回押したか
+                                player2.stop();
+                                player3.stop();
+                                player4.stop();
+                                player5.stop();
+                                print(serviceTime);
+                                print(_isEnabled);
+
+                                player1.play(ans_url[counts]);
+                              },
+                        backgroundColor: Colors.orangeAccent,
+                        child: Icon(
+                          Icons.volume_up,
+                          size: 40.0,
+                        ),
+                        heroTag: "btn1",
+                      ),
                     ),
-                    heroTag: "btn1",
-                  ),
+                  ],
                 ),
                 Row(
+                    //横
                     // mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
-                      new SizedBox(
-                        width: 80.0,
-                        height: 80.0,
-                        child: FloatingActionButton(
-                          backgroundColor: Colors.orangeAccent,
-                          child: Icon(Icons.volume_up),
-                          heroTag: "btn2",
-                          onPressed: _isEnabled
-                              ? () {
-                                  print(list[0]);
-                                  player1.stop();
-                                  player3.stop();
-                                  player4.stop();
-                                  player5.stop();
-                                  //time_lis.start();
-                                  //print('timestart${time_lis.elapsed}');
-                                  player2.play(list[0]);
-                                  print(_isEnabled);
-                                  count2++;
-                                }
-                              : null,
-                        ),
-                      ),
-                      new SizedBox(
-                        height: 60,
-                        width: 230,
-                        child: ElevatedButton(
-                          child: ans_url.length > 2
-                              ? Text('select1')
-                              : Text('loading'),
-                          onPressed: !_isEnabled
-                              ? null
-                              : () {
-                                  shape:
-                                  OutlineInputBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10.0)),
-                                  );
-                                  stopsound();
-                                  answer(list[0]); //urlを返す
-                                  print('select$_isEnabled');
-                                },
-                          style: ElevatedButton.styleFrom(
-                            primary: Colors.lightGreen,
-                            onPrimary: Colors.white,
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          if (state[1] == true) WavePage(key: Key('0'), h: 0),
+                          SizedBox(
+                            height: 80,
+                            width: 80,
+                            child: FloatingActionButton(
+                              backgroundColor: Colors.orangeAccent,
+                              child: Icon(
+                                Icons.volume_up,
+                                size: 40.0,
+                              ),
+                              heroTag: "btn2",
+                              onPressed: _isEnabled
+                                  ? () {
+                                      print(list[0]);
+                                      player1.stop();
+                                      player3.stop();
+                                      player4.stop();
+                                      player5.stop();
+                                      //time_lis.start();
+                                      //print('timestart${time_lis.elapsed}');
+                                      player2.play(list[0]);
+                                      print(_isEnabled);
+                                      count2++;
+                                    }
+                                  : null,
+                            ),
                           ),
-                        ),
+                        ],
                       ),
+                      !_diaEnabled
+                          ? new SizedBox(
+                              height: 60,
+                              width: 230,
+                              child: ElevatedButton(
+                                child: ans_url.length > 2
+                                    ? Text('select1')
+                                    : Text('loading'),
+                                onPressed: !_isEnabled
+                                    ? null
+                                    : () {
+                                        //elevatedbutton表示の話
+                                        shape:
+                                        OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10.0)),
+                                        );
+                                        stopsound();
+                                        answer(list[0]); //urlを返す
+                                        print('正解または不正解$show');
+                                        print('select$_isEnabled');
+                                        _diaEnabled = true;
+                                        setState(() {});
+                                        return showAlert(
+                                            context, show); //showdialog
+                                      },
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.lightGreen,
+                                  onPrimary: Colors.white,
+                                ),
+                              ),
+                            )
+                          : new SizedBox(
+                              child: ansjudge[0]
+                                  ? Icon(Icons.brightness_1_outlined,
+                                      color: Colors.red, size: 100.0)
+                                  : Icon(Icons.remove_circle_outline,
+                                      color: Colors.blue, size: 100.0))
                     ]),
                 Row(
                     mainAxisSize: MainAxisSize.max,
@@ -646,29 +704,50 @@ class _MyHomePageState extends State<MyHomePage> {
                               : null,
                         ),
                       ),
-                      new SizedBox(
-                        height: 50,
-                        width: 230,
-                        child: ElevatedButton(
-                            onPressed: ans_url.length > 2
-                                ? () {
-                                    shape:
-                                    OutlineInputBorder(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10.0)),
-                                    );
-                                    stopsound();
-                                    answer(list[1]);
-                                  }
-                                : null,
-                            style: ElevatedButton.styleFrom(
-                              primary: Colors.lightGreen,
-                              onPrimary: Colors.white,
-                            ),
-                            child: ans_url.length > 2
-                                ? Text('select 2')
-                                : Text('loading')),
-                      ),
+                      !_diaEnabled
+                          ? new SizedBox(
+                              height: 50,
+                              width: 230,
+                              child: ElevatedButton(
+                                onPressed: ans_url.length > 2
+                                    ? () {
+                                        shape:
+                                        OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10.0)),
+                                        );
+                                        stopsound();
+                                        answer(list[1]);
+                                        print('正解または不正解$show');
+                                        _diaEnabled = true;
+                                        setState(() {});
+                                        print('${ansjudge[1]}');
+                                        return showAlert(
+                                            context, show); //showdialog
+                                      }
+                                    : null,
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.lightGreen,
+                                  onPrimary: Colors.white,
+                                ),
+                                child: (ans_url.length > 2
+                                    ? Text('select 2')
+                                    : Text('loading')),
+                              ),
+                            )
+                          : new SizedBox(
+                              child: ansjudge[1]
+                                  ? Icon(Icons.brightness_1_outlined,
+                                      color: Colors.red, size: 100.0)
+                                  : Icon(Icons.remove_circle_outline,
+                                      color: Colors.blue, size: 100.0),
+                            )
+                      //Text('${ansjudge(list[1])}') //ここに書く
+                      // ? Text('')
+                      // : Icon(Icons.remove_circle_outline,
+                      //   color: Colors.blue, size: 300.0),
+
+                      //child: show ? Text('$show b') : Text('$show a'))
                     ]),
                 Row(
                     mainAxisSize: MainAxisSize.max,
@@ -688,29 +767,40 @@ class _MyHomePageState extends State<MyHomePage> {
                           count4++;
                         },
                       ),
-                      new SizedBox(
-                        height: 50,
-                        width: 230,
-                        child: ElevatedButton(
-                            onPressed: !_isEnabled
-                                ? null
-                                : () {
-                                    shape:
-                                    OutlineInputBorder(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10.0)),
-                                    );
-                                    stopsound();
-                                    answer(list[2]);
-                                  },
-                            style: ElevatedButton.styleFrom(
-                              primary: Colors.lightGreen,
-                              onPrimary: Colors.white,
+                      !_diaEnabled
+                          ? new SizedBox(
+                              height: 50,
+                              width: 230,
+                              child: ElevatedButton(
+                                  onPressed: !_isEnabled
+                                      ? null
+                                      : () {
+                                          shape:
+                                          OutlineInputBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(10.0)),
+                                          );
+                                          stopsound();
+                                          answer(list[2]);
+                                          print('正解または不正解$show');
+                                          _diaEnabled = true;
+                                          return showAlert(context, show);
+                                        },
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Colors.lightGreen,
+                                    onPrimary: Colors.white,
+                                  ),
+                                  child: ans_url.length > 2
+                                      ? Text('select 3')
+                                      : Text('loading')),
+                            )
+                          : new SizedBox(
+                              child: ansjudge[2]
+                                  ? Icon(Icons.brightness_1_outlined,
+                                      color: Colors.red, size: 100.0)
+                                  : Icon(Icons.remove_circle_outline,
+                                      color: Colors.blue, size: 100.0),
                             ),
-                            child: ans_url.length > 2
-                                ? Text('select 3')
-                                : Text('loading')),
-                      ),
                     ]),
                 Row(
                     mainAxisSize: MainAxisSize.max,
@@ -731,30 +821,57 @@ class _MyHomePageState extends State<MyHomePage> {
                           count5++;
                         },
                       ),
-                      new SizedBox(
-                        height: 50,
-                        width: 230,
-                        child: ElevatedButton(
-                            onPressed: !_isEnabled
-                                ? null
-                                : () {
-                                    shape:
-                                    OutlineInputBorder(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10.0)),
-                                    );
-                                    stopsound();
-                                    answer(list[3]);
-                                  },
-                            style: ElevatedButton.styleFrom(
-                              primary: Colors.lightGreen,
-                              onPrimary: Colors.white,
+                      !_diaEnabled
+                          ? new SizedBox(
+                              height: 50,
+                              width: 230,
+                              child: ElevatedButton(
+                                  onPressed: !_isEnabled
+                                      ? null
+                                      : () {
+                                          shape:
+                                          OutlineInputBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(10.0)),
+                                          );
+                                          stopsound();
+                                          answer(list[3]);
+                                          _diaEnabled = true;
+                                          return showAlert(context, show);
+                                        },
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Colors.lightGreen,
+                                    onPrimary: Colors.white,
+                                  ),
+                                  child: !_isEnabled
+                                      ? Text('loading')
+                                      : Text('select 4')),
+                            )
+                          : new SizedBox(
+                              child: ansjudge[3]
+                                  ? Icon(Icons.brightness_1_outlined,
+                                      color: Colors.red, size: 100.0)
+                                  : Icon(Icons.remove_circle_outline,
+                                      color: Colors.blue, size: 100.0),
                             ),
-                            child: !_isEnabled
-                                ? Text('loading')
-                                : Text('select 4')),
-                      ),
                     ]),
+                Row(
+                  children: [
+                    _diaEnabled
+                        ? FloatingActionButton.extended(
+                            onPressed: () {
+                              stopsound();
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => MyHomePage()));
+                            },
+                            label: Text('Next'),
+                            icon: Icon(Icons.arrow_forward_sharp),
+                          )
+                        : new SizedBox()
+                  ],
+                )
               ]),
           Center(
             child: !_isEnabled
@@ -796,4 +913,36 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+}
+
+//dialogshowalertの
+void showAlert(BuildContext context, bool show) async {
+  showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          //title: Text('Aの動作の確認'),
+          title: Stack(children: <Widget>[
+            show
+                ? Center(
+                    child: Stack(children: <Widget>[
+                      Icon(Icons.brightness_1_outlined,
+                          color: Colors.red, size: 300.0),
+                      Text('正解',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 30)),
+                    ]),
+                  )
+                : Center(
+                    child: Stack(children: <Widget>[
+                      Icon(Icons.remove_circle_outline,
+                          color: Colors.blue, size: 300.0),
+                      Text('不正解',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 30)),
+                    ]),
+                  )
+          ]),
+        );
+      });
 }
