@@ -2,8 +2,9 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 class WavePage extends StatefulWidget {
+  WavePage({Key? key, required this.h}) : super(key: key);
   double h;
-  WavePage(this.h);
+  //WavePage(this.h);
   @override
   _WavePageState createState() => _WavePageState(h);
 }
@@ -32,36 +33,37 @@ class _WavePageState extends State<WavePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: CustomPaint(
-          painter: SpritePainter(
-            _animationController,
-            tall,
-          ),
-          child: SizedBox(
-            //widthは大きさが変わるheightは何も変わらん
-            width: 300.0,
-            height: 300.0,
-            child: Text('$tall'),
-          ),
+    return Container(
+      height: 200,
+      width: 200,
+      //scafold入れると
+      child: CustomPaint(
+        painter: SpritePainter(
+          _animationController,
         ),
+        /*
+        child: SizedBox(
+          //widthは大きさが変わるheightは何も変わらん
+          width: 300.0,
+          height: 300.0,
+          child: Text('$tall'),
+        ),*/
       ),
     );
   }
 }
 
 class SpritePainter extends CustomPainter {
-  double ta;
+  //double ta;
   final Animation<double> _animation;
-  SpritePainter(this._animation, this.ta) : super(repaint: _animation);
+  SpritePainter(this._animation) : super(repaint: _animation);
 
   void circle(Canvas canvas, Rect rect, double value) {
     double opacity = (1.0 - (value / 4.0)).clamp(0.0, 1.0); // 透明度の設定
     Color color = Color.fromRGBO(188, 175, 237, opacity); // 色の設定
 
     // print(rect);
-    double size = rect.width / 3; //半径の長さ？
+    double size = rect.width; //半径の長さ？
     double area = size * size;
     double radius = sqrt(area * value / 4);
 
@@ -72,7 +74,7 @@ class SpritePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     Rect rect = Rect.fromLTRB(
-        14.0, ta, size.width, size.height); //LTWH,left,top,width,height
+        100, 0, size.width, size.height); //LTWH,left,top,width,height
 
     for (int wave = 3; wave >= 0; wave--) {
       circle(canvas, rect, wave + _animation.value);

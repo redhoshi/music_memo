@@ -12,6 +12,8 @@ import 'dart:math' as math;
 
 import 'package:music_memo/wave/wave.dart';
 
+import 'correctend/incorrect_page.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -87,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
   //docListのカウント
   int counta = 0;
   //順位ソートに用いる
-  int sort = -1;
+  int sort = 0;
   //sort初期化を防ぐ
   int counts = 0;
   //test
@@ -123,6 +125,7 @@ class _MyHomePageState extends State<MyHomePage> {
     docList.removeRange(0, docList.length); //回数分ロードするから無駄
     ans_file.removeRange(0, ans_file.length); //無駄
     ai += 1;
+    sort -= 1;
     _isEnabled = false;
 
     //ストップウォッチの初期化
@@ -141,7 +144,7 @@ class _MyHomePageState extends State<MyHomePage> {
     count5 = 0;
 
     //sort
-    counts = 0;
+    counts += 1;
   }
 
   //問題データ(文)と正解データ---1回読み込めば良いデータ
@@ -161,7 +164,7 @@ class _MyHomePageState extends State<MyHomePage> {
           },
         );
     counta = (docList.length / 2).toInt(); //問題レベル中間からスタート
-    counts = counta + sort; //3
+    //counts = counta + sort; //3
     print('counta$sort');
     print('doclist--1$counts');
     //docListがawaitするからそれ以降の中身がfetchNameに渡されない
@@ -188,6 +191,7 @@ class _MyHomePageState extends State<MyHomePage> {
           .getDownloadURL();
       ans_url.add(audio_data); //正解のurlを選択肢のところと同じところから取ってくる
       print('count----$i');
+      print('doclistのlength${docList.length}');
       print('ans_url---$ans_url');
       //問題文リスト作成
       dlist.add(que); //[フルートの音を選択]
@@ -393,12 +397,13 @@ class _MyHomePageState extends State<MyHomePage> {
     end.add(i);
     if (i > 2) {
       print('value$value');
+      /*作動しない
       Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) =>
                 EndPage('$now', end, countslist, result, value)),
-      );
+      );*/
     } else {
       //soundData();ここでdocListを取れば良いと思う
       //fetchName(); //ここでreloadをする
@@ -422,7 +427,7 @@ class _MyHomePageState extends State<MyHomePage> {
     //問題データのplayorstop
     player1.onPlayerStateChanged.listen((event) {
       print('0000000000000000000000000000');
-      if (player1.state == PlayerState.PLAYING) {
+      if (event == PlayerState.PLAYING) {
         time_lis1.start();
         print('player1:start${time_lis1.elapsed}');
         //print('-------${state[0]}');
@@ -430,8 +435,7 @@ class _MyHomePageState extends State<MyHomePage> {
           state[0] = true;
         });
       }
-      if (player1.state == PlayerState.STOPPED ||
-          player1.state == PlayerState.COMPLETED) {
+      if (event == PlayerState.STOPPED || event == PlayerState.COMPLETED) {
         time_lis1.stop();
         print('player1:stop${time_lis1.elapsed}');
         // print('-------${state[0]}');
@@ -443,7 +447,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     //player1がplyaing,stoppedorcomplete
     player2.onPlayerStateChanged.listen((event) {
-      if (player2.state == PlayerState.PLAYING) {
+      if (event == PlayerState.PLAYING) {
         time_lis2.start();
         print('player2:start${time_lis2.elapsed}');
         // print('-------${state[1]}');
@@ -452,8 +456,7 @@ class _MyHomePageState extends State<MyHomePage> {
         });
         //print('-------${state[1]}');
       }
-      if (player2.state == PlayerState.STOPPED ||
-          player2.state == PlayerState.COMPLETED) {
+      if (event == PlayerState.STOPPED || event == PlayerState.COMPLETED) {
         time_lis2.stop();
         print('player2:stop:${time_lis2.elapsed}');
         //print('-------${state[1]}');
@@ -466,7 +469,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     //player1がplyaing,stoppedorcomplete
     player3.onPlayerStateChanged.listen((event) {
-      if (player3.state == PlayerState.PLAYING) {
+      if (event == PlayerState.PLAYING) {
         time_lis3.start();
 
         ///        print('player3:start${time_lis3.elapsed}');
@@ -476,8 +479,7 @@ class _MyHomePageState extends State<MyHomePage> {
         });
         //   print('-------${state[2]}');
       }
-      if (player3.state == PlayerState.STOPPED ||
-          player3.state == PlayerState.COMPLETED) {
+      if (event == PlayerState.STOPPED || event == PlayerState.COMPLETED) {
         time_lis3.stop();
         //       print('player3:stop:${time_lis3.elapsed}');
         //       print('-------${state[2]}');
@@ -489,7 +491,7 @@ class _MyHomePageState extends State<MyHomePage> {
       //    print('Event1$event');
     });
     player4.onPlayerStateChanged.listen((event) {
-      if (player4.state == PlayerState.PLAYING) {
+      if (event == PlayerState.PLAYING) {
         time_lis4.stop();
         //       print('player4:start:${time_lis4.elapsed}');
         //   print('-------${state[3]}');
@@ -497,8 +499,7 @@ class _MyHomePageState extends State<MyHomePage> {
           state[3] = true;
         });
       }
-      if (player4.state == PlayerState.STOPPED ||
-          player4.state == PlayerState.COMPLETED) {
+      if (event == PlayerState.STOPPED || event == PlayerState.COMPLETED) {
         time_lis4.stop();
         //      print('player4:stop:${time_lis4.elapsed}');
         //   print('-------${state[3]}');
@@ -543,11 +544,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
           //for (int i = 0; i < state.length; i++)
           // if (state[i] == true) //wave[i]
-          if (player1.state == PlayerState.PLAYING) WavePage(wave[0]),
-          if (player2.state == PlayerState.PLAYING) WavePage(wave[1]),
-          if (state[2] == true) WavePage(wave[2]),
-          if (state[3] == true) WavePage(wave[3]),
-          if (state[4] == true) WavePage(wave[4]),
+          /*
+          if (state[0] == true) WavePage(key: Key('0'), h: wave[0]),
+          if (state[1] == true) WavePage(key: Key('1'), h: wave[1]),
+          if (state[2] == true) WavePage(key: Key('2'), h: wave[2]),
+          if (state[3] == true) WavePage(key: Key('3'), h: wave[3]),*/
+          // if (state[4] == true) WavePage(key: Key('4'), h: wave[4]),
           //Text('$i${wave[i]}'),
 
           Column(
@@ -565,59 +567,74 @@ class _MyHomePageState extends State<MyHomePage> {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                new SizedBox(
-                  width: 110.0,
-                  height: 110.0,
-                  child: FloatingActionButton(
-                    onPressed: !_isEnabled
-                        ? null
-                        : () {
-                            final now = new DateTime.now(); //いつボタン押したか。
-                            serviceTime.add({'btn1': '$now'});
-                            count1++; //何回押したか
-                            player2.stop();
-                            player3.stop();
-                            player4.stop();
-                            player5.stop();
-                            print(serviceTime);
-                            print(_isEnabled);
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    if (state[0] == true) WavePage(key: Key('0'), h: 0),
+                    SizedBox(
+                      height: 100,
+                      width: 100,
+                      child: FloatingActionButton(
+                        onPressed: !_isEnabled
+                            ? null
+                            : () {
+                                final now = new DateTime.now(); //いつボタン押したか。
+                                serviceTime.add({'btn1': '$now'});
+                                count1++; //何回押したか
+                                player2.stop();
+                                player3.stop();
+                                player4.stop();
+                                player5.stop();
+                                print(serviceTime);
+                                print(_isEnabled);
 
-                            player1.play(ans_url[counts]);
-                          },
-                    backgroundColor: Colors.orangeAccent,
-                    child: Icon(
-                      Icons.volume_up,
-                      size: 40.0,
+                                player1.play(ans_url[counts]);
+                              },
+                        backgroundColor: Colors.orangeAccent,
+                        child: Icon(
+                          Icons.volume_up,
+                          size: 40.0,
+                        ),
+                        heroTag: "btn1",
+                      ),
                     ),
-                    heroTag: "btn1",
-                  ),
+                  ],
                 ),
                 Row(
                     // mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
-                      new SizedBox(
-                        width: 80.0,
-                        height: 80.0,
-                        child: FloatingActionButton(
-                          backgroundColor: Colors.orangeAccent,
-                          child: Icon(Icons.volume_up),
-                          heroTag: "btn2",
-                          onPressed: _isEnabled
-                              ? () {
-                                  print(list[0]);
-                                  player1.stop();
-                                  player3.stop();
-                                  player4.stop();
-                                  player5.stop();
-                                  //time_lis.start();
-                                  //print('timestart${time_lis.elapsed}');
-                                  player2.play(list[0]);
-                                  print(_isEnabled);
-                                  count2++;
-                                }
-                              : null,
-                        ),
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          if (state[1] == true) WavePage(key: Key('0'), h: 0),
+                          SizedBox(
+                            height: 80,
+                            width: 80,
+                            child: FloatingActionButton(
+                              backgroundColor: Colors.orangeAccent,
+                              child: Icon(
+                                Icons.volume_up,
+                                size: 40.0,
+                              ),
+                              heroTag: "btn2",
+                              onPressed: _isEnabled
+                                  ? () {
+                                      print(list[0]);
+                                      player1.stop();
+                                      player3.stop();
+                                      player4.stop();
+                                      player5.stop();
+                                      //time_lis.start();
+                                      //print('timestart${time_lis.elapsed}');
+                                      player2.play(list[0]);
+                                      print(_isEnabled);
+                                      count2++;
+                                    }
+                                  : null,
+                            ),
+                          ),
+                        ],
                       ),
                       !_diaEnabled
                           ? new SizedBox(
@@ -837,6 +854,20 @@ class _MyHomePageState extends State<MyHomePage> {
                                       color: Colors.blue, size: 100.0),
                             ),
                     ]),
+                Row(
+                  children: [
+                    FloatingActionButton.extended(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => MyHomePage()));
+                      },
+                      label: Text('Next'),
+                      icon: Icon(Icons.arrow_forward_sharp),
+                    ),
+                  ],
+                )
               ]),
           Center(
             child: !_isEnabled
