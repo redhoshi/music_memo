@@ -63,7 +63,7 @@ class SpritePainter extends CustomPainter {
     Color color = Color.fromRGBO(188, 175, 237, opacity); // 色の設定
 
     // print(rect);
-    double size = rect.width; //半径の長さ？
+    double size = rect.width / 1.4; //半径の長さ？
     double area = size * size;
     double radius = sqrt(area * value / 4);
 

@@ -601,6 +601,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ],
                 ),
                 Row(
+                    //横
                     // mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
@@ -856,16 +857,19 @@ class _MyHomePageState extends State<MyHomePage> {
                     ]),
                 Row(
                   children: [
-                    FloatingActionButton.extended(
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => MyHomePage()));
-                      },
-                      label: Text('Next'),
-                      icon: Icon(Icons.arrow_forward_sharp),
-                    ),
+                    _diaEnabled
+                        ? FloatingActionButton.extended(
+                            onPressed: () {
+                              stopsound();
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => MyHomePage()));
+                            },
+                            label: Text('Next'),
+                            icon: Icon(Icons.arrow_forward_sharp),
+                          )
+                        : new SizedBox()
                   ],
                 )
               ]),
