@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/rendering/object.dart';
+import 'package:music_memo/Login/login.dart';
 import 'package:music_memo/correctend/end_page.dart';
 
 import 'dart:math' as math;
@@ -95,6 +96,8 @@ class _MyHomePageState extends State<MyHomePage> {
   //test
   final ada = [0, 0, 0, 0];
   final adb = [];
+  //ページ番号
+  int _page = 0;
 
   //showdialog用のbool
   bool show = false;
@@ -116,10 +119,27 @@ class _MyHomePageState extends State<MyHomePage> {
     calcurate(queli); //[0,1,2]をランダムにする
   }
 
+  //End画面への遷移
+  Future<void> passend() async {
+    _page > 5
+        ? Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    EndPage('now', end, countslist, result, value)))
+        : reload();
+  }
+
+  //リロード
+  Future<void> reload() async {
+    fetchName();
+    counts++;
+  }
+
 //リストの初期化(繊維ごとに初期化)
   Future<void> Initialized() async {
     dlist.removeRange(0, dlist.length);
-    ans_url.removeRange(0, ans_url.length);
+    //ans_url.removeRange(0, ans_url.length);
     selist.removeRange(0, selist.length);
     list.removeRange(0, list.length);
     docList.removeRange(0, docList.length); //回数分ロードするから無駄
@@ -127,6 +147,7 @@ class _MyHomePageState extends State<MyHomePage> {
     ai += 1;
     sort -= 1;
     _isEnabled = false;
+    _diaEnabled = false;
 
     //ストップウォッチの初期化
     time_lis1.reset();
@@ -144,7 +165,8 @@ class _MyHomePageState extends State<MyHomePage> {
     count5 = 0;
 
     //sort
-    counts += 1;
+    print('aqqqqqqqqqqqqqqqqqqqqqqqq$counts');
+    // counts += 1;
   }
 
   //問題データ(文)と正解データ---1回読み込めば良いデータ
@@ -180,8 +202,8 @@ class _MyHomePageState extends State<MyHomePage> {
       String que = '${snepshot['que']}'; //問題文
       String ans = '${snepshot['audio']}'; //正解のファイル名
 
-      print('que$que');
-      print('ans$ans');
+      //  print('que$que');
+      // print('ans$ans');
       //正解データのURL取得
       final audio_data = await firebase_storage.FirebaseStorage.instance
           .ref()
@@ -190,12 +212,12 @@ class _MyHomePageState extends State<MyHomePage> {
           .child(ans)
           .getDownloadURL();
       ans_url.add(audio_data); //正解のurlを選択肢のところと同じところから取ってくる
-      print('count----$i');
-      print('doclistのlength${docList.length}');
-      print('ans_url---$ans_url');
+      // print('count----$i');
+      //  print('doclistのlength${docList.length}');
+      print('ans_url---$ans_url'); //3個
       //問題文リスト作成
       dlist.add(que); //[フルートの音を選択]
-      print('dlist$dlist');
+      //   print('dlist$dlist');
 
       //画像参照用のファイル名取得
       final j = ans.length - 4; //ファイル名取得
@@ -205,8 +227,8 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     //問題文リストから難易度別のリストに並べた
     countslist.add(dlist[counts]); //countsのlistを提示
-    print('countlist$countslist');
-    print('setstateato$docList'); //[que1,que2]
+    //  print('countlist$countslist');
+    // print('setstateato$docList'); //[que1,que2]
     SoundSet(ans_url[counts]); //queli[aio]
   }
 
@@ -253,7 +275,7 @@ class _MyHomePageState extends State<MyHomePage> {
   audiodata(aiu, eio) async {
     calcurate(aiu);
     urllist(aiu, eio); //aiuがリスト
-    print('aiu$aiu'); //aiuリストの中でans_urlと一致するやつが正解
+    //print('aiu$aiu'); //aiuリストの中でans_urlと一致するやつが正解
   }
 
   //音のUrl取得
@@ -320,13 +342,24 @@ class _MyHomePageState extends State<MyHomePage> {
   final end = []; //問題
   final result = []; //正解・不正解の結果
 
+  Future<void> passans(final list) async {
+    print('9999999999999$list');
+    deteans(list);
+    setState(() {});
+  }
+
 //正解不正解のicon表示用のlist取得
-  deteans(String val) async {
-    if (ans_url[counts] != val) {
-      ansjudge.add(false);
-    } else {
-      ansjudge.add(true);
+  deteans(final val) {
+    //list
+    print('$val\n');
+    for (int i = 0; i < val.length; i++) {
+      if (ans_url[counts] != val[i]) {
+        ansjudge.add(false);
+      } else {
+        ansjudge.add(true);
+      }
     }
+    print('ansjudge$ansjudge\n');
   }
 
   //選択肢があっているか否か
@@ -487,20 +520,13 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  Future<void> passans(final list) async {
-    for (int i = 0; i < list.length; i++) {
-      deteans(list[i]); //ansの配列を作る
-    }
-    setState(() {});
-  }
-
   //画面が作られたときに一度だけ呼ばれる
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     QueExample();
-    Initialized();
+    //Initialized();
     PassDoc();
     fetchName();
     PlayTime();
@@ -834,15 +860,20 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                     ]),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     _diaEnabled
                         ? FloatingActionButton.extended(
                             onPressed: () {
                               stopsound();
+                              _page++;
+                              passend();
+                              //reloadする
+                              /*
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => MyHomePage()));
+                                      builder: (context) => MyHomePage()));*/
                             },
                             label: Text('Next'),
                             icon: Icon(Icons.arrow_forward_sharp),
