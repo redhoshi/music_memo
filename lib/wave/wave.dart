@@ -34,8 +34,8 @@ class _WavePageState extends State<WavePage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 200,
-      width: 200,
+      //height: 100, //他のオブジェクトに影響する
+      //width: 100,
       //scafold入れると
       child: CustomPaint(
         painter: SpritePainter(
@@ -63,7 +63,7 @@ class SpritePainter extends CustomPainter {
     Color color = Color.fromRGBO(188, 175, 237, opacity); // 色の設定
 
     // print(rect);
-    double size = rect.width / 1.4; //半径の長さ？
+    double size = rect.width * 1000; //半径の長さ？
     double area = size * size;
     double radius = sqrt(area * value / 4);
 
@@ -74,7 +74,7 @@ class SpritePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     Rect rect = Rect.fromLTRB(
-        100, 0, size.width, size.height); //LTWH,left,top,width,height
+        0.1, 0, size.width, size.height); //LTWH,left,top,width,height0.1*1000
 
     for (int wave = 3; wave >= 0; wave--) {
       circle(canvas, rect, wave + _animation.value);

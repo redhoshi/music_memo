@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/rendering/object.dart';
+import 'package:music_memo/Login/login.dart';
 import 'package:music_memo/correctend/end_page.dart';
 
 import 'dart:math' as math;
@@ -95,6 +96,8 @@ class _MyHomePageState extends State<MyHomePage> {
   //test
   final ada = [0, 0, 0, 0];
   final adb = [];
+  //ページ番号
+  int _page = 0;
 
   //showdialog用のbool
   bool show = false;
@@ -116,10 +119,27 @@ class _MyHomePageState extends State<MyHomePage> {
     calcurate(queli); //[0,1,2]をランダムにする
   }
 
+  //End画面への遷移
+  Future<void> passend() async {
+    _page > 5
+        ? Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    EndPage('now', end, countslist, result, value)))
+        : reload();
+  }
+
+  //リロード
+  Future<void> reload() async {
+    fetchName();
+    counts++;
+  }
+
 //リストの初期化(繊維ごとに初期化)
   Future<void> Initialized() async {
     dlist.removeRange(0, dlist.length);
-    ans_url.removeRange(0, ans_url.length);
+    //ans_url.removeRange(0, ans_url.length);
     selist.removeRange(0, selist.length);
     list.removeRange(0, list.length);
     docList.removeRange(0, docList.length); //回数分ロードするから無駄
@@ -127,6 +147,7 @@ class _MyHomePageState extends State<MyHomePage> {
     ai += 1;
     sort -= 1;
     _isEnabled = false;
+    _diaEnabled = false;
 
     //ストップウォッチの初期化
     time_lis1.reset();
@@ -144,7 +165,8 @@ class _MyHomePageState extends State<MyHomePage> {
     count5 = 0;
 
     //sort
-    counts += 1;
+    print('aqqqqqqqqqqqqqqqqqqqqqqqq$counts');
+    // counts += 1;
   }
 
   //問題データ(文)と正解データ---1回読み込めば良いデータ
@@ -180,8 +202,8 @@ class _MyHomePageState extends State<MyHomePage> {
       String que = '${snepshot['que']}'; //問題文
       String ans = '${snepshot['audio']}'; //正解のファイル名
 
-      print('que$que');
-      print('ans$ans');
+      //  print('que$que');
+      // print('ans$ans');
       //正解データのURL取得
       final audio_data = await firebase_storage.FirebaseStorage.instance
           .ref()
@@ -190,12 +212,12 @@ class _MyHomePageState extends State<MyHomePage> {
           .child(ans)
           .getDownloadURL();
       ans_url.add(audio_data); //正解のurlを選択肢のところと同じところから取ってくる
-      print('count----$i');
-      print('doclistのlength${docList.length}');
-      print('ans_url---$ans_url');
+      // print('count----$i');
+      //  print('doclistのlength${docList.length}');
+      print('ans_url---$ans_url'); //3個
       //問題文リスト作成
       dlist.add(que); //[フルートの音を選択]
-      print('dlist$dlist');
+      //   print('dlist$dlist');
 
       //画像参照用のファイル名取得
       final j = ans.length - 4; //ファイル名取得
@@ -205,8 +227,8 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     //問題文リストから難易度別のリストに並べた
     countslist.add(dlist[counts]); //countsのlistを提示
-    print('countlist$countslist');
-    print('setstateato$docList'); //[que1,que2]
+    //  print('countlist$countslist');
+    // print('setstateato$docList'); //[que1,que2]
     SoundSet(ans_url[counts]); //queli[aio]
   }
 
@@ -253,7 +275,7 @@ class _MyHomePageState extends State<MyHomePage> {
   audiodata(aiu, eio) async {
     calcurate(aiu);
     urllist(aiu, eio); //aiuがリスト
-    print('aiu$aiu'); //aiuリストの中でans_urlと一致するやつが正解
+    //print('aiu$aiu'); //aiuリストの中でans_urlと一致するやつが正解
   }
 
   //音のUrl取得
@@ -272,13 +294,7 @@ class _MyHomePageState extends State<MyHomePage> {
       SetUrl(i);
     }
     passans(list);
-/*
-    await player1.setUrl(list[0]); //awaitせずにasyncで非同期処理にすると早くなる。
-    await player2.setUrl(list[1]);
-    await player3.setUrl(list[2]);
-    await player4.setUrl(list[3]);*/
     _isEnabled = true;
-
     time_ans.start();
     setState(() {}); //描画
   }
@@ -326,14 +342,24 @@ class _MyHomePageState extends State<MyHomePage> {
   final end = []; //問題
   final result = []; //正解・不正解の結果
 
+  Future<void> passans(final list) async {
+    print('9999999999999$list');
+    deteans(list);
+    setState(() {});
+  }
+
 //正解不正解のicon表示用のlist取得
-  deteans(String val) async {
-    if (ans_url[counts] != val) {
-      ansjudge.add(false);
-    } else {
-      ansjudge.add(true);
+  deteans(final val) {
+    //list
+    print('$val\n');
+    for (int i = 0; i < val.length; i++) {
+      if (ans_url[counts] != val[i]) {
+        ansjudge.add(false);
+      } else {
+        ansjudge.add(true);
+      }
     }
-    print('nnnnnnnnnnnansjudge:$ansjudge');
+    print('ansjudge$ansjudge\n');
   }
 
   //選択肢があっているか否か
@@ -417,105 +443,81 @@ class _MyHomePageState extends State<MyHomePage> {
   AudioPlayer player4 = new AudioPlayer(mode: PlayerMode.LOW_LATENCY);
   AudioPlayer player5 = new AudioPlayer(mode: PlayerMode.LOW_LATENCY);
 
-  //waveの位置
-  final wave = [-400.0, -110.0, 150.0, 300.0, 450.0].cast<double>(); //縦軸
-  final beside = []; //横軸
+  //waveの出力
   final state = [false, false, false, false, false].cast<bool>();
 
-  //playしている時間
+  //eventのstateがplaying/stopped.or.completeの時の処理
   Future<void> PlayTime() async {
-    //問題データのplayorstop
     player1.onPlayerStateChanged.listen((event) {
-      print('0000000000000000000000000000');
       if (event == PlayerState.PLAYING) {
         time_lis1.start();
-        print('player1:start${time_lis1.elapsed}');
-        //print('-------${state[0]}');
         setState(() {
           state[0] = true;
         });
       }
       if (event == PlayerState.STOPPED || event == PlayerState.COMPLETED) {
         time_lis1.stop();
-        print('player1:stop${time_lis1.elapsed}');
-        // print('-------${state[0]}');
         setState(() {
           state[0] = false;
         });
       }
-      print('Event:player1:$state');
     });
-    //player1がplyaing,stoppedorcomplete
     player2.onPlayerStateChanged.listen((event) {
       if (event == PlayerState.PLAYING) {
         time_lis2.start();
-        print('player2:start${time_lis2.elapsed}');
-        // print('-------${state[1]}');
         setState(() {
           state[1] = true;
         });
-        //print('-------${state[1]}');
       }
       if (event == PlayerState.STOPPED || event == PlayerState.COMPLETED) {
         time_lis2.stop();
-        print('player2:stop:${time_lis2.elapsed}');
-        //print('-------${state[1]}');
         setState(() {
           state[1] = false;
         });
-        //  print('-------${state[1]}');
       }
-      print('Event2${state}');
     });
-    //player1がplyaing,stoppedorcomplete
     player3.onPlayerStateChanged.listen((event) {
       if (event == PlayerState.PLAYING) {
         time_lis3.start();
-
-        ///        print('player3:start${time_lis3.elapsed}');
-        //      print('-------${state[2]}');
         setState(() {
           state[2] = true;
         });
-        //   print('-------${state[2]}');
       }
       if (event == PlayerState.STOPPED || event == PlayerState.COMPLETED) {
         time_lis3.stop();
-        //       print('player3:stop:${time_lis3.elapsed}');
-        //       print('-------${state[2]}');
         setState(() {
           state[2] = false;
         });
-        //     print('-------${state}');
       }
-      //    print('Event1$event');
     });
     player4.onPlayerStateChanged.listen((event) {
       if (event == PlayerState.PLAYING) {
         time_lis4.stop();
-        //       print('player4:start:${time_lis4.elapsed}');
-        //   print('-------${state[3]}');
         setState(() {
           state[3] = true;
         });
       }
       if (event == PlayerState.STOPPED || event == PlayerState.COMPLETED) {
         time_lis4.stop();
-        //      print('player4:stop:${time_lis4.elapsed}');
-        //   print('-------${state[3]}');
         setState(() {
           state[3] = false;
         });
       }
-      // print('Event4:event${state}');
     });
-  }
-
-  Future<void> passans(final list) async {
-    for (int i = 0; i < list.length; i++) {
-      deteans(list[i]); //ansの配列を作る
-    }
-    setState(() {});
+    player5.onPlayerStateChanged.listen((event) {
+      if (event == PlayerState.PLAYING) {
+        time_lis5.stop();
+        setState(() {
+          state[4] = true;
+        });
+      }
+      if (event == PlayerState.STOPPED || event == PlayerState.COMPLETED) {
+        time_lis5.stop();
+        setState(() {
+          state[4] = false;
+        });
+      }
+    });
   }
 
   //画面が作られたときに一度だけ呼ばれる
@@ -524,8 +526,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // TODO: implement initState
     super.initState();
     QueExample();
-    Initialized();
-    //追加
+    //Initialized();
     PassDoc();
     fetchName();
     PlayTime();
@@ -540,18 +541,6 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Stack(
         children: [
-          //別の値を入れる。配列に元から場所入れておく。
-
-          //for (int i = 0; i < state.length; i++)
-          // if (state[i] == true) //wave[i]
-          /*
-          if (state[0] == true) WavePage(key: Key('0'), h: wave[0]),
-          if (state[1] == true) WavePage(key: Key('1'), h: wave[1]),
-          if (state[2] == true) WavePage(key: Key('2'), h: wave[2]),
-          if (state[3] == true) WavePage(key: Key('3'), h: wave[3]),*/
-          // if (state[4] == true) WavePage(key: Key('4'), h: wave[4]),
-          //Text('$i${wave[i]}'),
-
           Column(
               //縦
               mainAxisSize: MainAxisSize.max,
@@ -626,8 +615,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                       player3.stop();
                                       player4.stop();
                                       player5.stop();
-                                      //time_lis.start();
-                                      //print('timestart${time_lis.elapsed}');
                                       player2.play(list[0]);
                                       print(_isEnabled);
                                       count2++;
@@ -680,30 +667,33 @@ class _MyHomePageState extends State<MyHomePage> {
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
-                      new SizedBox(
-                        width: 80.0,
-                        height: 80.0,
-                        child: FloatingActionButton(
-                          backgroundColor: Colors.orangeAccent,
-                          child: Icon(
-                            Icons.volume_up,
-                            size: 35.0,
+                      Stack(alignment: Alignment.center, children: [
+                        if (state[2] == true) WavePage(key: Key('0'), h: 0),
+                        new SizedBox(
+                          width: 80.0,
+                          height: 80.0,
+                          child: FloatingActionButton(
+                            backgroundColor: Colors.orangeAccent,
+                            child: Icon(
+                              Icons.volume_up,
+                              size: 35.0,
+                            ),
+                            heroTag: "btn3",
+                            onPressed: ans_url.length > 2
+                                ? () {
+                                    print("pre2"); //音を鳴らす
+                                    print(list[1]);
+                                    player1.stop();
+                                    player2.stop();
+                                    player4.stop();
+                                    player5.stop();
+                                    player3.play(list[1]);
+                                    count3++;
+                                  }
+                                : null,
                           ),
-                          heroTag: "btn3",
-                          onPressed: ans_url.length > 2
-                              ? () {
-                                  print("pre2"); //音を鳴らす
-                                  print(list[1]);
-                                  player1.stop();
-                                  player2.stop();
-                                  player4.stop();
-                                  player5.stop();
-                                  player3.play(list[1]);
-                                  count3++;
-                                }
-                              : null,
                         ),
-                      ),
+                      ]),
                       !_diaEnabled
                           ? new SizedBox(
                               height: 50,
@@ -742,31 +732,35 @@ class _MyHomePageState extends State<MyHomePage> {
                                   : Icon(Icons.remove_circle_outline,
                                       color: Colors.blue, size: 100.0),
                             )
-                      //Text('${ansjudge(list[1])}') //ここに書く
-                      // ? Text('')
-                      // : Icon(Icons.remove_circle_outline,
-                      //   color: Colors.blue, size: 300.0),
-
-                      //child: show ? Text('$show b') : Text('$show a'))
                     ]),
                 Row(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
-                      FloatingActionButton(
-                        backgroundColor: Colors.orangeAccent,
-                        child: Icon(Icons.volume_up),
-                        heroTag: "btn4",
-                        onPressed: () {
-                          print(list[2]);
-                          player1.stop();
-                          player2.stop();
-                          player3.stop();
-                          player5.stop();
-                          player4.play(list[2]);
-                          count4++;
-                        },
-                      ),
+                      Stack(alignment: Alignment.center, children: [
+                        if (state[3] == true) WavePage(key: Key('0'), h: 0),
+                        new SizedBox(
+                          width: 80.0,
+                          height: 80.0,
+                          child: FloatingActionButton(
+                            backgroundColor: Colors.orangeAccent,
+                            child: Icon(
+                              Icons.volume_up,
+                              size: 35.0,
+                            ),
+                            heroTag: "btn4",
+                            onPressed: () {
+                              print(list[2]);
+                              player1.stop();
+                              player2.stop();
+                              player3.stop();
+                              player5.stop();
+                              player4.play(list[2]);
+                              count4++;
+                            },
+                          ),
+                        ),
+                      ]),
                       !_diaEnabled
                           ? new SizedBox(
                               height: 50,
@@ -806,21 +800,31 @@ class _MyHomePageState extends State<MyHomePage> {
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
-                      FloatingActionButton(
-                        backgroundColor: Colors.orangeAccent,
-                        child: Icon(Icons.volume_up),
-                        heroTag: "btn5",
-                        onPressed: () {
-                          print(list[3]);
-                          print(list);
-                          player1.stop();
-                          player2.stop();
-                          player3.stop();
-                          player4.stop();
-                          player5.play(list[3]);
-                          count5++;
-                        },
-                      ),
+                      Stack(alignment: Alignment.center, children: [
+                        if (state[4] == true) WavePage(key: Key('0'), h: 0),
+                        SizedBox(
+                          width: 80.0,
+                          height: 80.0,
+                          child: FloatingActionButton(
+                            backgroundColor: Colors.orangeAccent,
+                            child: Icon(
+                              Icons.volume_up,
+                              size: 35.0,
+                            ),
+                            heroTag: "btn5",
+                            onPressed: () {
+                              print(list[3]);
+                              print(list);
+                              player1.stop();
+                              player2.stop();
+                              player3.stop();
+                              player4.stop();
+                              player5.play(list[3]);
+                              count5++;
+                            },
+                          ),
+                        ),
+                      ]),
                       !_diaEnabled
                           ? new SizedBox(
                               height: 50,
@@ -856,15 +860,20 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                     ]),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     _diaEnabled
                         ? FloatingActionButton.extended(
                             onPressed: () {
                               stopsound();
+                              _page++;
+                              passend();
+                              //reloadする
+                              /*
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => MyHomePage()));
+                                      builder: (context) => MyHomePage()));*/
                             },
                             label: Text('Next'),
                             icon: Icon(Icons.arrow_forward_sharp),
