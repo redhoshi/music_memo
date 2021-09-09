@@ -115,7 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<void> QueExample() async {
+  Future<void> queExample() async {
     calcurate(queli); //[0,1,2]をランダムにする
   }
 
@@ -144,6 +144,7 @@ class _MyHomePageState extends State<MyHomePage> {
     list.removeRange(0, list.length);
     docList.removeRange(0, docList.length); //回数分ロードするから無駄
     ans_file.removeRange(0, ans_file.length); //無駄
+    ansjudge.removeRange(0, ansjudge.length); //正解・不正解リストの初期化
     ai += 1;
     sort -= 1;
     _isEnabled = false;
@@ -163,10 +164,6 @@ class _MyHomePageState extends State<MyHomePage> {
     count3 = 0;
     count4 = 0;
     count5 = 0;
-
-    //sort
-    print('aqqqqqqqqqqqqqqqqqqqqqqqq$counts');
-    // counts += 1;
   }
 
   //問題データ(文)と正解データ---1回読み込めば良いデータ
@@ -174,7 +171,6 @@ class _MyHomePageState extends State<MyHomePage> {
     //問題のリスト
     //**変更：usersからquestion */
     int i = 0;
-    ada[2] = 3;
 
     await FirebaseFirestore.instance.collection('question').get().then(
           (QuerySnapshot querySnapshot) => {
@@ -185,16 +181,10 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           },
         );
-    counta = (docList.length / 2).toInt(); //問題レベル中間からスタート
-    //counts = counta + sort; //3
-    print('counta$sort');
-    print('doclist--1$counts');
     //docListがawaitするからそれ以降の中身がfetchNameに渡されない
     soundData(docList); //que_1のみ
-    print('doclist--2$docList');
     //フィールドを参照
     for (int i = 0; i < docList.length; i++) {
-      ///再度検討
       final snepshot = await FirebaseFirestore.instance
           .collection('question')
           .doc(docList[i])
@@ -202,8 +192,6 @@ class _MyHomePageState extends State<MyHomePage> {
       String que = '${snepshot['que']}'; //問題文
       String ans = '${snepshot['audio']}'; //正解のファイル名
 
-      //  print('que$que');
-      // print('ans$ans');
       //正解データのURL取得
       final audio_data = await firebase_storage.FirebaseStorage.instance
           .ref()
@@ -212,12 +200,9 @@ class _MyHomePageState extends State<MyHomePage> {
           .child(ans)
           .getDownloadURL();
       ans_url.add(audio_data); //正解のurlを選択肢のところと同じところから取ってくる
-      // print('count----$i');
-      //  print('doclistのlength${docList.length}');
+
       print('ans_url---$ans_url'); //3個
-      //問題文リスト作成
       dlist.add(que); //[フルートの音を選択]
-      //   print('dlist$dlist');
 
       //画像参照用のファイル名取得
       final j = ans.length - 4; //ファイル名取得
@@ -234,12 +219,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> SoundSet(ans) async {
     await player1.setUrl(ans);
-  }
-
-  //試作用
-  Future<void> PassDoc() async {
-    ada[1] = 1;
-    adb.add(1);
   }
 
   Future<void> fetchName() async {
@@ -525,9 +504,8 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    QueExample();
+    queExample();
     //Initialized();
-    PassDoc();
     fetchName();
     PlayTime();
   }
