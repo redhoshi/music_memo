@@ -13,8 +13,6 @@ import 'dart:math' as math;
 
 import 'package:music_memo/wave/wave.dart';
 
-import 'correctend/incorrect_page.dart';
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -93,9 +91,6 @@ class _MyHomePageState extends State<MyHomePage> {
   int sort = 0;
   //sort初期化を防ぐ
   int counts = 0;
-  //test
-  final ada = [0, 0, 0, 0];
-  final adb = [];
   //ページ番号
   int _page = 0;
 
@@ -125,8 +120,8 @@ class _MyHomePageState extends State<MyHomePage> {
         ? Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) =>
-                    EndPage('now', end, countslist, result, value)))
+                builder: (context) => EndPage(
+                    'now', end, countslist, result, value))) //nowに名前を入れる
         : reload();
   }
 
@@ -210,10 +205,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ans_file.add(uu); //ans_fileリストに格納
       setState(() {});
     }
-    //問題文リストから難易度別のリストに並べた
     countslist.add(dlist[counts]); //countsのlistを提示
-    //  print('countlist$countslist');
-    // print('setstateato$docList'); //[que1,que2]
     SoundSet(ans_url[counts]); //queli[aio]
   }
 
@@ -247,14 +239,12 @@ class _MyHomePageState extends State<MyHomePage> {
       if (selist.length > 3) audiodata(selist, doc);
       setState(() {});
     });
-    // print('${time_ans.elapsed}');
   }
 
   //音をランダムに配置
   audiodata(aiu, eio) async {
     calcurate(aiu);
     urllist(aiu, eio); //aiuがリスト
-    //print('aiu$aiu'); //aiuリストの中でans_urlと一致するやつが正解
   }
 
   //音のUrl取得
@@ -322,7 +312,6 @@ class _MyHomePageState extends State<MyHomePage> {
   final result = []; //正解・不正解の結果
 
   Future<void> passans(final list) async {
-    print('9999999999999$list');
     deteans(list);
     setState(() {});
   }
@@ -345,42 +334,34 @@ class _MyHomePageState extends State<MyHomePage> {
   answer(String val) async {
     bool cor = false;
     StopTime();
+    i++;
+    end.add(i);
     if (ans_url[counts] != val) {
       print('不正解');
       value -= 10;
-      /*
-      await Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) =>
-                IncorPage(ans_file, counts, ans_url, val)), //ファイル名と引数
-      );*/
       show = false; //不正解のshowdialog
       Text('false-');
       result.add('不正解');
       sort--;
-      return show;
+      //return show;
     } else {
       print('正解');
       value += 10;
-      /*
-      await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => CorrectPage()),
-      );*/
       show = true;
-      return show;
       setState(() {});
       Text('true-');
       print('$cor');
       result.add('正解');
       sort++;
+      print('result${result[0]}');
+      print(i);
+      //return show;
     }
+    firewrite();
+  }
 
+  Future<void> firewrite() async {
     final now = new DateTime.now();
-    print('result${result[0]}');
-    print(i);
-    //ログデータの書き込み
     await FirebaseFirestore.instance
         .collection('results') // コレクションID--->名前入力でも良いかもね
         .doc('$now') // ここは空欄だと自動でIDが付く
@@ -398,21 +379,6 @@ class _MyHomePageState extends State<MyHomePage> {
       ],
       'time_ans': '${time_ans.elapsed}',
     });
-    i++;
-    end.add(i);
-    if (i > 2) {
-      print('value$value');
-      /*作動しない
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) =>
-                EndPage('$now', end, countslist, result, value)),
-      );*/
-    } else {
-      //soundData();ここでdocListを取れば良いと思う
-      //fetchName(); //ここでreloadをする
-    }
   }
 
   //audiocacheクラスの初期化
@@ -846,12 +812,6 @@ class _MyHomePageState extends State<MyHomePage> {
                               stopsound();
                               _page++;
                               passend();
-                              //reloadする
-                              /*
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => MyHomePage()));*/
                             },
                             label: Text('Next'),
                             icon: Icon(Icons.arrow_forward_sharp),
@@ -908,7 +868,6 @@ void showAlert(BuildContext context, bool show) async {
       context: context,
       builder: (context) {
         return AlertDialog(
-          //title: Text('Aの動作の確認'),
           title: Stack(children: <Widget>[
             show
                 ? Center(
