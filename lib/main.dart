@@ -36,14 +36,17 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
-
+  //const MyHomePage({Key? key}) : super(key: key);
+  MyHomePage(this.user);
+  String user;
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MyHomePage> createState() => _MyHomePageState(user);
 }
 
 class _MyHomePageState extends State<MyHomePage> {
   //ここで変数とか関数を定義
+  _MyHomePageState(this.user);
+  String user;
 
   //問題と正解データを格納するリスト
   final dlist = []; //初期値設定問題文初期値を2個以上つけたらエラーでない
@@ -121,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
             context,
             MaterialPageRoute(
                 builder: (context) => EndPage(
-                    'now', end, countslist, result, value))) //nowに名前を入れる
+                    '$userさん', end, countslist, result, value))) //nowに名前を入れる
         : reload();
   }
 
@@ -370,7 +373,7 @@ class _MyHomePageState extends State<MyHomePage> {
     print('count$count1');
     print('${time_lis1.elapsed}');
     await FirebaseFirestore.instance
-        .collection('results') // コレクションID--->名前入力でも良いかもね
+        .collection('$user') // コレクションID--->名前入力でも良いかもね
         .doc('$now') // ここは空欄だと自動でIDが付く
         .set({
       'hour': '${now.hour}/${now.minute}/${now.second}',

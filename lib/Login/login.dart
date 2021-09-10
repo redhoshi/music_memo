@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:music_memo/calender/calender.dart';
 import 'package:music_memo/first.dart';
+import 'package:music_memo/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
@@ -192,7 +193,7 @@ class _LoginPageState extends State<LoginPage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) =>
-                                CalenderExample(_userController.text)),
+                                MyHomePage(_userController.text)),
                       );
                 print('presss_id:$press_id');
               },
