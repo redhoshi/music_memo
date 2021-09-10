@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:music_memo/calender/calender.dart';
 import 'package:music_memo/first.dart';
+import 'package:music_memo/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
@@ -64,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
 
   //shared_preferencesを使ってみる
 
-  Future<void> SharedPre(String _user) async {
+  Future<void> SharedPre(String _user, String _pass) async {
     int i = 0;
     String m = 'aiu';
 
@@ -72,6 +73,7 @@ class _LoginPageState extends State<LoginPage> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     //保存
     prefs.setString('userid', _user);
+    prefs.setString('passid', _pass);
     print('user:$_user');
     setState(() {});
   }
@@ -79,11 +81,14 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> read() async {
     //instancを取得
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.get(
-      'userid',
-    );
+    prefs.get('userid');
     _userController.text = prefs.getString(
           'userid',
+        ) ??
+        '';
+    prefs.get('passid');
+    _passwordController.text = prefs.getString(
+          'passid',
         ) ??
         '';
     setState(() {});
@@ -175,7 +180,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               onPressed: () async {
                 CheckPass(_userController.text, _passwordController.text);
-                SharedPre(_userController.text);
+                SharedPre(_userController.text, _passwordController.text);
                 print(user_id);
                 print(
                     'user:${_userController.text}pass:${_passwordController.text}');
@@ -188,7 +193,7 @@ class _LoginPageState extends State<LoginPage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) =>
-                                CalenderExample(_userController.text)),
+                                MyHomePage(_userController.text)),
                       );
                 print('presss_id:$press_id');
               },
