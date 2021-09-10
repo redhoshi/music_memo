@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.indigo,
         ),
-        home: const MyHomePage()); //home: const MyHomePage
+        home: const LoginPage()); //home: const MyHomePage
   }
 }
 
@@ -162,7 +162,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   //問題データ(文)と正解データ---1回読み込めば良いデータ
-  Future<void> AnswerName() async {
+  Future<void> answerName() async {
     //問題のリスト
     //**変更：usersからquestion */
     int i = 0;
@@ -196,7 +196,7 @@ class _MyHomePageState extends State<MyHomePage> {
           .getDownloadURL();
       ans_url.add(audio_data); //正解のurlを選択肢のところと同じところから取ってくる
 
-      print('ans_url---$ans_url'); //3個
+      //print('ans_url---$ans_url'); //3個
       dlist.add(que); //[フルートの音を選択]
 
       //画像参照用のファイル名取得
@@ -206,17 +206,17 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {});
     }
     countslist.add(dlist[counts]); //countsのlistを提示
-    SoundSet(ans_url[counts]); //queli[aio]
+    soundSet(ans_url[counts]); //queli[aio]
   }
 
-  Future<void> SoundSet(ans) async {
+  Future<void> soundSet(ans) async {
     await player1.setUrl(ans);
   }
 
   Future<void> fetchName() async {
     Initialized(); //初期化
     print('問題格納リスト$queli'); //機能しない
-    AnswerName();
+    answerName();
     setState(() {});
   }
 
@@ -302,7 +302,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   //ストップウォッチ回答時間
-  void StopTime() {
+  void stopTime() {
     time_ans.stop();
     print('回答時間${time_ans.elapsed}');
   }
@@ -333,7 +333,7 @@ class _MyHomePageState extends State<MyHomePage> {
   //選択肢があっているか否か
   answer(String val) async {
     bool cor = false;
-    StopTime();
+    stopTime();
     i++;
     end.add(i);
     if (ans_url[counts] != val) {
@@ -344,6 +344,7 @@ class _MyHomePageState extends State<MyHomePage> {
       result.add('不正解');
       sort--;
       //return show;
+      firewrite();
     } else {
       print('正解');
       value += 10;
@@ -356,19 +357,25 @@ class _MyHomePageState extends State<MyHomePage> {
       print('result${result[0]}');
       print(i);
       //return show;
+      firewrite();
     }
-    firewrite();
   }
 
   Future<void> firewrite() async {
+    //呼び出すのはselectが変わったあとで次へを押す前
+    print('-------------------------------$i');
     final now = new DateTime.now();
+    print('doclist${docList[i]}');
+    print('result${result[i - 1]}');
+    print('count$count1');
+    print('${time_lis1.elapsed}');
     await FirebaseFirestore.instance
         .collection('results') // コレクションID--->名前入力でも良いかもね
         .doc('$now') // ここは空欄だと自動でIDが付く
         .set({
       'hour': '${now.hour}/${now.minute}/${now.second}',
       'que': '${docList[i]}',
-      'ans': '${result[i]}',
+      'ans': '${result[i - 1]}',
       'btn': ['$count1', '$count2', '$count2', '$count3', '$count4'],
       'soundtime': [
         '${time_lis1.elapsed}',
