@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:music_memo/main.dart';
 import 'package:music_memo/pie_chart/pie.dart';
 
 Future<void> main() async {
@@ -92,37 +93,6 @@ class EndPagePage extends State<EndPage> {
           const SizedBox(
             height: 12,
           ),
-          /*
-          Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              border: const Border(
-                left: const BorderSide(
-                  color: Colors.black,
-                  width: 3,
-                ),
-                right: const BorderSide(
-                  color: Colors.black,
-                  width: 3,
-                ),
-                top: const BorderSide(
-                  color: Colors.black,
-                  width: 3,
-                ),
-                bottom: const BorderSide(
-                  color: Colors.black,
-                  width: 3,
-                ),
-              ),
-            ),
-            child: Center(
-              child: Text(
-                '$val点',
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),*/
           Table(
             border: TableBorder.all(),
             children: [
@@ -134,6 +104,14 @@ class EndPagePage extends State<EndPage> {
                 ]),
             ],
           ),
+          FloatingActionButton.extended(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => MyHomePage(name))); //
+              },
+              label: Text('もう一回')),
         ],
       ),
     );
