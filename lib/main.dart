@@ -75,19 +75,24 @@ class _MyHomePageState extends State<MyHomePage> {
   Stopwatch time_lis4 = Stopwatch();
   Stopwatch time_lis5 = Stopwatch();
 
-  //音源ボタンを押した回数
-  int count1 = 0; //音源データをタップした回数
+  //問題提示時に音源ボタンを押した回数
+  int count1 = 0;
   int count2 = 0;
   int count3 = 0;
   int count4 = 0;
   int count5 = 0;
+  //復習の時に音源ボタンを押した回数
+  int out1 = 0;
+  int out2 = 0;
+  int out3 = 0;
+  int out4 = 0;
+  int out5 = 0;
 
   //いつどのボタンを押したかのタイムスタンプ
   final List<Map<String, dynamic>> serviceTime = [];
 
   //答えの画面で表示するリスト
   int value = 0; //得点
-
   //docListのカウント
   int counta = 0;
   //順位ソートに用いる
@@ -154,14 +159,21 @@ class _MyHomePageState extends State<MyHomePage> {
     time_lis3.reset();
     time_lis4.reset();
     time_lis5.reset();
-    time_ans.reset(); //回答時間の初期化
+    time_ans.reset();
 
-    //ボタンカウンタの初期化
+    //カウンタの初期化
     count1 = 0;
     count2 = 0;
     count3 = 0;
     count4 = 0;
     count5 = 0;
+
+    //カウンタの初期化
+    out1 = 0;
+    out2 = 0;
+    out3 = 0;
+    out4 = 0;
+    out5 = 0;
   }
 
   //問題データ(文)と正解データ---1回読み込めば良いデータ
@@ -337,7 +349,6 @@ class _MyHomePageState extends State<MyHomePage> {
   answer(String val) async {
     bool cor = false;
     stopTime();
-    i++;
     end.add(i);
     if (ans_url[counts] != val) {
       print('不正解');
@@ -346,7 +357,6 @@ class _MyHomePageState extends State<MyHomePage> {
       Text('false-');
       result.add('不正解');
       sort--;
-      //return show;
       firewrite();
     } else {
       print('正解');
@@ -359,8 +369,7 @@ class _MyHomePageState extends State<MyHomePage> {
       sort++;
       print('result${result[0]}');
       print(i);
-      //return show;
-      firewrite();
+      // firewrite(); //next押された時点で書き込めるといいかな
     }
   }
 
@@ -368,8 +377,9 @@ class _MyHomePageState extends State<MyHomePage> {
     //呼び出すのはselectが変わったあとで次へを押す前
     print('-------------------------------$i');
     final now = new DateTime.now();
+    print('docList$docList');
     print('doclist${docList[i]}');
-    print('result${result[i - 1]}');
+    print('result${result[i]}');
     print('count$count1');
     print('${time_lis1.elapsed}');
     await FirebaseFirestore.instance
@@ -378,7 +388,7 @@ class _MyHomePageState extends State<MyHomePage> {
         .set({
       'hour': '${now.hour}/${now.minute}/${now.second}',
       'que': '${docList[i]}',
-      'ans': '${result[i - 1]}',
+      'ans': '${result[i]}',
       'btn': ['$count1', '$count2', '$count2', '$count3', '$count4'],
       'soundtime': [
         '${time_lis1.elapsed}',
@@ -388,6 +398,7 @@ class _MyHomePageState extends State<MyHomePage> {
         '${time_lis5.elapsed}'
       ],
       'time_ans': '${time_ans.elapsed}',
+      'resoundbtn': ['$out1', out2, out3, out4, out5],
     });
   }
 
@@ -530,8 +541,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                 player5.stop();
                                 print(serviceTime);
                                 print(_isEnabled);
-
                                 player1.play(ans_url[counts]);
+                                _diaEnabled ? out1++ : print('');
                               },
                         backgroundColor: Colors.orangeAccent,
                         child: Icon(
@@ -572,6 +583,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                       player2.play(list[0]);
                                       print(_isEnabled);
                                       count2++;
+                                      _diaEnabled ? out2++ : print('');
                                     }
                                   : null,
                             ),
@@ -643,6 +655,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     player5.stop();
                                     player3.play(list[1]);
                                     count3++;
+                                    _diaEnabled ? out3++ : print('');
                                   }
                                 : null,
                           ),
@@ -711,6 +724,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               player5.stop();
                               player4.play(list[2]);
                               count4++;
+                              _diaEnabled ? out4++ : print('');
                             },
                           ),
                         ),
@@ -775,6 +789,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               player4.stop();
                               player5.play(list[3]);
                               count5++;
+                              _diaEnabled ? out5++ : print('');
                             },
                           ),
                         ),
@@ -820,6 +835,11 @@ class _MyHomePageState extends State<MyHomePage> {
                         ? FloatingActionButton.extended(
                             onPressed: () {
                               stopsound();
+                              firewrite();
+                              i++;
+                              print('nextpressed');
+                              print('docList$docList');
+                              //print('ansurl$ans_url');
                               _page++;
                               passend();
                             },
