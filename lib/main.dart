@@ -125,12 +125,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   //End画面への遷移
   Future<void> passend() async {
+    print('user$user,end$end,countslist:$countslist,result$result,value$value');
     _page > 5
         ? Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => EndPage(
-                    '$userさん', end, countslist, result, value))) //nowに名前を入れる
+                    '$user', end, countslist, result, value))) //nowに名前を入れる
         : reload();
   }
 
@@ -142,12 +143,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
 //リストの初期化(繊維ごとに初期化)
   Future<void> Initialized() async {
-    dlist.removeRange(0, dlist.length);
+    //dlist.removeRange(0, dlist.length);
     //ans_url.removeRange(0, ans_url.length);
     selist.removeRange(0, selist.length);
     list.removeRange(0, list.length);
-    docList.removeRange(0, docList.length); //回数分ロードするから無駄
-    ans_file.removeRange(0, ans_file.length); //無駄
+    //docList.removeRange(0, docList.length); //回数分ロードするから無駄
+    //ans_file.removeRange(0, ans_file.length); //無駄
     ansjudge.removeRange(0, ansjudge.length); //正解・不正解リストの初期化
     ai += 1;
     sort -= 1;
@@ -179,10 +180,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   //問題データ(文)と正解データ---1回読み込めば良いデータ
   Future<void> answerName() async {
-    //問題のリスト
-    //**変更：usersからquestion */
     int i = 0;
-
     await FirebaseFirestore.instance.collection('question').get().then(
           (QuerySnapshot querySnapshot) => {
             querySnapshot.docs.forEach(
@@ -232,6 +230,15 @@ class _MyHomePageState extends State<MyHomePage> {
     soundSet(ans_url[counta]); //queli[aio]
   }
 
+  //2回目以降にsoundDataを呼び出す関数
+  Future<void> endlist(docu) async {
+    final snepshot =
+        await FirebaseFirestore.instance.collection('question').doc(docu).get();
+    String que = '${snepshot['que']}'; //問題文
+    dlist.add(que);
+    countslist.add(dlist[counta]);
+  }
+
   Future<void> soundSet(ans) async {
     await player1.setUrl(ans);
   }
@@ -239,13 +246,14 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> fetchName() async {
     Initialized(); //初期化
     print('問題格納リスト$queli'); //機能しない
-    answerName();
+    counta < 1 ? answerName() : new SizedBox();
+    counta > 0 ? soundData(docList) : new SizedBox();
     setState(() {});
   }
 
   //選択肢のファイルの名前取得　ドキュメントidのディレクトリのファイルを参照して、ファイルの名前を一部抽出
   Future<void> soundData(doc) async {
-    //選択肢ファイルのファイル名取得
+    counta > 0 ? endlist(doc[counta]) : new SizedBox();
     firebase_storage.ListResult result = await firebase_storage
         .FirebaseStorage.instance
         .ref()
@@ -272,6 +280,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   //音のUrl取得
   Future<void> urllist(aiu, doc) async {
+    print('ドックカウンタ${doc[counta]},${aiu}');
     for (int j = 0; j < aiu.length; j++) {
       final audio_url = await firebase_storage.FirebaseStorage.instance
           .ref()
@@ -395,11 +404,12 @@ class _MyHomePageState extends State<MyHomePage> {
     print('count$count1');
     print('${time_lis1.elapsed}');
     final now = new DateTime.now();
-    await FirebaseFirestore.instance
+    /*
+    FirebaseFirestore.instance
         .collection('$user') // コレクションID--->名前入力でも良いかもね
-        .doc('now') // ここは空欄だと自動でIDが付く
+        .doc('$now') // ここは空欄だと自動でIDが付く
         .set({
-      'hour': '${now.hour}/${now.minute}/${now.second}',
+      //'hour': '${'now.hour'}/${'now.minute'}/${'now.second'}',
       'que': '${docList[counta]}',
       'ans': '${result[counta]}',
       'btn': ['$count1', '$count2', '$count2', '$count3', '$count4'],
@@ -413,7 +423,7 @@ class _MyHomePageState extends State<MyHomePage> {
       'time_ans': time_ans.elapsed,
       'resoundbtn': [out1, out2, out3, out4, out5],
       'ansjudge': ansjudge,
-    });
+    });*/
   }
 
   //audiocacheクラスの初期化
@@ -853,7 +863,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               print('nextpressed');
                               print('docList$docList');
                               //print('ansurl$ans_url');
-                              firewrite();
+                              //firewrite();
                               _page++;
                               counta++;
                               passend();

@@ -87,7 +87,7 @@ class EndPagePage extends State<EndPage> {
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
-          Text('【$name】の結果'),
+          Text('【$nameさん】の結果'),
           //PieChartSample2(),
           PieChartSample2(e: per_c1, o: per_i1),
           const SizedBox(
@@ -98,7 +98,7 @@ class EndPagePage extends State<EndPage> {
             children: [
               for (int i = 0; i < e.length; i++)
                 TableRow(children: [
-                  Text('第${e[i]}問'),
+                  Text('第${e[i] + 1}問'),
                   Text('${text[i]}'),
                   Text('${re[i]}')
                 ]),
