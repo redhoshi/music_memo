@@ -417,8 +417,8 @@ class _MyHomePageState extends State<MyHomePage> {
       '何問目': counta + 1,
       'que': '${docList[counta]}',
       'ans': '${result[counta]}',
+      'inst': ['${selist[0]}', '${selist[1]}', '${selist[2]}', '${selist[3]}'],
       'btn': ['$count1', '$count2', '$count2', '$count3', '$count4'],
-
       'soundtime': [
         '${time_lis1.elapsed}',
         '${time_lis2.elapsed}',
@@ -426,8 +426,7 @@ class _MyHomePageState extends State<MyHomePage> {
         '${time_lis4.elapsed}',
         '${time_lis5.elapsed}'
       ],
-      'time_ans': '${time_ans.elapsed}', //ここが問題
-
+      'time_ans': '${time_ans.elapsed}', //文字列で囲まないとdurationが出る
       'resoundbtn': [out1, out2, out3, out4, out5],
       'ansjudge': ansjudge,
     });
