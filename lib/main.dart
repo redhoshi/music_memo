@@ -362,6 +362,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ansjudge.add(true);
       }
     }
+
     print('ansjudge$ansjudge\n');
   }
 
@@ -403,16 +404,21 @@ class _MyHomePageState extends State<MyHomePage> {
     print('result${result[counta]}');
     print('count$count1');
     print('${time_lis1.elapsed}');
+    print('out$out1');
+    print('タイムアンス${time_ans.elapsed}');
+    print('ansjudge$ansjudge');
     final now = new DateTime.now();
-    /*
-    FirebaseFirestore.instance
+
+    await FirebaseFirestore.instance
         .collection('$user') // コレクションID--->名前入力でも良いかもね
         .doc('$now') // ここは空欄だと自動でIDが付く
         .set({
       //'hour': '${'now.hour'}/${'now.minute'}/${'now.second'}',
+      '何問目': counta + 1,
       'que': '${docList[counta]}',
       'ans': '${result[counta]}',
       'btn': ['$count1', '$count2', '$count2', '$count3', '$count4'],
+
       'soundtime': [
         '${time_lis1.elapsed}',
         '${time_lis2.elapsed}',
@@ -420,10 +426,11 @@ class _MyHomePageState extends State<MyHomePage> {
         '${time_lis4.elapsed}',
         '${time_lis5.elapsed}'
       ],
-      'time_ans': time_ans.elapsed,
+      'time_ans': '${time_ans.elapsed}', //ここが問題
+
       'resoundbtn': [out1, out2, out3, out4, out5],
       'ansjudge': ansjudge,
-    });*/
+    });
   }
 
   //audiocacheクラスの初期化
@@ -863,7 +870,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               print('nextpressed');
                               print('docList$docList');
                               //print('ansurl$ans_url');
-                              //firewrite();
+                              firewrite();
                               _page++;
                               counta++;
                               passend();
