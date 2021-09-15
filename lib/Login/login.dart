@@ -193,7 +193,7 @@ class _LoginPageState extends State<LoginPage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) =>
-                                MyHomePage(_userController.text)),
+                                FirstPage(_userController.text)),
                       );
                 print('presss_id:$press_id');
               },
