@@ -109,7 +109,8 @@ class EndPagePage extends State<EndPage> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => MyHomePage(name))); //
+                        builder: (context) =>
+                            MyHomePage(name, 'sound'))); //first.dartにいく
               },
               label: Text('もう一回')),
         ],

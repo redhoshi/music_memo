@@ -15,7 +15,7 @@ class FirstPage extends StatefulWidget {
 class _FirstPageState extends State<FirstPage> {
   _FirstPageState(this.user);
   String user;
-  bool _isEnded = false;
+  bool _isEnded1 = false;
 
   @override
   Widget build(BuildContext context) {
@@ -61,13 +61,14 @@ class _FirstPageState extends State<FirstPage> {
             height: 100,
             child: NeumorphicFloatingActionButton(
               child: Icon(Icons.campaign_sharp, size: 30),
-              onPressed: _isEnded //trueなら押せなくする
+              onPressed: _isEnded1 //trueなら押せなくする
                   ? null
                   : () async {
                       await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => MyHomePage(user),
+                            builder: (context) =>
+                                MyHomePage(user, 'sound'), //sound
                           ));
                     },
             ),
@@ -85,7 +86,7 @@ class _FirstPageState extends State<FirstPage> {
             height: 100,
             child: NeumorphicFloatingActionButton(
               child: Icon(Icons.construction, size: 30),
-              onPressed: () {},
+              onPressed: () {}, //audio
             ),
           ),
           Text(
@@ -101,7 +102,7 @@ class _FirstPageState extends State<FirstPage> {
             height: 100,
             child: NeumorphicFloatingActionButton(
               child: Icon(Icons.construction, size: 30),
-              onPressed: () {},
+              onPressed: () {}, //sound3
             ),
           ),
           /*

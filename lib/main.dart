@@ -37,16 +37,17 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   //const MyHomePage({Key? key}) : super(key: key);
-  MyHomePage(this.user);
-  String user;
+  MyHomePage(this.user, this.sound);
+  String user, sound;
+
   @override
-  State<MyHomePage> createState() => _MyHomePageState(user);
+  State<MyHomePage> createState() => _MyHomePageState(user, sound);
 }
 
 class _MyHomePageState extends State<MyHomePage> {
   //ここで変数とか関数を定義
-  _MyHomePageState(this.user);
-  String user;
+  _MyHomePageState(this.user, this.sound);
+  String user, sound;
 
   //問題と正解データを格納するリスト
   final dlist = []; //初期値設定問題文初期値を2個以上つけたらエラーでない
@@ -211,7 +212,7 @@ class _MyHomePageState extends State<MyHomePage> {
       //正解データのURL取得
       final audio_data = await firebase_storage.FirebaseStorage.instance
           .ref()
-          .child('sound')
+          .child('$sound')
           .child(docList[i])
           .child(ans)
           .getDownloadURL();
@@ -257,7 +258,7 @@ class _MyHomePageState extends State<MyHomePage> {
     firebase_storage.ListResult result = await firebase_storage
         .FirebaseStorage.instance
         .ref()
-        .child('sound')
+        .child('$sound')
         .child(doc[counta])
         .listAll(); //que_1の中のファイル名を返す
     result.items.forEach((firebase_storage.Reference ref) async {
@@ -284,7 +285,7 @@ class _MyHomePageState extends State<MyHomePage> {
     for (int j = 0; j < aiu.length; j++) {
       final audio_url = await firebase_storage.FirebaseStorage.instance
           .ref()
-          .child('sound') /*audio->sound */
+          .child('$sound') /*audio->sound */
           .child(doc[counta]) //que_1
           .child(aiu[j]) //dri_tp
           .getDownloadURL();
