@@ -60,7 +60,8 @@ class EndPagePage extends State<EndPage> {
     final now = new DateTime.now();
     DateFormat outputFormat = DateFormat('yyyy-MM-dd');
     String date = outputFormat.format(now);
-    await FirebaseFirestore.instance.collection('userre').doc('$date').set({
+    await FirebaseFirestore.instance.collection('userre').doc('$name').set({
+      'date': '$date',
       'correct': '$per',
       '正解': '$perc',
       '不正解': '$peri',
@@ -109,8 +110,8 @@ class EndPagePage extends State<EndPage> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) =>
-                            MyHomePage(name, 'sound'))); //first.dartにいく
+                        builder: (context) => MyHomePage(
+                            name, 'sound', 'question'))); //first.dartにいく
               },
               label: Text('もう一回')),
         ],

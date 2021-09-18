@@ -68,7 +68,7 @@ class _FirstPageState extends State<FirstPage> {
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                MyHomePage(user, 'sound'), //sound
+                                MyHomePage(user, 'sound', 'question'), //sound
                           ));
                     },
             ),
@@ -86,7 +86,14 @@ class _FirstPageState extends State<FirstPage> {
             height: 100,
             child: NeumorphicFloatingActionButton(
               child: Icon(Icons.construction, size: 30),
-              onPressed: () {}, //audio
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          MyHomePage(user, 'sound2', 'question2'), //sound
+                    ));
+              }, //audio
             ),
           ),
           Text(
