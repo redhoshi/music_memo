@@ -37,17 +37,17 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   //const MyHomePage({Key? key}) : super(key: key);
-  MyHomePage(this.user, this.sound);
-  String user, sound;
+  MyHomePage(this.user, this.sound, this.question);
+  String user, sound, question;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState(user, sound);
+  State<MyHomePage> createState() => _MyHomePageState(user, sound, question);
 }
 
 class _MyHomePageState extends State<MyHomePage> {
   //ここで変数とか関数を定義
-  _MyHomePageState(this.user, this.sound);
-  String user, sound;
+  _MyHomePageState(this.user, this.sound, this.question);
+  String user, sound, question;
 
   //問題と正解データを格納するリスト
   final dlist = []; //初期値設定問題文初期値を2個以上つけたらエラーでない
@@ -182,7 +182,7 @@ class _MyHomePageState extends State<MyHomePage> {
   //問題データ(文)と正解データ---1回読み込めば良いデータ
   Future<void> answerName() async {
     int i = 0;
-    await FirebaseFirestore.instance.collection('question').get().then(
+    await FirebaseFirestore.instance.collection('$question').get().then(
           (QuerySnapshot querySnapshot) => {
             querySnapshot.docs.forEach(
               (doc) async {
@@ -198,7 +198,7 @@ class _MyHomePageState extends State<MyHomePage> {
     //フィールドを参照
     for (int i = 0; i < docList.length; i++) {
       final snepshot = await FirebaseFirestore.instance
-          .collection('question')
+          .collection('$question')
           .doc(docList[i])
           .get();
       //calcurate(docList); //問題をランダム化
@@ -233,8 +233,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   //2回目以降にsoundDataを呼び出す関数
   Future<void> endlist(docu) async {
-    final snepshot =
-        await FirebaseFirestore.instance.collection('question').doc(docu).get();
+    final snepshot = await FirebaseFirestore.instance
+        .collection('$question')
+        .doc(docu)
+        .get();
     String que = '${snepshot['que']}'; //問題文
     dlist.add(que);
     countslist.add(dlist[counta]);
@@ -542,12 +544,12 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                if (dlist.length > 2)
+                if (dlist.length > 5)
                   new SizedBox(
                     width: 500.0,
                     height: 18.0,
                     child: Text(
-                      dlist.length > 5 ? dlist[counta] : '', //これが一番遅いかな
+                      dlist.length > 2 ? dlist[counta] : '', //これが一番遅いかな
                       style: TextStyle(fontSize: 15),
                       textAlign: TextAlign.center,
                     ),
