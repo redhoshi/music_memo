@@ -109,7 +109,14 @@ class _FirstPageState extends State<FirstPage> {
             height: 100,
             child: NeumorphicFloatingActionButton(
               child: Icon(Icons.construction, size: 30),
-              onPressed: () {}, //sound3
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          MyHomePage(user, 'sound3', 'question3'), //sound
+                    ));
+              }, //sound3
             ),
           ),
           /*
