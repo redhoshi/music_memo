@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:music_memo/Login/login.dart';
 import 'package:music_memo/main.dart';
+import 'dart:math' as math;
 
 class FirstPage extends StatefulWidget {
   //const FirstPage({Key? key}) : super(key: key);
@@ -16,9 +17,24 @@ class _FirstPageState extends State<FirstPage> {
   _FirstPageState(this.user);
   String user;
   bool _isEnded1 = false;
+  final num = List<int>.generate(3, (i) => i + 0);
+  final sound = ['sound', 'sound2', 'sound3'];
+  final question = ['question', 'question2', 'question3'];
+
+  calcurate(aiu) async {
+    var dat;
+    for (int j = 0; j < aiu.length; j++) {
+      int lottery = math.Random().nextInt(j + 1);
+      dat = aiu[j];
+      aiu[j] = aiu[lottery];
+      aiu[lottery] = dat;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    calcurate(num);
+    print(num);
     return Scaffold(
       appBar: AppBar(
         title: Text('FirstPage'),
@@ -64,11 +80,12 @@ class _FirstPageState extends State<FirstPage> {
               onPressed: _isEnded1 //trueなら押せなくする
                   ? null
                   : () async {
+                      print('$num');
                       await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                MyHomePage(user, 'sound', 'question'), //sound
+                            builder: (context) => MyHomePage(
+                                user, sound[num[0]], question[num[0]]), //sound
                           ));
                     },
             ),
@@ -90,8 +107,8 @@ class _FirstPageState extends State<FirstPage> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>
-                          MyHomePage(user, 'sound2', 'question2'), //sound
+                      builder: (context) => MyHomePage(
+                          user, sound[num[1]], question[num[1]]), //sound
                     ));
               }, //audio
             ),
@@ -113,8 +130,8 @@ class _FirstPageState extends State<FirstPage> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>
-                          MyHomePage(user, 'sound3', 'question3'), //sound
+                      builder: (context) => MyHomePage(
+                          user, sound[num[2]], question[num[2]]), //sound
                     ));
               }, //sound3
             ),
