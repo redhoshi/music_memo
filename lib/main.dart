@@ -61,7 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
   //選択肢データを格納するリスト
   final list = <String>[]; //audioファイルリスト
   //問題数を入力
-  final queli = List<int>.generate(6, (i) => i + 0);
+  final queli = List<int>.generate(10, (i) => i + 0);
   List docList = []; //ドキュメントidを取ってくる
   final docuList = new List.generate(10, (index) => ''); //可変長？
   bool _isEnabled = false; //onbuttonを押させない
@@ -127,7 +127,7 @@ class _MyHomePageState extends State<MyHomePage> {
   //End画面への遷移
   Future<void> passend() async {
     print('user$user,end$end,countslist:$countslist,result$result,value$value');
-    _page > 5
+    _page > 9
         ? Navigator.push(
             context,
             MaterialPageRoute(
@@ -544,7 +544,7 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                if (dlist.length > 5)
+                if (dlist.length > 9)
                   new SizedBox(
                     width: 500.0,
                     height: 18.0,
