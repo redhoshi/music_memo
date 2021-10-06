@@ -37,18 +37,22 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   //const MyHomePage({Key? key}) : super(key: key);
-  MyHomePage(this.user, this.sound, this.question);
+  MyHomePage(this.user, this.sound, this.question, this.isended1, this.isended2,
+      this.isended3);
   String user, sound, question;
+  bool isended1, isended2, isended3;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState(user, sound, question);
+  State<MyHomePage> createState() =>
+      _MyHomePageState(user, sound, question, isended1, isended2, isended3);
 }
 
 class _MyHomePageState extends State<MyHomePage> {
   //ここで変数とか関数を定義
-  _MyHomePageState(this.user, this.sound, this.question);
+  _MyHomePageState(this.user, this.sound, this.question, this._isEnded1,
+      this._isEnded2, this._isEnded3);
   String user, sound, question;
-
+  bool _isEnded1, _isEnded2, _isEnded3;
   //問題と正解データを格納するリスト
   final dlist = []; //初期値設定問題文初期値を2個以上つけたらエラーでない
   final ans_url = []; //ansリストのurl
@@ -131,8 +135,8 @@ class _MyHomePageState extends State<MyHomePage> {
         ? Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => EndPage(
-                    '$user', end, countslist, result, value))) //nowに名前を入れる
+                builder: (context) => EndPage('$user', end, countslist, result,
+                    value, _isEnded1, _isEnded2, _isEnded3))) //nowに名前を入れる
         : reload();
   }
 

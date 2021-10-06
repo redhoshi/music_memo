@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:music_memo/first.dart';
 import 'package:music_memo/main.dart';
 import 'package:music_memo/pie_chart/pie.dart';
 
@@ -14,22 +15,27 @@ Future<void> main() async {
 }
 
 class EndPage extends StatefulWidget {
-  EndPage(this.a, this.i, this.u, this.e, this.o);
+  EndPage(this.a, this.i, this.u, this.e, this.o, this.isended1, this.isended2,
+      this.isended3);
   String a = '';
   List i = []; //問題番号
   List u = []; //問題のテキスト
   List e = []; //正解か不正解かaiu
   int o = 0;
-  EndPagePage createState() => EndPagePage(a, i, u, e, o);
+  bool isended1, isended2, isended3;
+  EndPagePage createState() =>
+      EndPagePage(a, i, u, e, o, isended1, isended2, isended3);
 }
 
 class EndPagePage extends State<EndPage> {
-  EndPagePage(this.name, this.e, this.text, this.re, this.val);
+  EndPagePage(this.name, this.e, this.text, this.re, this.val, this._isEnded1,
+      this._isEnded2, this._isEnded3);
   String name;
   List e = []; //問題番号
   List text = []; //問題のテキスト
   List re = []; //正解か不正解かaiu
   int val = 0;
+  bool _isEnded1, _isEnded2, _isEnded3;
   int per_c = 0;
   int per_i = 0;
   double per_c1 = 0.0;
@@ -111,8 +117,8 @@ class EndPagePage extends State<EndPage> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => MyHomePage(
-                            name, 'sound', 'question'))); //first.dartにいく
+                        builder: (context) => FirstPage(name, _isEnded1,
+                            _isEnded2, _isEnded3))); //first.dartにいく
               },
               label: Text('もう一回')),
         ],
