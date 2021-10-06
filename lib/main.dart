@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/rendering/object.dart';
 import 'package:music_memo/Login/login.dart';
 import 'package:music_memo/correctend/end_page.dart';
+import 'package:music_memo/thanks.dart';
 
 import 'dart:math' as math;
 
@@ -407,7 +408,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // final now = new DateTime.now();
     print('docList$docList');
     print('doclist${docList[i]}');
-    print('リザルト$result');
+    print('リザルト$result'); //---------------------------ここでerror
     print('result${result[counta]}');
     print('count$count1');
     print('${time_lis1.elapsed}');

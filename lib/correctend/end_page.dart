@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:music_memo/first.dart';
 import 'package:music_memo/main.dart';
 import 'package:music_memo/pie_chart/pie.dart';
+import 'package:music_memo/thanks.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,6 +37,7 @@ class EndPagePage extends State<EndPage> {
   List re = []; //正解か不正解かaiu
   int val = 0;
   bool _isEnded1, _isEnded2, _isEnded3;
+  bool last = false;
   int per_c = 0;
   int per_i = 0;
   double per_c1 = 0.0;
@@ -43,7 +45,7 @@ class EndPagePage extends State<EndPage> {
   get child => null; //result
 
   //円グラフの正解・不正解の割合を求める
-  Future<void> PerChange() async {
+  Future<void> perChange() async {
     for (int i = 0; i < re.length; i++) {
       if (re[i] == '正解') {
         per_c++;
@@ -58,11 +60,11 @@ class EndPagePage extends State<EndPage> {
     per_i1 *= 100;
     print('per_c$per_c1');
     print('per_i$per_i1');
-    InputData(per_c1, per_c, per_i);
+    inputData(per_c1, per_c, per_i);
   }
 
   //cloudfirestoreにデータを格納
-  Future<void> InputData(per, perc, peri) async {
+  Future<void> inputData(per, perc, peri) async {
     final now = new DateTime.now();
     DateFormat outputFormat = DateFormat('yyyy-MM-dd');
     String date = outputFormat.format(now);
@@ -74,13 +76,21 @@ class EndPagePage extends State<EndPage> {
     });
   }
 
+  Future<void> checkEnded() async {
+    if (_isEnded1 == true && _isEnded2 == true && _isEnded3 == true) {
+      last = true;
+      print('lastがtrueになる$last');
+    }
+  }
+
   //画面が作られたときに一度だけ呼ばれる
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    PerChange();
+    perChange();
     //InputData();正答率出すのならperchangeから呼び出す
+    checkEnded();
   }
 
   @override
@@ -114,13 +124,16 @@ class EndPagePage extends State<EndPage> {
           ),
           FloatingActionButton.extended(
               onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => FirstPage(name, _isEnded1,
-                            _isEnded2, _isEnded3))); //first.dartにいく
+                last
+                    ? Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => ThanksPage()))
+                    : Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => FirstPage(name, _isEnded1,
+                                _isEnded2, _isEnded3))); //first.dartにいく
               },
-              label: Text('もう一回')),
+              label: last ? Text('終了する') : Text('Homeへ戻る')),
         ],
       ),
     );
