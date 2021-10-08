@@ -6,17 +6,22 @@ import 'dart:math' as math;
 
 class FirstPage extends StatefulWidget {
   //const FirstPage({Key? key}) : super(key: key);
-  FirstPage(this.user);
+  FirstPage(this.user, this.isEnded1, this.isEnded2, this.isEnded3);
   String user;
+  bool isEnded1, isEnded2, isEnded3;
 
   @override
-  State<FirstPage> createState() => _FirstPageState(user);
+  State<FirstPage> createState() =>
+      _FirstPageState(user, isEnded1, isEnded2, isEnded3);
 }
 
 class _FirstPageState extends State<FirstPage> {
-  _FirstPageState(this.user);
+  _FirstPageState(this.user, this._isEnded1, this._isEnded2, this._isEnded3);
   String user;
-  bool _isEnded1 = false;
+  //ボタンを無効にする
+  bool _isEnded1;
+  bool _isEnded2;
+  bool _isEnded3;
   final num = List<int>.generate(3, (i) => i + 0);
   final sound = ['sound', 'sound2', 'sound3'];
   final question = ['question', 'question2', 'question3'];
@@ -81,11 +86,17 @@ class _FirstPageState extends State<FirstPage> {
                   ? null
                   : () async {
                       print('$num');
+                      _isEnded1 = true;
                       await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => MyHomePage(
-                                user, sound[num[0]], question[num[0]]), //sound
+                                user,
+                                sound[num[0]],
+                                question[num[0]],
+                                _isEnded1,
+                                _isEnded2,
+                                _isEnded3), //sound
                           ));
                     },
             ),
@@ -103,14 +114,22 @@ class _FirstPageState extends State<FirstPage> {
             height: 100,
             child: NeumorphicFloatingActionButton(
               child: Icon(Icons.construction, size: 30),
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MyHomePage(
-                          user, sound[num[1]], question[num[1]]), //sound
-                    ));
-              }, //audio
+              onPressed: _isEnded2
+                  ? null
+                  : () {
+                      _isEnded2 = true;
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MyHomePage(
+                                user,
+                                sound[num[1]],
+                                question[num[1]],
+                                _isEnded1,
+                                _isEnded2,
+                                _isEnded3), //sound
+                          ));
+                    }, //audio
             ),
           ),
           Text(
@@ -126,14 +145,22 @@ class _FirstPageState extends State<FirstPage> {
             height: 100,
             child: NeumorphicFloatingActionButton(
               child: Icon(Icons.construction, size: 30),
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MyHomePage(
-                          user, sound[num[2]], question[num[2]]), //sound
-                    ));
-              }, //sound3
+              onPressed: _isEnded3
+                  ? null
+                  : () {
+                      _isEnded3 = true;
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MyHomePage(
+                                user,
+                                sound[num[2]],
+                                question[num[2]],
+                                _isEnded1,
+                                _isEnded2,
+                                _isEnded3), //sound
+                          ));
+                    }, //sound3
             ),
           ),
           /*

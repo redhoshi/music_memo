@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/rendering/object.dart';
 import 'package:music_memo/Login/login.dart';
 import 'package:music_memo/correctend/end_page.dart';
+import 'package:music_memo/thanks.dart';
 
 import 'dart:math' as math;
 
@@ -37,18 +38,22 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   //const MyHomePage({Key? key}) : super(key: key);
-  MyHomePage(this.user, this.sound, this.question);
+  MyHomePage(this.user, this.sound, this.question, this.isended1, this.isended2,
+      this.isended3);
   String user, sound, question;
+  bool isended1, isended2, isended3;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState(user, sound, question);
+  State<MyHomePage> createState() =>
+      _MyHomePageState(user, sound, question, isended1, isended2, isended3);
 }
 
 class _MyHomePageState extends State<MyHomePage> {
   //ここで変数とか関数を定義
-  _MyHomePageState(this.user, this.sound, this.question);
+  _MyHomePageState(this.user, this.sound, this.question, this._isEnded1,
+      this._isEnded2, this._isEnded3);
   String user, sound, question;
-
+  bool _isEnded1, _isEnded2, _isEnded3;
   //問題と正解データを格納するリスト
   final dlist = []; //初期値設定問題文初期値を2個以上つけたらエラーでない
   final ans_url = []; //ansリストのurl
@@ -131,8 +136,8 @@ class _MyHomePageState extends State<MyHomePage> {
         ? Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => EndPage(
-                    '$user', end, countslist, result, value))) //nowに名前を入れる
+                builder: (context) => EndPage('$user', end, countslist, result,
+                    value, _isEnded1, _isEnded2, _isEnded3))) //nowに名前を入れる
         : reload();
   }
 
@@ -403,7 +408,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // final now = new DateTime.now();
     print('docList$docList');
     print('doclist${docList[i]}');
-    print('リザルト$result');
+    print('リザルト$result'); //---------------------------ここでerror
     print('result${result[counta]}');
     print('count$count1');
     print('${time_lis1.elapsed}');
@@ -891,34 +896,35 @@ class _MyHomePageState extends State<MyHomePage> {
                   )
                 : Text(''),
           ),
-          Positioned(
-            top: 200,
-            left: 160,
-            child: DefaultTextStyle(
-              style: const TextStyle(
-                  fontSize: 25.0,
-                  fontFamily: 'Horizon',
-                  color: Colors.black,
-                  fontWeight: FontWeight.w100),
-              child: !_isEnabled
-                  ? AnimatedTextKit(
-                      animatedTexts: [FadeAnimatedText('Loading....')],
-                    )
-                  : Text(''),
-            ),
-          ),
           Center(
-            child: SizedBox(
-              width: 50,
-              height: 50,
-              child: !_isEnabled
-                  ? CircularProgressIndicator(
-                      backgroundColor: Colors.grey,
-                      strokeWidth: 8.0,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
-                    )
-                  : Text(''),
-            ),
+            child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+              DefaultTextStyle(
+                style: const TextStyle(
+                    fontSize: 30.0,
+                    fontFamily: 'Horizon',
+                    color: Colors.black,
+                    fontWeight: FontWeight.w100),
+                child: !_isEnabled
+                    ? AnimatedTextKit(
+                        animatedTexts: [FadeAnimatedText('Loading...')],
+                      )
+                    : Text(''),
+              ),
+              SizedBox(
+                height: 50,
+              ),
+              SizedBox(
+                width: 50,
+                height: 50,
+                child: !_isEnabled
+                    ? CircularProgressIndicator(
+                        backgroundColor: Colors.grey,
+                        strokeWidth: 8.0,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                      )
+                    : Text(''),
+              ),
+            ]),
           ),
         ],
       ),
@@ -937,7 +943,7 @@ void showAlert(BuildContext context, bool show) async {
                 ? Center(
                     child: Stack(children: <Widget>[
                       Icon(Icons.brightness_1_outlined,
-                          color: Colors.red, size: 300.0),
+                          color: Colors.red, size: 260.0),
                       Text('正解',
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 30)),
@@ -946,7 +952,7 @@ void showAlert(BuildContext context, bool show) async {
                 : Center(
                     child: Stack(children: <Widget>[
                       Icon(Icons.remove_circle_outline,
-                          color: Colors.blue, size: 300.0),
+                          color: Colors.blue, size: 260.0),
                       Text('不正解',
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 30)),

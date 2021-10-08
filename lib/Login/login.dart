@@ -21,7 +21,10 @@ class _LoginPageState extends State<LoginPage> {
   int press_id = 0;
   final docList = [];
   final password = [];
-
+  //sectionの変数
+  bool _isEnded1 = false;
+  bool _isEnded2 = false;
+  bool _isEnded3 = false;
 //firestore
   Future<void> User() async {
     await FirebaseFirestore.instance
@@ -192,8 +195,11 @@ class _LoginPageState extends State<LoginPage> {
                     : await Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>
-                                FirstPage(_userController.text)),
+                            builder: (context) => FirstPage(
+                                _userController.text,
+                                _isEnded1,
+                                _isEnded2,
+                                _isEnded3)),
                       );
                 print('presss_id:$press_id');
               },
