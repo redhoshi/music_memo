@@ -896,34 +896,35 @@ class _MyHomePageState extends State<MyHomePage> {
                   )
                 : Text(''),
           ),
-          Positioned(
-            top: 200,
-            left: 160,
-            child: DefaultTextStyle(
-              style: const TextStyle(
-                  fontSize: 25.0,
-                  fontFamily: 'Horizon',
-                  color: Colors.black,
-                  fontWeight: FontWeight.w100),
-              child: !_isEnabled
-                  ? AnimatedTextKit(
-                      animatedTexts: [FadeAnimatedText('Loading....')],
-                    )
-                  : Text(''),
-            ),
-          ),
           Center(
-            child: SizedBox(
-              width: 50,
-              height: 50,
-              child: !_isEnabled
-                  ? CircularProgressIndicator(
-                      backgroundColor: Colors.grey,
-                      strokeWidth: 8.0,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
-                    )
-                  : Text(''),
-            ),
+            child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+              DefaultTextStyle(
+                style: const TextStyle(
+                    fontSize: 30.0,
+                    fontFamily: 'Horizon',
+                    color: Colors.black,
+                    fontWeight: FontWeight.w100),
+                child: !_isEnabled
+                    ? AnimatedTextKit(
+                        animatedTexts: [FadeAnimatedText('Loading...')],
+                      )
+                    : Text(''),
+              ),
+              SizedBox(
+                height: 50,
+              ),
+              SizedBox(
+                width: 50,
+                height: 50,
+                child: !_isEnabled
+                    ? CircularProgressIndicator(
+                        backgroundColor: Colors.grey,
+                        strokeWidth: 8.0,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                      )
+                    : Text(''),
+              ),
+            ]),
           ),
         ],
       ),
@@ -942,7 +943,7 @@ void showAlert(BuildContext context, bool show) async {
                 ? Center(
                     child: Stack(children: <Widget>[
                       Icon(Icons.brightness_1_outlined,
-                          color: Colors.red, size: 300.0),
+                          color: Colors.red, size: 260.0),
                       Text('正解',
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 30)),
@@ -951,7 +952,7 @@ void showAlert(BuildContext context, bool show) async {
                 : Center(
                     child: Stack(children: <Widget>[
                       Icon(Icons.remove_circle_outline,
-                          color: Colors.blue, size: 300.0),
+                          color: Colors.blue, size: 260.0),
                       Text('不正解',
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 30)),
