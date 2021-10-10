@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/rendering/object.dart';
 import 'package:music_memo/Login/login.dart';
 import 'package:music_memo/correctend/end_page.dart';
-import 'package:music_memo/thanks.dart';
 
 import 'dart:math' as math;
 
@@ -94,18 +93,18 @@ class _MyHomePageState extends State<MyHomePage> {
   int out3 = 0;
   int out4 = 0;
   int out5 = 0;
+  //正解だと思ったボタン
+  int ansuser = 0;
 
   //いつどのボタンを押したかのタイムスタンプ
   final List<Map<String, dynamic>> serviceTime = [];
 
   //答えの画面で表示するリスト
-  int value = 0; //得点
+  int value = 0;
   //docListのカウント
   int counta = 0;
   //順位ソートに用いる
   int sort = 0;
-  //sort初期化を防ぐ
-  //int counts = 0;
   //ページ番号
   int _page = 0;
 
@@ -148,7 +147,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
 //リストの初期化(繊維ごとに初期化)
-  Future<void> Initialized() async {
+  Future<void> initialized() async {
     //dlist.removeRange(0, dlist.length);
     //ans_url.removeRange(0, ans_url.length);
     selist.removeRange(0, selist.length);
@@ -182,6 +181,8 @@ class _MyHomePageState extends State<MyHomePage> {
     out3 = 0;
     out4 = 0;
     out5 = 0;
+    //ボタンのタイムスタンプの初期化
+    serviceTime.removeRange(0, serviceTime.length);
   }
 
   //問題データ(文)と正解データ---1回読み込めば良いデータ
@@ -252,7 +253,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> fetchName() async {
-    Initialized(); //初期化
+    initialized(); //初期化
     print('問題格納リスト$queli'); //機能しない
     counta < 1 ? answerName() : new SizedBox();
     counta > 0 ? soundData(docList) : new SizedBox();
@@ -423,10 +424,12 @@ class _MyHomePageState extends State<MyHomePage> {
         .set({
       //'hour': '${'now.hour'}/${'now.minute'}/${'now.second'}',
       '何問目': counta + 1,
+      '選んだ選択肢': ansuser,
+      'サウンドボタンを押した時間': serviceTime,
       'que': '${docList[counta]}',
       'ans': '${result[counta]}',
       'inst': ['${selist[0]}', '${selist[1]}', '${selist[2]}', '${selist[3]}'],
-      'btn': ['$count1', '$count2', '$count2', '$count3', '$count4'],
+      'btn': ['$count1', '$count2', '$count3', '$count4', '$count5'],
       'soundtime': [
         '${time_lis1.elapsed}',
         '${time_lis2.elapsed}',
@@ -451,7 +454,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final state = [false, false, false, false, false].cast<bool>();
 
   //eventのstateがplaying/stopped.or.completeの時の処理
-  Future<void> PlayTime() async {
+  Future<void> playTime() async {
     player1.onPlayerStateChanged.listen((event) {
       if (event == PlayerState.PLAYING) {
         time_lis1.start();
@@ -496,7 +499,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     player4.onPlayerStateChanged.listen((event) {
       if (event == PlayerState.PLAYING) {
-        time_lis4.stop();
+        time_lis4.start();
         setState(() {
           state[3] = true;
         });
@@ -510,7 +513,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     player5.onPlayerStateChanged.listen((event) {
       if (event == PlayerState.PLAYING) {
-        time_lis5.stop();
+        time_lis5.start();
         setState(() {
           state[4] = true;
         });
@@ -532,7 +535,7 @@ class _MyHomePageState extends State<MyHomePage> {
     queExample();
     //Initialized();
     fetchName();
-    PlayTime();
+    playTime();
   }
 
   @override
@@ -615,7 +618,8 @@ class _MyHomePageState extends State<MyHomePage> {
                               heroTag: "btn2",
                               onPressed: _isEnabled
                                   ? () {
-                                      print(list[0]);
+                                      final now = new DateTime.now();
+                                      serviceTime.add({'btn2': '$now'});
                                       player1.stop();
                                       player3.stop();
                                       player4.stop();
@@ -648,6 +652,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                               Radius.circular(10.0)),
                                         );
                                         stopsound();
+                                        ansuser = 1;
                                         answer(list[0]); //urlを返す
                                         print('正解または不正解$show');
                                         print('select$_isEnabled');
@@ -690,6 +695,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             onPressed: ans_url.length > 2
                                 ? () {
                                     print("pre2"); //音を鳴らす
+                                    final now = new DateTime.now();
+                                    serviceTime.add({'btn3': '$now'});
                                     print(list[1]);
                                     player1.stop();
                                     player2.stop();
@@ -716,6 +723,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                               Radius.circular(10.0)),
                                         );
                                         stopsound();
+                                        ansuser = 2;
                                         answer(list[1]);
                                         print('正解または不正解$show');
                                         _diaEnabled = true;
@@ -762,6 +770,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             heroTag: "btn4",
                             onPressed: () {
                               print(list[2]);
+                              final now = new DateTime.now();
+                              serviceTime.add({'btn4': '$now'});
                               player1.stop();
                               player2.stop();
                               player3.stop();
@@ -787,6 +797,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 Radius.circular(10.0)),
                                           );
                                           stopsound();
+                                          ansuser = 3;
                                           answer(list[2]);
                                           print('正解または不正解$show');
                                           _diaEnabled = true;
@@ -828,7 +839,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             heroTag: "btn5",
                             onPressed: () {
                               print(list[3]);
-                              print(list);
+                              final now = new DateTime.now();
+                              serviceTime.add({'btn5': '$now'});
                               player1.stop();
                               player2.stop();
                               player3.stop();
@@ -854,6 +866,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 Radius.circular(10.0)),
                                           );
                                           stopsound();
+                                          ansuser = 4;
                                           answer(list[3]);
                                           _diaEnabled = true;
                                           return showAlert(context, show);
