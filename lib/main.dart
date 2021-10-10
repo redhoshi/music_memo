@@ -542,7 +542,7 @@ class _MyHomePageState extends State<MyHomePage> {
     //buildの中に変数書くの良くない
     return Scaffold(
       appBar: AppBar(
-        title: Text('第${devicewidth}問'),
+        title: Text('第${deviceheight}問'),
       ),
       body: Stack(
         children: [
