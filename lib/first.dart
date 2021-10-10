@@ -38,6 +38,8 @@ class _FirstPageState extends State<FirstPage> {
 
   @override
   Widget build(BuildContext context) {
+    final double deviceheight = MediaQuery.of(context).size.height;
+    final double devicewidth = MediaQuery.of(context).size.width;
     calcurate(num);
     print(num);
     return Scaffold(
@@ -56,7 +58,7 @@ class _FirstPageState extends State<FirstPage> {
               'ようこそ $userさん',
               textAlign: TextAlign.right,
               style: TextStyle(
-                fontSize: 30,
+                fontSize: deviceheight * 0.03,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'RobotoMono',
               ),
@@ -65,21 +67,24 @@ class _FirstPageState extends State<FirstPage> {
 
           Center(
             child: Text(
-              'Section1-3のボタンを押すと問題に進むことができます。\nどのSectionから始めても構いません。\n全てのSectionを完了させてください。',
+              'Section1-3のボタンを押すと問題が始まります。\nどのSectionから始めても構いません。\n全てのSectionを完了させてください。',
               textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: deviceheight * 0.02,
+              ),
             ),
           ),
           Text(
             'Section 1',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: deviceheight * 0.03,
               fontWeight: FontWeight.bold,
               fontFamily: 'RobotoMono',
             ),
           ),
           new SizedBox(
-            width: 100,
-            height: 100,
+            width: devicewidth * 0.25,
+            height: devicewidth * 0.25,
             child: NeumorphicFloatingActionButton(
               child: Icon(Icons.campaign_sharp, size: 30),
               onPressed: _isEnded1 //trueなら押せなくする
@@ -104,14 +109,14 @@ class _FirstPageState extends State<FirstPage> {
           Text(
             'Section2',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: deviceheight * 0.03,
               fontWeight: FontWeight.bold,
               fontFamily: 'RobotoMono',
             ),
           ),
           new SizedBox(
-            width: 100,
-            height: 100,
+            width: devicewidth * 0.25,
+            height: devicewidth * 0.25,
             child: NeumorphicFloatingActionButton(
               child: Icon(Icons.construction, size: 30),
               onPressed: _isEnded2
@@ -135,14 +140,14 @@ class _FirstPageState extends State<FirstPage> {
           Text(
             'Section3',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: deviceheight * 0.03,
               fontWeight: FontWeight.bold,
               fontFamily: 'RobotoMono',
             ),
           ),
           new SizedBox(
-            width: 100,
-            height: 100,
+            width: devicewidth * 0.25,
+            height: devicewidth * 0.25,
             child: NeumorphicFloatingActionButton(
               child: Icon(Icons.construction, size: 30),
               onPressed: _isEnded3

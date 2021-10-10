@@ -537,6 +537,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final double deviceheight = MediaQuery.of(context).size.height;
+    final double devicewidth = MediaQuery.of(context).size.width;
     //buildの中に変数書くの良くない
     return Scaffold(
       appBar: AppBar(
@@ -551,8 +553,8 @@ class _MyHomePageState extends State<MyHomePage> {
               children: <Widget>[
                 if (dlist.length > 9)
                   new SizedBox(
-                    width: 500.0,
-                    height: 18.0,
+                    width: deviceheight * 0.5, //500
+                    height: devicewidth * 0.05, //18.0
                     child: Text(
                       dlist.length > 2 ? dlist[counta] : '', //これが一番遅いかな
                       style: TextStyle(fontSize: 15),

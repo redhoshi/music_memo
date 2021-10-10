@@ -19,14 +19,19 @@ class _LoginPageState extends State<LoginPage> {
   var _passwordController = TextEditingController(text: '');
   bool user_id = false;
   int press_id = 0;
+  //firebaseからuseridを取ってくる
   final docList = [];
+  //firebaseからpassを取ってくる
   final password = [];
+  //passwordの個数格納用
+  int pacount = 0;
   //sectionの変数
   bool _isEnded1 = false;
   bool _isEnded2 = false;
   bool _isEnded3 = false;
+
 //firestore
-  Future<void> User() async {
+  Future<void> user() async {
     await FirebaseFirestore.instance
         .collection('userid')
         .get()
@@ -44,11 +49,12 @@ class _LoginPageState extends State<LoginPage> {
       password.add('${snepshot['password']}');
     }
     print('password:$password');
+    setState(() {});
     // print('usercontroller$_userController');
   }
 
   //Firebase上のパスワードとの一致
-  Future<void> CheckPass(_user, _pass) async {
+  Future<void> checkPass(_user, _pass) async {
     for (int i = 0; i < docList.length; i++) {
       if (_user == docList[i]) {
         print('1');
@@ -68,7 +74,7 @@ class _LoginPageState extends State<LoginPage> {
 
   //shared_preferencesを使ってみる
 
-  Future<void> SharedPre(String _user, String _pass) async {
+  Future<void> sharedPre(String _user, String _pass) async {
     int i = 0;
     String m = 'aiu';
 
@@ -96,6 +102,18 @@ class _LoginPageState extends State<LoginPage> {
         '';
     setState(() {});
   }
+
+  Future<void> readcount() async {
+    final passcount = await FirebaseFirestore.instance
+        .collection('math')
+        .doc('password_count')
+        .get();
+
+    pacount = passcount['count'].toInt();
+    print(pacount);
+    print(password.length);
+    setState(() {});
+  }
 /*
   Future<void> Init() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -107,7 +125,8 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    User();
+    user();
+    readcount();
     read();
     //Init();
   }
@@ -122,7 +141,7 @@ class _LoginPageState extends State<LoginPage> {
       backgroundColor: NeumorphicTheme.baseColor(context),
       body: Center(
         child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-          Text('UserName'),
+          Text('UserID'),
           new SizedBox(
             width: 200,
             height: 50,
@@ -176,34 +195,37 @@ class _LoginPageState extends State<LoginPage> {
           new SizedBox(
             width: 100,
             height: 40,
-            child: NeumorphicButton(
-              child: Text(
-                'ログイン',
-                textAlign: TextAlign.center,
-              ),
-              onPressed: () async {
-                CheckPass(_userController.text, _passwordController.text);
-                SharedPre(_userController.text, _passwordController.text);
-                print(user_id);
-                print(
-                    'user:${_userController.text}pass:${_passwordController.text}');
-                print(user_id);
-                user_id != true
-                    ? setState(() {
-                        press_id++;
-                      })
-                    : await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => FirstPage(
-                                _userController.text,
-                                _isEnded1,
-                                _isEnded2,
-                                _isEnded3)),
-                      );
-                print('presss_id:$press_id');
-              },
-            ),
+            child: password.length > pacount
+                ? NeumorphicButton(
+                    child: Text(
+                      'ログイン',
+                      textAlign: TextAlign.center,
+                    ),
+                    onPressed: //passwordはリストがないのはなぜ？
+                        () async {
+                      checkPass(_userController.text, _passwordController.text);
+                      sharedPre(_userController.text, _passwordController.text);
+                      print(user_id);
+                      print(
+                          'user:${_userController.text}pass:${_passwordController.text}');
+                      print(user_id);
+                      user_id != true
+                          ? setState(() {
+                              press_id++;
+                            })
+                          : await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => FirstPage(
+                                      _userController.text,
+                                      _isEnded1,
+                                      _isEnded2,
+                                      _isEnded3)),
+                            );
+                      print('presss_id:$press_id');
+                    },
+                  )
+                : null,
           ),
           new SizedBox(
             height: 30,
