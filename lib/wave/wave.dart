@@ -12,6 +12,7 @@ class WavePage extends StatefulWidget {
 class _WavePageState extends State<WavePage> with TickerProviderStateMixin {
   _WavePageState(this.tall);
   double tall;
+
   late AnimationController _animationController;
   @override
   void initState() {
@@ -33,14 +34,13 @@ class _WavePageState extends State<WavePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final double deviceheight = MediaQuery.of(context).size.height;
     return Container(
       //height: 100, //他のオブジェクトに影響する
       //width: 100,
       //scafold入れると
       child: CustomPaint(
-        painter: SpritePainter(
-          _animationController,
-        ),
+        painter: SpritePainter(_animationController, deviceheight),
         /*
         child: SizedBox(
           //widthは大きさが変わるheightは何も変わらん
@@ -55,15 +55,18 @@ class _WavePageState extends State<WavePage> with TickerProviderStateMixin {
 
 class SpritePainter extends CustomPainter {
   //double ta;
+
   final Animation<double> _animation;
-  SpritePainter(this._animation) : super(repaint: _animation);
+  final double deviceheight;
+  SpritePainter(this._animation, this.deviceheight)
+      : super(repaint: _animation);
 
   void circle(Canvas canvas, Rect rect, double value) {
     double opacity = (1.0 - (value / 4.0)).clamp(0.0, 1.0); // 透明度の設定
     Color color = Color.fromRGBO(188, 175, 237, opacity); // 色の設定
 
     // print(rect);
-    double size = rect.width * 1000; //半径の長さ？
+    double size = rect.width * deviceheight * 1.2; //半径の長さ？*1000
     double area = size * size;
     double radius = sqrt(area * value / 4);
 
