@@ -95,6 +95,8 @@ class EndPagePage extends State<EndPage> {
 
   @override
   Widget build(BuildContext context) {
+    final double deviceheight = MediaQuery.of(context).size.height;
+    final double devicewidth = MediaQuery.of(context).size.width;
     // TODO: implement buildsss
     return Scaffold(
       appBar: AppBar(
@@ -116,24 +118,30 @@ class EndPagePage extends State<EndPage> {
             children: [
               for (int i = 0; i < e.length; i++)
                 TableRow(children: [
-                  Text('第${e[i] + 1}問'),
-                  Text('${text[i].replaceFirst('の音を選択してください', '')}'),
-                  Text('${re[i]}')
+                  Center(child: Text('第${e[i] + 1}問')),
+                  Center(
+                      child:
+                          Text('${text[i].replaceFirst('の音を選択してください', '')}')),
+                  Center(child: Text('${re[i]}'))
                 ]),
             ],
           ),
-          FloatingActionButton.extended(
-              onPressed: () {
-                last
-                    ? Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => ThanksPage()))
-                    : Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => FirstPage(name, _isEnded1,
-                                _isEnded2, _isEnded3))); //first.dartにいく
-              },
-              label: last ? Text('終了する') : Text('Homeへ戻る')),
+          new SizedBox(
+            height: deviceheight * 0.07,
+            width: devicewidth * 0.34,
+            child: FloatingActionButton.extended(
+                onPressed: () {
+                  last
+                      ? Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => ThanksPage()))
+                      : Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => FirstPage(name, _isEnded1,
+                                  _isEnded2, _isEnded3))); //first.dartにいく
+                },
+                label: last ? Text('終了する') : Text('Homeへ戻る')),
+          ),
         ],
       ),
     );
