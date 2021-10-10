@@ -133,9 +133,11 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final double deviceheight = MediaQuery.of(context).size.height;
+    final double devicewidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
-        title: Text('FirstPage'),
+        title: Text('ログインページ'),
         centerTitle: true,
       ),
       backgroundColor: NeumorphicTheme.baseColor(context),
@@ -143,8 +145,8 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
           Text('UserID'),
           new SizedBox(
-            width: 200,
-            height: 50,
+            width: deviceheight * 0.3,
+            height: devicewidth * 0.15,
             child: Neumorphic(
               style: NeumorphicStyle(depth: -5),
               child: TextField(
@@ -164,12 +166,12 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
           new SizedBox(
-            height: 30,
+            height: deviceheight * 0.02,
           ),
           Text('PassWord'),
           new SizedBox(
-            width: 200,
-            height: 50,
+            width: deviceheight * 0.3,
+            height: devicewidth * 0.15,
             child: Neumorphic(
               style: NeumorphicStyle(depth: -5),
               child: TextField(
@@ -190,16 +192,19 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
           new SizedBox(
-            height: 60,
+            height: deviceheight * 0.04,
           ),
           new SizedBox(
-            width: 100,
-            height: 40,
+            width: devicewidth * 0.3,
+            height: deviceheight * 0.06,
             child: password.length > pacount
                 ? NeumorphicButton(
                     child: Text(
                       'ログイン',
                       textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: deviceheight * 0.02,
+                      ),
                     ),
                     onPressed: //passwordはリストがないのはなぜ？
                         () async {
@@ -228,7 +233,7 @@ class _LoginPageState extends State<LoginPage> {
                 : null,
           ),
           new SizedBox(
-            height: 30,
+            height: deviceheight * 0.03,
           ),
           press_id > 0
               ? Text('正しい値を入力してください', textAlign: TextAlign.right)

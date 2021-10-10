@@ -542,7 +542,7 @@ class _MyHomePageState extends State<MyHomePage> {
     //buildの中に変数書くの良くない
     return Scaffold(
       appBar: AppBar(
-        title: Text('第${i + 1}問'),
+        title: Text('第${devicewidth}問'),
       ),
       body: Stack(
         children: [
@@ -554,10 +554,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 if (dlist.length > 9)
                   new SizedBox(
                     width: deviceheight * 0.5, //500
-                    height: devicewidth * 0.05, //18.0
+                    height: devicewidth * 0.049, //18.0
                     child: Text(
                       dlist.length > 2 ? dlist[counta] : '', //これが一番遅いかな
-                      style: TextStyle(fontSize: 15),
+                      style: TextStyle(fontSize: deviceheight * 0.017),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -566,8 +566,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: [
                     if (state[0] == true) WavePage(key: Key('0'), h: 0),
                     SizedBox(
-                      height: 100,
-                      width: 100,
+                      height: deviceheight * 0.11, //100
+                      width: deviceheight * 0.11, //100
                       child: FloatingActionButton(
                         onPressed: !_isEnabled
                             ? null
@@ -587,7 +587,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         backgroundColor: Colors.orangeAccent,
                         child: Icon(
                           Icons.volume_up,
-                          size: 40.0,
+                          size: deviceheight * 0.05,
                         ),
                         heroTag: "btn1",
                       ),
@@ -604,13 +604,13 @@ class _MyHomePageState extends State<MyHomePage> {
                         children: [
                           if (state[1] == true) WavePage(key: Key('0'), h: 0),
                           SizedBox(
-                            height: 80,
-                            width: 80,
+                            height: deviceheight * 0.085,
+                            width: deviceheight * 0.085,
                             child: FloatingActionButton(
                               backgroundColor: Colors.orangeAccent,
                               child: Icon(
                                 Icons.volume_up,
-                                size: 40.0,
+                                size: deviceheight * 0.04,
                               ),
                               heroTag: "btn2",
                               onPressed: _isEnabled
@@ -632,8 +632,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       !_diaEnabled
                           ? new SizedBox(
-                              height: 60,
-                              width: 230,
+                              height: deviceheight * 0.059,
+                              width: devicewidth * 0.54,
                               child: ElevatedButton(
                                 child: ans_url.length > 2
                                     ? Text('select1')
@@ -665,9 +665,11 @@ class _MyHomePageState extends State<MyHomePage> {
                           : new SizedBox(
                               child: ansjudge[0]
                                   ? Icon(Icons.brightness_1_outlined,
-                                      color: Colors.red, size: 100.0)
+                                      color: Colors.red,
+                                      size: deviceheight * 0.1)
                                   : Icon(Icons.remove_circle_outline,
-                                      color: Colors.blue, size: 100.0))
+                                      color: Colors.blue,
+                                      size: deviceheight * 0.1))
                     ]),
                 Row(
                     mainAxisSize: MainAxisSize.max,
@@ -676,13 +678,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       Stack(alignment: Alignment.center, children: [
                         if (state[2] == true) WavePage(key: Key('0'), h: 0),
                         new SizedBox(
-                          width: 80.0,
-                          height: 80.0,
+                          width: deviceheight * 0.085,
+                          height: deviceheight * 0.085,
                           child: FloatingActionButton(
                             backgroundColor: Colors.orangeAccent,
                             child: Icon(
                               Icons.volume_up,
-                              size: 35.0,
+                              size: deviceheight * 0.04,
                             ),
                             heroTag: "btn3",
                             onPressed: ans_url.length > 2
@@ -703,8 +705,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       ]),
                       !_diaEnabled
                           ? new SizedBox(
-                              height: 50,
-                              width: 230,
+                              height: deviceheight * 0.059,
+                              width: devicewidth * 0.54,
                               child: ElevatedButton(
                                 onPressed: ans_url.length > 2
                                     ? () {
@@ -735,9 +737,11 @@ class _MyHomePageState extends State<MyHomePage> {
                           : new SizedBox(
                               child: ansjudge[1]
                                   ? Icon(Icons.brightness_1_outlined,
-                                      color: Colors.red, size: 100.0)
+                                      color: Colors.red,
+                                      size: deviceheight * 0.1)
                                   : Icon(Icons.remove_circle_outline,
-                                      color: Colors.blue, size: 100.0),
+                                      color: Colors.blue,
+                                      size: deviceheight * 0.1),
                             )
                     ]),
                 Row(
@@ -747,13 +751,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       Stack(alignment: Alignment.center, children: [
                         if (state[3] == true) WavePage(key: Key('0'), h: 0),
                         new SizedBox(
-                          width: 80.0,
-                          height: 80.0,
+                          width: deviceheight * 0.085,
+                          height: deviceheight * 0.085,
                           child: FloatingActionButton(
                             backgroundColor: Colors.orangeAccent,
                             child: Icon(
                               Icons.volume_up,
-                              size: 35.0,
+                              size: deviceheight * 0.04,
                             ),
                             heroTag: "btn4",
                             onPressed: () {
@@ -771,8 +775,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       ]),
                       !_diaEnabled
                           ? new SizedBox(
-                              height: 50,
-                              width: 230,
+                              height: deviceheight * 0.059,
+                              width: devicewidth * 0.54,
                               child: ElevatedButton(
                                   onPressed: !_isEnabled
                                       ? null
@@ -799,9 +803,11 @@ class _MyHomePageState extends State<MyHomePage> {
                           : new SizedBox(
                               child: ansjudge[2]
                                   ? Icon(Icons.brightness_1_outlined,
-                                      color: Colors.red, size: 100.0)
+                                      color: Colors.red,
+                                      size: deviceheight * 0.1)
                                   : Icon(Icons.remove_circle_outline,
-                                      color: Colors.blue, size: 100.0),
+                                      color: Colors.blue,
+                                      size: deviceheight * 0.1),
                             ),
                     ]),
                 Row(
@@ -811,13 +817,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       Stack(alignment: Alignment.center, children: [
                         if (state[4] == true) WavePage(key: Key('0'), h: 0),
                         SizedBox(
-                          width: 80.0,
-                          height: 80.0,
+                          width: deviceheight * 0.08,
+                          height: deviceheight * 0.08,
                           child: FloatingActionButton(
                             backgroundColor: Colors.orangeAccent,
                             child: Icon(
                               Icons.volume_up,
-                              size: 35.0,
+                              size: deviceheight * 0.036,
                             ),
                             heroTag: "btn5",
                             onPressed: () {
@@ -836,8 +842,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       ]),
                       !_diaEnabled
                           ? new SizedBox(
-                              height: 50,
-                              width: 230,
+                              height: deviceheight * 0.059,
+                              width: devicewidth * 0.54,
                               child: ElevatedButton(
                                   onPressed: !_isEnabled
                                       ? null
@@ -863,9 +869,11 @@ class _MyHomePageState extends State<MyHomePage> {
                           : new SizedBox(
                               child: ansjudge[3]
                                   ? Icon(Icons.brightness_1_outlined,
-                                      color: Colors.red, size: 100.0)
+                                      color: Colors.red,
+                                      size: deviceheight * 0.1)
                                   : Icon(Icons.remove_circle_outline,
-                                      color: Colors.blue, size: 100.0),
+                                      color: Colors.blue,
+                                      size: deviceheight * 0.1),
                             ),
                     ]),
                 Row(
@@ -913,15 +921,15 @@ class _MyHomePageState extends State<MyHomePage> {
                     : Text(''),
               ),
               SizedBox(
-                height: 50,
+                height: deviceheight * 0.05,
               ),
               SizedBox(
-                width: 50,
-                height: 50,
+                width: deviceheight * 0.05,
+                height: deviceheight * 0.05,
                 child: !_isEnabled
                     ? CircularProgressIndicator(
                         backgroundColor: Colors.grey,
-                        strokeWidth: 8.0,
+                        strokeWidth: deviceheight * 0.008,
                         valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
                       )
                     : Text(''),
@@ -939,25 +947,29 @@ void showAlert(BuildContext context, bool show) async {
   showDialog(
       context: context,
       builder: (context) {
+        final double dvheight = MediaQuery.of(context).size.height;
+        //final double devicewidth = MediaQuery.of(context).size.width;
         return AlertDialog(
           title: Stack(children: <Widget>[
             show
                 ? Center(
                     child: Stack(children: <Widget>[
                       Icon(Icons.brightness_1_outlined,
-                          color: Colors.red, size: 260.0),
+                          color: Colors.red, size: dvheight * 0.3),
                       Text('正解',
                           style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 30)),
+                              fontWeight: FontWeight.bold,
+                              fontSize: dvheight * 0.03)),
                     ]),
                   )
                 : Center(
                     child: Stack(children: <Widget>[
                       Icon(Icons.remove_circle_outline,
-                          color: Colors.blue, size: 260.0),
+                          color: Colors.blue, size: dvheight * 0.3),
                       Text('不正解',
                           style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 30)),
+                              fontWeight: FontWeight.bold,
+                              fontSize: dvheight * 0.03)),
                     ]),
                   )
           ]),
