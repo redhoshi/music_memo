@@ -23,15 +23,18 @@ class PieChart2State extends State {
   @override
   Widget build(BuildContext context) {
     //return Scaffold(
+    final double deviceheight = MediaQuery.of(context).size.height;
+
     return AspectRatio(
       aspectRatio: 1.3,
       //body: Center(
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          const SizedBox(
-            height: 18,
-          ),
+          /*
+          new SizedBox(
+            height: deviceheight * 0.02, //18
+          ),*/
           Expanded(
             child: AspectRatio(
               aspectRatio: 1,
@@ -72,17 +75,19 @@ class PieChart2State extends State {
                 text: '正解',
                 isSquare: true,
               ),
+              /*
               SizedBox(
-                height: 4,
-              ),
+                height: 3,
+              ),*/
               Indicator(
                 color: Color(0xff0293ee),
                 text: '不正解',
                 isSquare: true,
               ),
+              /*
               SizedBox(
-                height: 4,
-              ),
+                height: 3,
+              ),*/
             ],
           ),
           const SizedBox(

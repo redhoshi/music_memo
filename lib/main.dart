@@ -80,6 +80,12 @@ class _MyHomePageState extends State<MyHomePage> {
   Stopwatch time_lis3 = Stopwatch();
   Stopwatch time_lis4 = Stopwatch();
   Stopwatch time_lis5 = Stopwatch();
+  //resound用
+  Stopwatch retime1 = Stopwatch();
+  Stopwatch retime2 = Stopwatch();
+  Stopwatch retime3 = Stopwatch();
+  Stopwatch retime4 = Stopwatch();
+  Stopwatch retime5 = Stopwatch();
 
   //問題提示時に音源ボタンを押した回数
   int count1 = 0;
@@ -95,6 +101,12 @@ class _MyHomePageState extends State<MyHomePage> {
   int out5 = 0;
   //正解だと思ったボタン
   int ansuser = 0;
+  //soundとresound分けるよう
+  Duration tsound1 = new Duration(hours: 0, minutes: 0, seconds: 0);
+  Duration tsound2 = new Duration(hours: 0, minutes: 0, seconds: 0);
+  Duration tsound3 = new Duration(hours: 0, minutes: 0, seconds: 0);
+  Duration tsound4 = new Duration(hours: 0, minutes: 0, seconds: 0);
+  Duration tsound5 = new Duration(hours: 0, minutes: 0, seconds: 0);
 
   //いつどのボタンを押したかのタイムスタンプ
   final List<Map<String, dynamic>> serviceTime = [];
@@ -354,8 +366,17 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> passans(final list) async {
     print('何回実行か${ans_url.length}');
-    //ans_url.length > 6 ?
     deteans(list);
+    setState(() {});
+  }
+
+  //soundtimeとresoundtimeを分ける
+  Future<void> divsound() async {
+    tsound1 = time_lis1.elapsed;
+    tsound2 = time_lis2.elapsed;
+    tsound3 = time_lis3.elapsed;
+    tsound4 = time_lis4.elapsed;
+    tsound5 = time_lis5.elapsed;
     setState(() {});
   }
 
@@ -371,8 +392,6 @@ class _MyHomePageState extends State<MyHomePage> {
         ansjudge.add(true);
       }
     }
-
-    print('ansjudge$ansjudge\n');
   }
 
   //選択肢があっているか否か
@@ -389,17 +408,11 @@ class _MyHomePageState extends State<MyHomePage> {
       sort--;
       //firewrite();
     } else {
-      print('正解');
       value += 10;
       show = true;
       setState(() {});
-      Text('true-');
-      print('$cor');
       result.add('正解');
       sort++;
-      print('result${result[0]}');
-      print(i);
-      // firewrite(); //next押された時点で書き込めるといいかな
     }
   }
 
@@ -422,22 +435,35 @@ class _MyHomePageState extends State<MyHomePage> {
         .collection('$user') // コレクションID--->名前入力でも良いかもね
         .doc('$now') // ここは空欄だと自動でIDが付く
         .set({
-      //'hour': '${'now.hour'}/${'now.minute'}/${'now.second'}',
       '何問目': counta + 1,
       '選んだ選択肢': ansuser,
-      'サウンドボタンを押した時間': serviceTime,
+      'ボタンを押した時間': serviceTime,
       'que': '${docList[counta]}',
       'ans': '${result[counta]}',
       'inst': ['${selist[0]}', '${selist[1]}', '${selist[2]}', '${selist[3]}'],
-      'btn': ['$count1', '$count2', '$count3', '$count4', '$count5'],
+      'soundbtn': [count1, count2, count3, count4, count5],
       'soundtime': [
+        '${tsound1}',
+        '${tsound2}',
+        '${tsound3}',
+        '${tsound4}',
+        '${tsound5}'
+      ],
+      'resoundtime': [
+        '${retime1.elapsed}',
+        '${retime2.elapsed}',
+        '${retime3.elapsed}',
+        '${retime4.elapsed}',
+        '${retime5.elapsed}'
+      ],
+      'allsoundtime': [
         '${time_lis1.elapsed}',
         '${time_lis2.elapsed}',
         '${time_lis3.elapsed}',
         '${time_lis4.elapsed}',
         '${time_lis5.elapsed}'
       ],
-      'time_ans': '${time_ans.elapsed}', //文字列で囲まないとdurationが出る
+      'time_ans': '${time_ans.elapsed}',
       'resoundbtn': [out1, out2, out3, out4, out5],
       'ansjudge': ansjudge,
     });
@@ -458,12 +484,15 @@ class _MyHomePageState extends State<MyHomePage> {
     player1.onPlayerStateChanged.listen((event) {
       if (event == PlayerState.PLAYING) {
         time_lis1.start();
+        // !_diaEnabled ? time_lis1.start() : retime1.start();
+        _diaEnabled ? retime1.start() : SizedBox();
         setState(() {
           state[0] = true;
         });
       }
       if (event == PlayerState.STOPPED || event == PlayerState.COMPLETED) {
         time_lis1.stop();
+        retime1.stop();
         setState(() {
           state[0] = false;
         });
@@ -472,12 +501,14 @@ class _MyHomePageState extends State<MyHomePage> {
     player2.onPlayerStateChanged.listen((event) {
       if (event == PlayerState.PLAYING) {
         time_lis2.start();
+        _diaEnabled ? retime2.start() : SizedBox();
         setState(() {
           state[1] = true;
         });
       }
       if (event == PlayerState.STOPPED || event == PlayerState.COMPLETED) {
         time_lis2.stop();
+        retime2.stop();
         setState(() {
           state[1] = false;
         });
@@ -486,12 +517,14 @@ class _MyHomePageState extends State<MyHomePage> {
     player3.onPlayerStateChanged.listen((event) {
       if (event == PlayerState.PLAYING) {
         time_lis3.start();
+        _diaEnabled ? retime3.start() : SizedBox();
         setState(() {
           state[2] = true;
         });
       }
       if (event == PlayerState.STOPPED || event == PlayerState.COMPLETED) {
         time_lis3.stop();
+        retime3.stop();
         setState(() {
           state[2] = false;
         });
@@ -500,12 +533,14 @@ class _MyHomePageState extends State<MyHomePage> {
     player4.onPlayerStateChanged.listen((event) {
       if (event == PlayerState.PLAYING) {
         time_lis4.start();
+        _diaEnabled ? retime4.start() : SizedBox();
         setState(() {
           state[3] = true;
         });
       }
       if (event == PlayerState.STOPPED || event == PlayerState.COMPLETED) {
         time_lis4.stop();
+        retime4.stop();
         setState(() {
           state[3] = false;
         });
@@ -514,12 +549,14 @@ class _MyHomePageState extends State<MyHomePage> {
     player5.onPlayerStateChanged.listen((event) {
       if (event == PlayerState.PLAYING) {
         time_lis5.start();
+        _diaEnabled ? retime5.start() : SizedBox();
         setState(() {
           state[4] = true;
         });
       }
       if (event == PlayerState.STOPPED || event == PlayerState.COMPLETED) {
         time_lis5.stop();
+        retime5.stop();
         setState(() {
           state[4] = false;
         });
@@ -545,7 +582,7 @@ class _MyHomePageState extends State<MyHomePage> {
     //buildの中に変数書くの良くない
     return Scaffold(
       appBar: AppBar(
-        title: Text('第${devicewidth}問'),
+        title: Text('第${i + 1}問'),
       ),
       body: Stack(
         children: [
@@ -577,14 +614,13 @@ class _MyHomePageState extends State<MyHomePage> {
                             : () {
                                 final now = new DateTime.now(); //いつボタン押したか。
                                 serviceTime.add({'btn1': '$now'});
-                                count1++; //何回押したか
+
                                 player2.stop();
                                 player3.stop();
                                 player4.stop();
                                 player5.stop();
-                                print(serviceTime);
-                                print(_isEnabled);
                                 player1.play(ans_url[counta]);
+                                !_diaEnabled ? count1++ : print(''); //何回押したか
                                 _diaEnabled ? out1++ : print('');
                               },
                         backgroundColor: Colors.orangeAccent,
@@ -626,7 +662,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                       player5.stop();
                                       player2.play(list[0]);
                                       print(_isEnabled);
-                                      count2++;
+                                      !_diaEnabled ? count2++ : print('');
                                       _diaEnabled ? out2++ : print('');
                                     }
                                   : null,
@@ -645,17 +681,20 @@ class _MyHomePageState extends State<MyHomePage> {
                                 onPressed: !_isEnabled
                                     ? null
                                     : () {
-                                        //elevatedbutton表示の話
                                         shape:
                                         OutlineInputBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(10.0)),
                                         );
                                         stopsound();
+                                        divsound();
+                                        //btnタイムスタンプ
+                                        final now = new DateTime.now();
+                                        serviceTime
+                                            .add({'elevatedbtn1': '$now'});
                                         ansuser = 1;
-                                        answer(list[0]); //urlを返す
-                                        print('正解または不正解$show');
-                                        print('select$_isEnabled');
+                                        //urlを返す
+                                        answer(list[0]);
                                         _diaEnabled = true;
                                         setState(() {});
                                         return showAlert(
@@ -703,7 +742,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                     player4.stop();
                                     player5.stop();
                                     player3.play(list[1]);
-                                    count3++;
+                                    !_diaEnabled
+                                        ? count3++
+                                        : print(''); //何回押したか
                                     _diaEnabled ? out3++ : print('');
                                   }
                                 : null,
@@ -723,9 +764,12 @@ class _MyHomePageState extends State<MyHomePage> {
                                               Radius.circular(10.0)),
                                         );
                                         stopsound();
+                                        divsound();
+                                        final now = new DateTime.now();
+                                        serviceTime
+                                            .add({'elevatedbtn2': '$now'});
                                         ansuser = 2;
                                         answer(list[1]);
-                                        print('正解または不正解$show');
                                         _diaEnabled = true;
                                         setState(() {});
                                         print('${ansjudge[1]}');
@@ -777,7 +821,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               player3.stop();
                               player5.stop();
                               player4.play(list[2]);
-                              count4++;
+                              !_diaEnabled ? count4++ : print(''); //何回押したか
                               _diaEnabled ? out4++ : print('');
                             },
                           ),
@@ -797,6 +841,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 Radius.circular(10.0)),
                                           );
                                           stopsound();
+                                          divsound();
+                                          final now = new DateTime.now();
+                                          serviceTime
+                                              .add({'elevatedbtn3': '$now'});
+
                                           ansuser = 3;
                                           answer(list[2]);
                                           print('正解または不正解$show');
@@ -846,7 +895,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               player3.stop();
                               player4.stop();
                               player5.play(list[3]);
-                              count5++;
+                              !_diaEnabled ? count5++ : print(''); //何回押したか
                               _diaEnabled ? out5++ : print('');
                             },
                           ),
@@ -866,6 +915,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 Radius.circular(10.0)),
                                           );
                                           stopsound();
+                                          divsound();
+                                          final now = new DateTime.now();
+                                          serviceTime
+                                              .add({'elevatedbtn4': '$now'});
                                           ansuser = 4;
                                           answer(list[3]);
                                           _diaEnabled = true;
@@ -896,10 +949,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         ? FloatingActionButton.extended(
                             onPressed: () {
                               stopsound();
+                              final now = new DateTime.now();
+                              serviceTime.add({'NextButton': '$now'});
                               i++;
-                              print('nextpressed');
-                              print('docList$docList');
-                              //print('ansurl$ans_url');
                               firewrite();
                               _page++;
                               counta++;
@@ -961,7 +1013,6 @@ void showAlert(BuildContext context, bool show) async {
       context: context,
       builder: (context) {
         final double dvheight = MediaQuery.of(context).size.height;
-        //final double devicewidth = MediaQuery.of(context).size.width;
         return AlertDialog(
           title: Stack(children: <Widget>[
             show
