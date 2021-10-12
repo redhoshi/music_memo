@@ -100,31 +100,47 @@ class EndPagePage extends State<EndPage> {
     // TODO: implement buildsss
     return Scaffold(
       appBar: AppBar(
-        title: Text('終了画面'),
+        title: Text('$nameさんの結果'),
       ),
       body: Column(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
-          Text('【$nameさん】の結果'),
+          // Text('【$deviceheightさん】の結果'), //name
 
           //PieChartSample2(),
+
           PieChartSample2(e: per_c1, o: per_i1),
-          const SizedBox(
-            height: 12,
-          ),
-          Table(
-            border: TableBorder.all(),
-            children: [
-              for (int i = 0; i < e.length; i++)
-                TableRow(children: [
-                  Center(child: Text('第${e[i] + 1}問')),
-                  Center(
-                      child:
-                          Text('${text[i].replaceFirst('の音を選択してください', '')}')),
-                  Center(child: Text('${re[i]}'))
-                ]),
-            ],
+          /*
+          new SizedBox(
+            height: deviceheight * 0.021,
+          ),*/
+          new SizedBox(
+            height: deviceheight * 0.3,
+            width: devicewidth * 1.0,
+            child: Table(
+              border: TableBorder.all(),
+              children: [
+                for (int i = 0; i < e.length; i++)
+                  TableRow(children: [
+                    Center(
+                        child: Text(
+                      '第${e[i] + 1}問',
+                      style: TextStyle(fontSize: 12),
+                    )),
+                    Center(
+                        child: Text(
+                      '${text[i].replaceFirst('の音を選択してください', '')}',
+                      style: TextStyle(fontSize: 12),
+                    )),
+                    Center(
+                        child: Text(
+                      '${re[i]}',
+                      style: TextStyle(fontSize: 12),
+                    ))
+                  ]),
+              ],
+            ),
           ),
           new SizedBox(
             height: deviceheight * 0.07,
