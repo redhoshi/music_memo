@@ -1,11 +1,9 @@
-import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:music_memo/calender/calender.dart';
 import 'package:music_memo/first.dart';
-import 'package:music_memo/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:math' as math;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -29,6 +27,17 @@ class _LoginPageState extends State<LoginPage> {
   bool _isEnded1 = false;
   bool _isEnded2 = false;
   bool _isEnded3 = false;
+  final num = List<int>.generate(3, (i) => i + 0);
+
+  calcurate(aiu) async {
+    var dat;
+    for (int j = 0; j < aiu.length; j++) {
+      int lottery = math.Random().nextInt(j + 1);
+      dat = aiu[j];
+      aiu[j] = aiu[lottery];
+      aiu[lottery] = dat;
+    }
+  }
 
 //firestore
   Future<void> user() async {
@@ -133,6 +142,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    calcurate(num);
+    print(num);
     final double deviceheight = MediaQuery.of(context).size.height;
     final double devicewidth = MediaQuery.of(context).size.width;
     return Scaffold(

@@ -151,6 +151,7 @@ class EndPagePage extends State<EndPage> {
                       ? Navigator.push(context,
                           MaterialPageRoute(builder: (context) => ThanksPage()))
                       : Navigator.push(
+                          //push→pop
                           context,
                           MaterialPageRoute(
                               builder: (context) => FirstPage(name, _isEnded1,

@@ -147,6 +147,7 @@ class _MyHomePageState extends State<MyHomePage> {
     print('user$user,end$end,countslist:$countslist,result$result,value$value');
     _page > 9
         ? Navigator.push(
+            //push→pop
             context,
             MaterialPageRoute(
                 builder: (context) => EndPage('$user', end, countslist, result,
@@ -585,6 +586,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('第${i + 1}問'),
+        automaticallyImplyLeading: false,
       ),
       body: Stack(
         children: [

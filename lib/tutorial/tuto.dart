@@ -1,3 +1,4 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -41,7 +42,15 @@ class TutoPagePage extends State<TutoPage> {
   bool isEnabled = false;
   //正解or不正解
   bool show = false;
-  //ログデータ用
+  //urllistが取れたら
+  bool _getEnabled = false;
+  //ログデータ用音sound時間
+  //音源データを聞いている時間
+  Stopwatch stime1 = Stopwatch();
+  Stopwatch stime2 = Stopwatch();
+  Stopwatch stime3 = Stopwatch();
+  Stopwatch stime4 = Stopwatch();
+  Stopwatch stime5 = Stopwatch();
 
   //問題リストと答えのリストを取得
   Future<void> findlist() async {
@@ -99,6 +108,7 @@ class TutoPagePage extends State<TutoPage> {
     for (int i = 0; i < 4; i++) {
       setUrl(i);
     }
+    _getEnabled = true;
     setState(() {});
   }
 
@@ -147,11 +157,13 @@ class TutoPagePage extends State<TutoPage> {
     player1.onPlayerStateChanged.listen((event) {
       if (event == PlayerState.PLAYING) {
         //time_lis1.start();
+        stime1.start();
         setState(() {
           state[0] = true;
         });
       }
       if (event == PlayerState.STOPPED || event == PlayerState.COMPLETED) {
+        stime1.stop();
         setState(() {
           state[0] = false;
         });
@@ -159,6 +171,7 @@ class TutoPagePage extends State<TutoPage> {
     });
     player2.onPlayerStateChanged.listen((event) {
       if (event == PlayerState.PLAYING) {
+        stime2.start();
         setState(() {
           state[1] = true;
         });
@@ -166,6 +179,7 @@ class TutoPagePage extends State<TutoPage> {
       if (event == PlayerState.STOPPED || event == PlayerState.COMPLETED) {
         //time_lis2.stop();
         //retime2.stop();
+        stime2.stop();
         setState(() {
           state[1] = false;
         });
@@ -173,11 +187,13 @@ class TutoPagePage extends State<TutoPage> {
     });
     player3.onPlayerStateChanged.listen((event) {
       if (event == PlayerState.PLAYING) {
+        stime3.start();
         setState(() {
           state[2] = true;
         });
       }
       if (event == PlayerState.STOPPED || event == PlayerState.COMPLETED) {
+        stime3.stop();
         setState(() {
           state[2] = false;
         });
@@ -185,11 +201,13 @@ class TutoPagePage extends State<TutoPage> {
     });
     player4.onPlayerStateChanged.listen((event) {
       if (event == PlayerState.PLAYING) {
+        stime4.start();
         setState(() {
           state[3] = true;
         });
       }
       if (event == PlayerState.STOPPED || event == PlayerState.COMPLETED) {
+        stime4.stop();
         setState(() {
           state[3] = false;
         });
@@ -197,15 +215,33 @@ class TutoPagePage extends State<TutoPage> {
     });
     player5.onPlayerStateChanged.listen((event) {
       if (event == PlayerState.PLAYING) {
+        stime5.start();
         setState(() {
           state[4] = true;
         });
       }
       if (event == PlayerState.STOPPED || event == PlayerState.COMPLETED) {
+        stime5.stop();
         setState(() {
           state[4] = false;
         });
       }
+    });
+  }
+
+  Future<void> writelog() async {
+    final now = new DateTime.now();
+    await FirebaseFirestore.instance
+        .collection('test$user') // コレクションID--->名前入力でも良いかもね
+        .doc('$now') // ここは空欄だと自動でIDが付く
+        .set({
+      'sountime': [
+        '${stime1}',
+        '${stime2}',
+        '${stime3}',
+        '${stime4}',
+        '${stime5}'
+      ]
     });
   }
 
@@ -221,7 +257,8 @@ class TutoPagePage extends State<TutoPage> {
     final double devicewidth = MediaQuery.of(context).size.width;
     return Scaffold(
         appBar: AppBar(
-          title: Text('さんの結果'),
+          title: Text('$userさんのお試し'),
+          automaticallyImplyLeading: false,
         ),
         body: Stack(children: [
           Column(
@@ -316,7 +353,7 @@ class TutoPagePage extends State<TutoPage> {
                             ),
                           )
                         : new SizedBox(
-                            child: show
+                            child: !show
                                 ? Icon(Icons.brightness_1_outlined,
                                     color: Colors.red, size: deviceheight * 0.1)
                                 : Icon(Icons.remove_circle_outline,
@@ -377,7 +414,7 @@ class TutoPagePage extends State<TutoPage> {
                             ),
                           )
                         : new SizedBox(
-                            child: show
+                            child: !show
                                 ? Icon(Icons.brightness_1_outlined,
                                     color: Colors.red, size: deviceheight * 0.1)
                                 : Icon(Icons.remove_circle_outline,
@@ -426,7 +463,7 @@ class TutoPagePage extends State<TutoPage> {
                                       BorderRadius.all(Radius.circular(10.0)),
                                 );
                                 stopsound();
-
+                                show = true;
                                 isEnabled = true;
                                 setState(() {});
                                 return showAlert(context, show); //showdialog
@@ -438,7 +475,7 @@ class TutoPagePage extends State<TutoPage> {
                             ),
                           )
                         : new SizedBox(
-                            child: !show
+                            child: show
                                 ? Icon(Icons.brightness_1_outlined,
                                     color: Colors.red, size: deviceheight * 0.1)
                                 : Icon(Icons.remove_circle_outline,
@@ -499,7 +536,7 @@ class TutoPagePage extends State<TutoPage> {
                             ),
                           )
                         : new SizedBox(
-                            child: show
+                            child: !show
                                 ? Icon(Icons.brightness_1_outlined,
                                     color: Colors.red, size: deviceheight * 0.1)
                                 : Icon(Icons.remove_circle_outline,
@@ -513,19 +550,58 @@ class TutoPagePage extends State<TutoPage> {
                     isEnabled
                         ? FloatingActionButton.extended(
                             onPressed: () {
-                              Navigator.push(
+                              stopsound();
+                              writelog();
+                              Navigator.pop(
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => FirstPage(
                                           user, false, false, false)));
                             },
                             label: Text('Homeに戻る'),
-                            icon: Icon(Icons.arrow_forward_sharp),
+                            icon: Icon(Icons.arrow_back_sharp),
                           )
                         : new SizedBox()
                   ],
-                )
-              ])
+                ),
+              ]),
+          Center(
+            child: !_getEnabled
+                ? Container(
+                    color: Color(0xFFE4E6F1),
+                  )
+                : Text(''),
+          ),
+          Center(
+            child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+              DefaultTextStyle(
+                style: const TextStyle(
+                    fontSize: 30.0,
+                    fontFamily: 'Horizon',
+                    color: Colors.black,
+                    fontWeight: FontWeight.w100),
+                child: !_getEnabled
+                    ? AnimatedTextKit(
+                        animatedTexts: [FadeAnimatedText('Loading...')],
+                      )
+                    : Text(''),
+              ),
+              SizedBox(
+                height: deviceheight * 0.05,
+              ),
+              SizedBox(
+                width: deviceheight * 0.05,
+                height: deviceheight * 0.05,
+                child: !_getEnabled
+                    ? CircularProgressIndicator(
+                        backgroundColor: Colors.grey,
+                        strokeWidth: deviceheight * 0.008,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                      )
+                    : Text(''),
+              ),
+            ]),
+          ),
         ]));
   }
 }
