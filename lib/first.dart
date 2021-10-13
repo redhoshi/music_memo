@@ -74,100 +74,142 @@ class _FirstPageState extends State<FirstPage> {
               ),
             ),
           ),
-          Text(
-            'Section 1',
-            style: TextStyle(
-              fontSize: deviceheight * 0.03,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'RobotoMono',
+          Column(children: <Widget>[
+            Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  Column(children: <Widget>[
+                    Text(
+                      'testお試し',
+                      style: TextStyle(
+                        fontSize: deviceheight * 0.03,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'RobotoMono',
+                      ),
+                    ),
+                    new SizedBox(
+                        width: devicewidth * 0.3,
+                        height: devicewidth * 0.3,
+                        child: NeumorphicFloatingActionButton(
+                            child: Icon(Icons.audiotrack, size: 50),
+                            onPressed: null)),
+                  ]),
+                  Column(
+                    children: <Widget>[
+                      Text(
+                        'Section 1',
+                        style: TextStyle(
+                          fontSize: deviceheight * 0.03,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'RobotoMono',
+                        ),
+                      ),
+                      new SizedBox(
+                        width: devicewidth * 0.3,
+                        height: devicewidth * 0.3,
+                        child: NeumorphicFloatingActionButton(
+                          child: Icon(Icons.campaign_sharp, size: 50),
+                          onPressed: _isEnded1 //trueなら押せなくする
+                              ? null
+                              : () async {
+                                  print('$num');
+                                  _isEnded1 = true;
+                                  await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => MyHomePage(
+                                            user,
+                                            sound[num[0]],
+                                            question[num[0]],
+                                            _isEnded1,
+                                            _isEnded2,
+                                            _isEnded3), //sound
+                                      ));
+                                },
+                        ),
+                      ),
+                    ],
+                  )
+                ]),
+            new SizedBox(
+              height: deviceheight * 0.07,
             ),
-          ),
-          new SizedBox(
-            width: devicewidth * 0.25,
-            height: devicewidth * 0.25,
-            child: NeumorphicFloatingActionButton(
-              child: Icon(Icons.campaign_sharp, size: 30),
-              onPressed: _isEnded1 //trueなら押せなくする
-                  ? null
-                  : () async {
-                      print('$num');
-                      _isEnded1 = true;
-                      await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MyHomePage(
-                                user,
-                                sound[num[0]],
-                                question[num[0]],
-                                _isEnded1,
-                                _isEnded2,
-                                _isEnded3), //sound
-                          ));
-                    },
-            ),
-          ),
-          Text(
-            'Section2',
-            style: TextStyle(
-              fontSize: deviceheight * 0.03,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'RobotoMono',
-            ),
-          ),
-          new SizedBox(
-            width: devicewidth * 0.25,
-            height: devicewidth * 0.25,
-            child: NeumorphicFloatingActionButton(
-              child: Icon(Icons.construction, size: 30),
-              onPressed: _isEnded2
-                  ? null
-                  : () {
-                      _isEnded2 = true;
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MyHomePage(
-                                user,
-                                sound[num[1]],
-                                question[num[1]],
-                                _isEnded1,
-                                _isEnded2,
-                                _isEnded3), //sound
-                          ));
-                    }, //audio
-            ),
-          ),
-          Text(
-            'Section3',
-            style: TextStyle(
-              fontSize: deviceheight * 0.03,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'RobotoMono',
-            ),
-          ),
-          new SizedBox(
-            width: devicewidth * 0.25,
-            height: devicewidth * 0.25,
-            child: NeumorphicFloatingActionButton(
-              child: Icon(Icons.construction, size: 30),
-              onPressed: _isEnded3
-                  ? null
-                  : () {
-                      _isEnded3 = true;
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MyHomePage(
-                                user,
-                                sound[num[2]],
-                                question[num[2]],
-                                _isEnded1,
-                                _isEnded2,
-                                _isEnded3), //sound
-                          ));
-                    }, //sound3
-            ),
-          ),
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Column(
+                  children: <Widget>[
+                    Text(
+                      'Section2',
+                      style: TextStyle(
+                        fontSize: deviceheight * 0.03,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'RobotoMono',
+                      ),
+                    ),
+                    new SizedBox(
+                      width: devicewidth * 0.3,
+                      height: devicewidth * 0.3,
+                      child: NeumorphicFloatingActionButton(
+                        child: Icon(Icons.circle_notifications, size: 50),
+                        onPressed: _isEnded2
+                            ? null
+                            : () {
+                                _isEnded2 = true;
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => MyHomePage(
+                                          user,
+                                          sound[num[1]],
+                                          question[num[1]],
+                                          _isEnded1,
+                                          _isEnded2,
+                                          _isEnded3), //sound
+                                    ));
+                              }, //audio
+                      ),
+                    ),
+                  ],
+                ),
+                Column(children: <Widget>[
+                  Text(
+                    'Section3',
+                    style: TextStyle(
+                      fontSize: deviceheight * 0.03,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'RobotoMono',
+                    ),
+                  ),
+                  new SizedBox(
+                    width: devicewidth * 0.3,
+                    height: devicewidth * 0.3,
+                    child: NeumorphicFloatingActionButton(
+                      child: Icon(Icons.contactless_outlined, size: 50),
+                      onPressed: _isEnded3
+                          ? null
+                          : () {
+                              _isEnded3 = true;
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => MyHomePage(
+                                        user,
+                                        sound[num[2]],
+                                        question[num[2]],
+                                        _isEnded1,
+                                        _isEnded2,
+                                        _isEnded3), //sound
+                                  ));
+                            }, //sound3
+                    ),
+                  ),
+                ]),
+              ],
+            )
+          ]),
           /*
           NeumorphicButton(
             onPressed: () {
