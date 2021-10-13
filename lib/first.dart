@@ -4,6 +4,8 @@ import 'package:music_memo/Login/login.dart';
 import 'package:music_memo/main.dart';
 import 'dart:math' as math;
 
+import 'tutorial/tuto.dart';
+
 class FirstPage extends StatefulWidget {
   //const FirstPage({Key? key}) : super(key: key);
   FirstPage(this.user, this.isEnded1, this.isEnded2, this.isEnded3);
@@ -92,8 +94,14 @@ class _FirstPageState extends State<FirstPage> {
                         width: devicewidth * 0.3,
                         height: devicewidth * 0.3,
                         child: NeumorphicFloatingActionButton(
-                            child: Icon(Icons.audiotrack, size: 50),
-                            onPressed: null)),
+                          child: Icon(Icons.audiotrack, size: 50),
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => TutoPage(user)));
+                          },
+                        )),
                   ]),
                   Column(
                     children: <Widget>[

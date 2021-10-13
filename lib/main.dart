@@ -13,6 +13,8 @@ import 'dart:math' as math;
 
 import 'package:music_memo/wave/wave.dart';
 
+import 'tutorial/tuto.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
