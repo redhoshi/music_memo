@@ -13,6 +13,8 @@ import 'dart:math' as math;
 
 import 'package:music_memo/wave/wave.dart';
 
+import 'tutorial/tuto.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -145,6 +147,7 @@ class _MyHomePageState extends State<MyHomePage> {
     print('user$user,end$end,countslist:$countslist,result$result,value$value');
     _page > 9
         ? Navigator.push(
+            //push→pop
             context,
             MaterialPageRoute(
                 builder: (context) => EndPage('$user', end, countslist, result,
@@ -583,6 +586,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('第${i + 1}問'),
+        automaticallyImplyLeading: false,
       ),
       body: Stack(
         children: [
