@@ -17,20 +17,21 @@ Future<void> main() async {
 
 class EndPage extends StatefulWidget {
   EndPage(this.a, this.i, this.u, this.e, this.o, this.isended1, this.isended2,
-      this.isended3);
+      this.isended3, this.num);
   String a = '';
   List i = []; //問題番号
   List u = []; //問題のテキスト
   List e = []; //正解か不正解かaiu
   int o = 0;
   bool isended1, isended2, isended3;
+  final num; //list3つ格納用
   EndPagePage createState() =>
-      EndPagePage(a, i, u, e, o, isended1, isended2, isended3);
+      EndPagePage(a, i, u, e, o, isended1, isended2, isended3, num);
 }
 
 class EndPagePage extends State<EndPage> {
   EndPagePage(this.name, this.e, this.text, this.re, this.val, this._isEnded1,
-      this._isEnded2, this._isEnded3);
+      this._isEnded2, this._isEnded3, this.num);
   String name;
   List e = []; //問題番号
   List text = []; //問題のテキスト
@@ -42,6 +43,7 @@ class EndPagePage extends State<EndPage> {
   int per_i = 0;
   double per_c1 = 0.0;
   double per_i1 = 0.0;
+  final num; //section3つ
   get child => null; //result
 
   //円グラフの正解・不正解の割合を求める
@@ -155,7 +157,7 @@ class EndPagePage extends State<EndPage> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => FirstPage(name, _isEnded1,
-                                  _isEnded2, _isEnded3))); //first.dartにいく
+                                  _isEnded2, _isEnded3, num))); //first.dartにいく
                 },
                 label: last ? Text('終了する') : Text('Homeへ戻る')),
           ),

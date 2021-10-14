@@ -8,41 +8,33 @@ import 'tutorial/tuto.dart';
 
 class FirstPage extends StatefulWidget {
   //const FirstPage({Key? key}) : super(key: key);
-  FirstPage(this.user, this.isEnded1, this.isEnded2, this.isEnded3);
+  FirstPage(this.user, this.isEnded1, this.isEnded2, this.isEnded3, this.num);
   String user;
   bool isEnded1, isEnded2, isEnded3;
+  final num;
 
   @override
   State<FirstPage> createState() =>
-      _FirstPageState(user, isEnded1, isEnded2, isEnded3);
+      _FirstPageState(user, isEnded1, isEnded2, isEnded3, num);
 }
 
 class _FirstPageState extends State<FirstPage> {
-  _FirstPageState(this.user, this._isEnded1, this._isEnded2, this._isEnded3);
+  _FirstPageState(
+      this.user, this._isEnded1, this._isEnded2, this._isEnded3, this.num);
   String user;
   //ボタンを無効にする
   bool _isEnded1;
   bool _isEnded2;
   bool _isEnded3;
-  final num = List<int>.generate(3, (i) => i + 0);
+  final num;
+  //final num = List<int>.generate(3, (i) => i + 0);
   final sound = ['sound', 'sound2', 'sound3'];
   final question = ['question', 'question2', 'question3'];
-
-  calcurate(aiu) async {
-    var dat;
-    for (int j = 0; j < aiu.length; j++) {
-      int lottery = math.Random().nextInt(j + 1);
-      dat = aiu[j];
-      aiu[j] = aiu[lottery];
-      aiu[lottery] = dat;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     final double deviceheight = MediaQuery.of(context).size.height;
     final double devicewidth = MediaQuery.of(context).size.width;
-    calcurate(num);
     print(num);
     return Scaffold(
       appBar: AppBar(
@@ -99,7 +91,7 @@ class _FirstPageState extends State<FirstPage> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => TutoPage(user)));
+                                    builder: (context) => TutoPage(user, num)));
                           },
                         )),
                   ]),
@@ -132,7 +124,8 @@ class _FirstPageState extends State<FirstPage> {
                                             question[num[0]],
                                             _isEnded1,
                                             _isEnded2,
-                                            _isEnded3), //sound
+                                            _isEnded3,
+                                            num), //sound
                                       ));
                                 },
                         ),
@@ -175,7 +168,8 @@ class _FirstPageState extends State<FirstPage> {
                                           question[num[1]],
                                           _isEnded1,
                                           _isEnded2,
-                                          _isEnded3), //sound
+                                          _isEnded3,
+                                          num), //sound
                                     ));
                               }, //audio
                       ),
@@ -209,7 +203,8 @@ class _FirstPageState extends State<FirstPage> {
                                         question[num[2]],
                                         _isEnded1,
                                         _isEnded2,
-                                        _isEnded3), //sound
+                                        _isEnded3,
+                                        num), //sound
                                   ));
                             }, //sound3
                     ),

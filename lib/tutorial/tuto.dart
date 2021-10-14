@@ -20,13 +20,14 @@ firebase_storage.FirebaseStorage storage =
 
 class TutoPage extends StatefulWidget {
   //TutoPage();
-  TutoPage(this.user);
+  TutoPage(this.user, this.num);
   String user;
-  TutoPagePage createState() => TutoPagePage(user);
+  final num;
+  TutoPagePage createState() => TutoPagePage(user, num);
 }
 
 class TutoPagePage extends State<TutoPage> {
-  TutoPagePage(this.user);
+  TutoPagePage(this.user, this.num);
   String user;
   //問題リスト
   String quelist = 'aiu';
@@ -44,6 +45,7 @@ class TutoPagePage extends State<TutoPage> {
   bool show = false;
   //urllistが取れたら
   bool _getEnabled = false;
+  final num; //section3
   //ログデータ用音sound時間
   //音源データを聞いている時間
   Stopwatch stime1 = Stopwatch();
@@ -556,7 +558,7 @@ class TutoPagePage extends State<TutoPage> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => FirstPage(
-                                          user, false, false, false)));
+                                          user, false, false, false, num)));
                             },
                             label: Text('Homeに戻る'),
                             icon: Icon(Icons.arrow_back_sharp),
