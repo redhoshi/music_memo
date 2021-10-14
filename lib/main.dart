@@ -122,11 +122,16 @@ class _MyHomePageState extends State<MyHomePage> {
   //ページ番号
   int _page = 0;
   //slider
-  double currentSliderValue = 50;
-  double inputValue = 50;
-  SfRangeValues _value = SfRangeValues(0, 100.0);
-  //rangevalue
-  RangeValues _rangeValues = RangeValues(0, 100.0);
+/*
+  final double _currentSliderValue1 = 50,
+      _currentSliderValue3 = 50,
+      _currentSliderValue2 = 50;*/
+
+  //slider初期値
+  final slider = [50.0, 50.0, 50.0];
+  //user値
+  List slidernum = [], slidernum2 = [], slidernum3 = [];
+  final facesheet = [];
 
   //showdialog用のbool
   bool show = false;
@@ -403,6 +408,23 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  Future<void> getText() async {
+    final snepshot = await FirebaseFirestore.instance
+        .collection('math')
+        .doc('facesheet')
+        .get();
+    facesheet.add(snepshot['face1']);
+    facesheet.add(snepshot['good']);
+    facesheet.add(snepshot['bad']);
+    facesheet.add(snepshot['face2']);
+    facesheet.add(snepshot['notconfident']);
+    facesheet.add(snepshot['confident']);
+    facesheet.add(snepshot['face3']);
+    facesheet.add(snepshot['unknown']);
+    facesheet.add(snepshot['know']);
+    setState(() {});
+  }
+
   //選択肢があっているか否か
   answer(String val) async {
     bool cor = false;
@@ -458,13 +480,13 @@ class _MyHomePageState extends State<MyHomePage> {
         '${tsound4}',
         '${tsound5}'
       ],
-      'resoundtime': [
+      /*追加'resoundtime': [
         '${retime1.elapsed}',
         '${retime2.elapsed}',
         '${retime3.elapsed}',
         '${retime4.elapsed}',
         '${retime5.elapsed}'
-      ],
+      ],*/
       'allsoundtime': [
         '${time_lis1.elapsed}',
         '${time_lis2.elapsed}',
@@ -473,8 +495,13 @@ class _MyHomePageState extends State<MyHomePage> {
         '${time_lis5.elapsed}'
       ],
       'time_ans': '${time_ans.elapsed}',
-      'resoundbtn': [out1, out2, out3, out4, out5],
+      //追加'resoundbtn': [out1, out2, out3, out4, out5],
       'ansjudge': ansjudge,
+      '実験主観難易度': [
+        slidernum[slidernum.length - 1],
+        slidernum2[slidernum2.length - 1],
+        slidernum3[slidernum3.length - 1]
+      ]
     });
   }
 
@@ -582,6 +609,7 @@ class _MyHomePageState extends State<MyHomePage> {
     //Initialized();
     fetchName();
     playTime();
+    getText();
   }
 
   @override
@@ -591,7 +619,7 @@ class _MyHomePageState extends State<MyHomePage> {
     //buildの中に変数書くの良くない
     return Scaffold(
       appBar: AppBar(
-        title: Text('第${i + 1}問'),
+        title: Text('第${i + 1}問'), //i+1
         automaticallyImplyLeading: false,
       ),
       body: Stack(
@@ -707,8 +735,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                         answer(list[0]);
                                         _diaEnabled = true;
                                         setState(() {});
+                                        /*追加
                                         return showAlert(
-                                            context, show); //showdialog
+                                            context, show); //showdialog*/
                                       },
                                 style: ElevatedButton.styleFrom(
                                   primary: Colors.lightGreen,
@@ -783,8 +812,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                         _diaEnabled = true;
                                         setState(() {});
                                         print('${ansjudge[1]}');
+                                        /*追加
                                         return showAlert(
-                                            context, show); //showdialog
+                                            context, show); //showdialog*/
                                       }
                                     : null,
                                 style: ElevatedButton.styleFrom(
@@ -860,7 +890,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                           answer(list[2]);
                                           print('正解または不正解$show');
                                           _diaEnabled = true;
-                                          return showAlert(context, show);
+                                          /*追加
+                                          return showAlert(context, show);*/
                                         },
                                   style: ElevatedButton.styleFrom(
                                     primary: Colors.lightGreen,
@@ -932,7 +963,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                           ansuser = 4;
                                           answer(list[3]);
                                           _diaEnabled = true;
-                                          return showAlert(context, show);
+                                          /*追加
+                                          return showAlert(context, show);*/
                                         },
                                   style: ElevatedButton.styleFrom(
                                     primary: Colors.lightGreen,
@@ -983,38 +1015,35 @@ class _MyHomePageState extends State<MyHomePage> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              SliderPage(),
-                              SfSlider(
-                                  min: 0.0,
-                                  max: 100.0,
-                                  interval: 25,
-                                  showDividers: true,
-                                  showTicks: true,
-                                  enableTooltip: true,
-                                  //minorTicksPerInterval: 1,
-                                  value: currentSliderValue,
-                                  onChanged: (inputValue) {
-                                    setState(() {
-                                      currentSliderValue = inputValue;
-                                    });
-                                  }),
-                              //後で描き直す
-                              //Slider(
-                              // value: currentSliderValue,
-                              /* onChanged: (double value) {
-                                    setState(() {
-                                      currentSliderValue = value;
-                                    });
-                                  })*/
-                              //onChanged: null,
-                              // )
+                              SliderPage(slider[0], facesheet[0], facesheet[1],
+                                  facesheet[2], slidernum),
+                              SliderPage(slider[1], facesheet[3], facesheet[4],
+                                  facesheet[5], slidernum2),
+                              SliderPage(slider[2], facesheet[6], facesheet[7],
+                                  facesheet[8], slidernum3),
+                              FloatingActionButton.extended(
+                                onPressed: () {
+                                  stopsound();
+                                  final now = new DateTime.now();
+                                  serviceTime.add({'NextButton': '$now'});
+                                  i++;
+                                  print(slidernum.length);
+                                  print(
+                                      'カレンと${slidernum[slidernum.length - 1]}');
+                                  firewrite();
+                                  _page++;
+                                  counta++;
+                                  passend();
+                                },
+                                label: Text('Next'),
+                                icon: Icon(Icons.arrow_forward_sharp),
+                              )
                             ],
-                          )
-                          //child: Text('aiuoe'),
-                          )
+                          ))
                       : Text('sasa'),
                 )
               : new SizedBox(),
+
           //----追加箇所------//
           Center(
             child: !_isEnabled

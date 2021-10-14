@@ -3,17 +3,26 @@ import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class SliderPage extends StatelessWidget {
-  const SliderPage({Key? key}) : super(key: key);
+  //const SliderPage({Key? key}) : super(key: key);
+  SliderPage(this._currentSliderValue, this.face1, this.face2, this.face3,
+      this.slidernum);
+  var _currentSliderValue;
+  String face1, face2, face3;
+  List slidernum = [];
 
-  static const String _title = 'Flutter Code Sample';
+  MyStatefulWidget createState() =>
+      MyStatefulWidget(_currentSliderValue, face1, face2, face3, slidernum);
+  //static const String _title = 'Flutter Code Sample';
 
   @override
   Widget build(BuildContext context) {
+    //final double deviceheight = MediaQuery.of(context).size.height;
     return AspectRatio(
-        aspectRatio: 1.3,
+        aspectRatio: 3.0,
         child: Column(
           children: <Widget>[
-            MyStatefulWidget(),
+            MyStatefulWidget(
+                _currentSliderValue, face1, face2, face3, slidernum),
           ],
         ));
   }
@@ -23,26 +32,31 @@ firebase_storage.FirebaseStorage storage =
     firebase_storage.FirebaseStorage.instance;
 
 class MyStatefulWidget extends StatefulWidget {
-  const MyStatefulWidget({Key? key}) : super(key: key);
+  //const MyStatefulWidget({Key? key}) : super(key: key);
+  MyStatefulWidget(this._currentSliderValue, this.face1, this.face2, this.face3,
+      this.slidernum);
+  var _currentSliderValue;
+  String face1, face2, face3;
+  List slidernum = [];
 
   @override
-  State<MyStatefulWidget> createState() => _MyStatefulWidgetState();
+  State<MyStatefulWidget> createState() => _MyStatefulWidgetState(
+      _currentSliderValue, face1, face2, face3, slidernum);
 }
 
 class _MyStatefulWidgetState extends State<MyStatefulWidget> {
-  double _currentSliderValue = 20;
+  _MyStatefulWidgetState(this._currentSliderValue, this.face1, this.face2,
+      this.face3, this.slidernum);
+  var _currentSliderValue;
+  String face1, face2, face3;
+  List slidernum = [];
 
-  Future<void> getText() async {
-    final snepshot = await FirebaseFirestore.instance
-        .collection('math')
-        .doc('facesheet')
-        .get();
-  }
+  final facesheet = [];
 
   @override
   Widget build(BuildContext context) {
     return Column(children: <Widget>[
-      Text('aiueo'),
+      Text('$face1'),
       SliderTheme(
         data: SliderTheme.of(context).copyWith(
           activeTickMarkColor: Colors.white,
@@ -54,9 +68,13 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           divisions: 4,
           label: _currentSliderValue.round().toString(),
           onChanged: (double value) {
+            _currentSliderValue = value;
             setState(() {
-              _currentSliderValue = value;
+              //_currentSliderValue = value;
+              slidernum.add(value);
             });
+
+            print('かかか$_currentSliderValue');
           },
         ),
       ),
@@ -64,24 +82,12 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            '良い',
+            '$_currentSliderValue',
           ),
           Text(
-            '悪い',
+            '$face3',
           ),
         ],
-      ),
-      Text('大変ですか'),
-      Slider(
-        value: _currentSliderValue,
-        min: 0,
-        max: 100,
-        divisions: 5,
-        onChanged: (double value) {
-          setState(() {
-            _currentSliderValue = value;
-          });
-        },
       ),
     ]);
   }
