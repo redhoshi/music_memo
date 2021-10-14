@@ -40,19 +40,20 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   //const MyHomePage({Key? key}) : super(key: key);
   MyHomePage(this.user, this.sound, this.question, this.isended1, this.isended2,
-      this.isended3);
+      this.isended3, this.num);
   String user, sound, question;
   bool isended1, isended2, isended3;
+  final num;
 
   @override
-  State<MyHomePage> createState() =>
-      _MyHomePageState(user, sound, question, isended1, isended2, isended3);
+  State<MyHomePage> createState() => _MyHomePageState(
+      user, sound, question, isended1, isended2, isended3, num);
 }
 
 class _MyHomePageState extends State<MyHomePage> {
   //ここで変数とか関数を定義
   _MyHomePageState(this.user, this.sound, this.question, this._isEnded1,
-      this._isEnded2, this._isEnded3);
+      this._isEnded2, this._isEnded3, this.num);
   String user, sound, question;
   bool _isEnded1, _isEnded2, _isEnded3;
   //問題と正解データを格納するリスト
@@ -62,6 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final quelist = []; //問題のリスト
   final ans_file = []; //dri_tp,画像データのファイル名指定
   final countslist = []; //問題データ格納用
+  final num; //section3つの順番
   int ai = -1;
 
   //選択肢データを格納するリスト
@@ -151,7 +153,7 @@ class _MyHomePageState extends State<MyHomePage> {
             context,
             MaterialPageRoute(
                 builder: (context) => EndPage('$user', end, countslist, result,
-                    value, _isEnded1, _isEnded2, _isEnded3))) //nowに名前を入れる
+                    value, _isEnded1, _isEnded2, _isEnded3, num))) //nowに名前を入れる
         : reload();
   }
 
