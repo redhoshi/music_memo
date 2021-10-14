@@ -8,12 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/rendering/object.dart';
 import 'package:music_memo/Login/login.dart';
 import 'package:music_memo/correctend/end_page.dart';
-
+import 'package:music_memo/slide/slide.dart';
 import 'dart:math' as math;
-
 import 'package:music_memo/wave/wave.dart';
-
-import 'tutorial/tuto.dart';
+import 'package:syncfusion_flutter_sliders/sliders.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -123,6 +121,12 @@ class _MyHomePageState extends State<MyHomePage> {
   int sort = 0;
   //ページ番号
   int _page = 0;
+  //slider
+  double currentSliderValue = 50;
+  double inputValue = 50;
+  SfRangeValues _value = SfRangeValues(0, 100.0);
+  //rangevalue
+  RangeValues _rangeValues = RangeValues(0, 100.0);
 
   //showdialog用のbool
   bool show = false;
@@ -970,6 +974,48 @@ class _MyHomePageState extends State<MyHomePage> {
                   ],
                 )
               ]),
+          //----追加箇所-----//
+          _diaEnabled
+              ? Center(
+                  child: _isEnabled
+                      ? Container(
+                          color: Color(0xFFE4E6F1),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SliderPage(),
+                              SfSlider(
+                                  min: 0.0,
+                                  max: 100.0,
+                                  interval: 25,
+                                  showDividers: true,
+                                  showTicks: true,
+                                  enableTooltip: true,
+                                  //minorTicksPerInterval: 1,
+                                  value: currentSliderValue,
+                                  onChanged: (inputValue) {
+                                    setState(() {
+                                      currentSliderValue = inputValue;
+                                    });
+                                  }),
+                              //後で描き直す
+                              //Slider(
+                              // value: currentSliderValue,
+                              /* onChanged: (double value) {
+                                    setState(() {
+                                      currentSliderValue = value;
+                                    });
+                                  })*/
+                              //onChanged: null,
+                              // )
+                            ],
+                          )
+                          //child: Text('aiuoe'),
+                          )
+                      : Text('sasa'),
+                )
+              : new SizedBox(),
+          //----追加箇所------//
           Center(
             child: !_isEnabled
                 ? Container(

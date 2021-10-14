@@ -44,6 +44,7 @@ dependencies:
   flutter_calendar_carousel: ^2.0.3
   intl: ^0.17.0
   avatar_glow: ^2.0.1
+  syncfusion_flutter_sliders: ^19.3.45
 
 dev_dependencies:
   flutter_test:
