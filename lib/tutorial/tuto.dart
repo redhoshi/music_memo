@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:music_memo/first.dart';
 import 'package:music_memo/main.dart';
+import 'package:music_memo/slide/slide.dart';
 import 'package:music_memo/wave/wave.dart';
 
 Future<void> main() async {
@@ -53,6 +54,18 @@ class TutoPagePage extends State<TutoPage> {
   Stopwatch stime3 = Stopwatch();
   Stopwatch stime4 = Stopwatch();
   Stopwatch stime5 = Stopwatch();
+  //slider初期値
+  final slider = [50.0, 50.0, 50.0];
+
+  List slidernum = [50], slidernum2 = [50], slidernum3 = [50];
+  final facesheet = [];
+  //いつなんのボタンを押したか
+  final List<Map<String, dynamic>> serviceTime = [];
+
+  Future<void> initialized() async {
+    //ボタンのタイムスタンプの初期化
+    serviceTime.removeRange(0, serviceTime.length);
+  }
 
   //問題リストと答えのリストを取得
   Future<void> findlist() async {
@@ -111,6 +124,23 @@ class TutoPagePage extends State<TutoPage> {
       setUrl(i);
     }
     _getEnabled = true;
+    setState(() {});
+  }
+
+  Future<void> getText() async {
+    final snepshot = await FirebaseFirestore.instance
+        .collection('math')
+        .doc('facesheet')
+        .get();
+    facesheet.add(snepshot['face1']);
+    facesheet.add(snepshot['bad']);
+    facesheet.add(snepshot['good']);
+    facesheet.add(snepshot['face2']);
+    facesheet.add(snepshot['notconfident']);
+    facesheet.add(snepshot['confident']);
+    facesheet.add(snepshot['face3']);
+    facesheet.add(snepshot['unknown']);
+    facesheet.add(snepshot['know']);
     setState(() {});
   }
 
@@ -234,16 +264,22 @@ class TutoPagePage extends State<TutoPage> {
   Future<void> writelog() async {
     final now = new DateTime.now();
     await FirebaseFirestore.instance
-        .collection('test$user') // コレクションID--->名前入力でも良いかもね
+        .collection('$userさんのテスト') // コレクションID--->名前入力でも良いかもね
         .doc('$now') // ここは空欄だと自動でIDが付く
         .set({
       'sountime': [
-        '${stime1}',
-        '${stime2}',
-        '${stime3}',
-        '${stime4}',
-        '${stime5}'
-      ]
+        '${stime1.elapsed}',
+        '${stime2.elapsed}',
+        '${stime3.elapsed}',
+        '${stime4.elapsed}',
+        '${stime5.elapsed}'
+      ],
+      'ボタンログ': serviceTime,
+      'アンケート': [
+        slidernum[slidernum.length - 1],
+        slidernum2[slidernum2.length - 1],
+        slidernum3[slidernum3.length - 1]
+      ],
     });
   }
 
@@ -251,6 +287,9 @@ class TutoPagePage extends State<TutoPage> {
   void initState() {
     // TODO: implement initState
     findlist();
+    playTime();
+    getText();
+    initialized();
   }
 
   @override
@@ -291,6 +330,8 @@ class TutoPagePage extends State<TutoPage> {
                           player4.stop();
                           player5.stop();
                           player1.play(anssound[0]);
+                          final now = new DateTime.now(); //いつボタン押したか。
+                          serviceTime.add({'soundbtn1': '$now'});
                         },
                         backgroundColor: Colors.orangeAccent,
                         child: Icon(
@@ -325,6 +366,8 @@ class TutoPagePage extends State<TutoPage> {
                               player4.stop();
                               player5.stop();
                               player2.play(soundlist[0]);
+                              final now = new DateTime.now(); //いつボタン押したか。
+                              serviceTime.add({'soundbtn2': '$now'});
                             },
                           ),
                         ),
@@ -343,10 +386,12 @@ class TutoPagePage extends State<TutoPage> {
                                       BorderRadius.all(Radius.circular(10.0)),
                                 );
                                 stopsound();
+                                final now = new DateTime.now(); //いつボタン押したか。
+                                serviceTime.add({'elebtn1': '$now'});
 
                                 isEnabled = true;
                                 setState(() {});
-                                return showAlert(context, show); //showdialog
+                                //追加return showAlert(context, show); //showdialog
                               },
                               style: ElevatedButton.styleFrom(
                                 primary: Colors.lightGreen,
@@ -386,6 +431,8 @@ class TutoPagePage extends State<TutoPage> {
                               player4.stop();
                               player5.stop();
                               player3.play(soundlist[1]);
+                              final now = new DateTime.now(); //いつボタン押したか。
+                              serviceTime.add({'soundbtn3': '$now'});
                             },
                           ),
                         ),
@@ -404,10 +451,11 @@ class TutoPagePage extends State<TutoPage> {
                                       BorderRadius.all(Radius.circular(10.0)),
                                 );
                                 stopsound();
-
+                                final now = new DateTime.now(); //いつボタン押したか。
+                                serviceTime.add({'elebtn2': '$now'});
                                 isEnabled = true;
                                 setState(() {});
-                                return showAlert(context, show); //showdialog
+                                //追加return showAlert(context, show); //showdialog
                               },
                               style: ElevatedButton.styleFrom(
                                 primary: Colors.lightGreen,
@@ -430,7 +478,7 @@ class TutoPagePage extends State<TutoPage> {
                     Stack(
                       alignment: Alignment.center,
                       children: [
-                        if (state[2] == true) WavePage(key: Key('0'), h: 0),
+                        if (state[3] == true) WavePage(key: Key('0'), h: 0),
                         SizedBox(
                           height: deviceheight * 0.085,
                           width: deviceheight * 0.085,
@@ -447,6 +495,8 @@ class TutoPagePage extends State<TutoPage> {
                               player3.stop();
                               player5.stop();
                               player4.play(soundlist[2]);
+                              final now = new DateTime.now(); //いつボタン押したか。
+                              serviceTime.add({'soundbtn4': '$now'});
                             },
                           ),
                         ),
@@ -465,10 +515,12 @@ class TutoPagePage extends State<TutoPage> {
                                       BorderRadius.all(Radius.circular(10.0)),
                                 );
                                 stopsound();
+                                final now = new DateTime.now(); //いつボタン押したか。
+                                serviceTime.add({'elebtn3': '$now'});
                                 show = true;
                                 isEnabled = true;
                                 setState(() {});
-                                return showAlert(context, show); //showdialog
+                                //追加return showAlert(context, show); //showdialog
                               },
                               style: ElevatedButton.styleFrom(
                                 primary: Colors.lightGreen,
@@ -508,6 +560,8 @@ class TutoPagePage extends State<TutoPage> {
                               player4.stop();
                               player3.stop();
                               player5.play(soundlist[3]);
+                              final now = new DateTime.now(); //いつボタン押したか。
+                              serviceTime.add({'soundbtn5': '$now'});
                             },
                           ),
                         ),
@@ -526,10 +580,11 @@ class TutoPagePage extends State<TutoPage> {
                                       BorderRadius.all(Radius.circular(10.0)),
                                 );
                                 stopsound();
-
+                                final now = new DateTime.now(); //いつボタン押したか。
+                                serviceTime.add({'elebtn4': '$now'});
                                 isEnabled = true;
                                 setState(() {});
-                                return showAlert(context, show); //showdialog
+                                //追加return showAlert(context, show); //showdialog
                               },
                               style: ElevatedButton.styleFrom(
                                 primary: Colors.lightGreen,
@@ -554,6 +609,7 @@ class TutoPagePage extends State<TutoPage> {
                             onPressed: () {
                               stopsound();
                               writelog();
+
                               Navigator.pop(
                                   context,
                                   MaterialPageRoute(
@@ -567,6 +623,40 @@ class TutoPagePage extends State<TutoPage> {
                   ],
                 ),
               ]),
+          isEnabled
+              ? Center(
+                  child: Container(
+                      color: Color(0xFFE4E6F1),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SliderPage(slider[0], facesheet[0], facesheet[1],
+                              facesheet[2], slidernum),
+                          SliderPage(slider[1], facesheet[3], facesheet[4],
+                              facesheet[5], slidernum2),
+                          SliderPage(slider[2], facesheet[6], facesheet[7],
+                              facesheet[8], slidernum3),
+                          FloatingActionButton.extended(
+                            heroTag: "homebtn",
+                            onPressed: () {
+                              print(slidernum3);
+                              stopsound();
+                              writelog();
+                              final now = new DateTime.now(); //いつボタン押したか。
+                              serviceTime.add({'homebtn': '$now'});
+                              Navigator.pop(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => FirstPage(
+                                          user, false, false, false, num)));
+                            },
+                            label: Text('Homeに戻る'),
+                            icon: Icon(Icons.arrow_back_sharp),
+                          )
+                        ],
+                      )),
+                )
+              : new SizedBox(),
           Center(
             child: !_getEnabled
                 ? Container(

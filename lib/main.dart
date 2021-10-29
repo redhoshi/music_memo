@@ -122,6 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
   //ページ番号
   int _page = 0;
   //slider
+
 /*
   final double _currentSliderValue1 = 50,
       _currentSliderValue3 = 50,
@@ -130,7 +131,7 @@ class _MyHomePageState extends State<MyHomePage> {
   //slider初期値
   final slider = [50.0, 50.0, 50.0];
   //user値
-  List slidernum = [], slidernum2 = [], slidernum3 = [];
+  List slidernum = [50], slidernum2 = [50], slidernum3 = [50];
   final facesheet = [];
 
   //showdialog用のbool
@@ -156,9 +157,11 @@ class _MyHomePageState extends State<MyHomePage> {
   //End画面への遷移
   Future<void> passend() async {
     print('user$user,end$end,countslist:$countslist,result$result,value$value');
+    if (_page == 9) firewrite();
     _page > 9
         ? Navigator.push(
             //push→pop
+
             context,
             MaterialPageRoute(
                 builder: (context) => EndPage('$user', end, countslist, result,
@@ -209,6 +212,10 @@ class _MyHomePageState extends State<MyHomePage> {
     out5 = 0;
     //ボタンのタイムスタンプの初期化
     serviceTime.removeRange(0, serviceTime.length);
+    //slider初期化
+    slidernum = [50];
+    slidernum2 = [50];
+    slidernum3 = [50];
   }
 
   //問題データ(文)と正解データ---1回読み込めば良いデータ
@@ -414,8 +421,8 @@ class _MyHomePageState extends State<MyHomePage> {
         .doc('facesheet')
         .get();
     facesheet.add(snepshot['face1']);
-    facesheet.add(snepshot['good']);
     facesheet.add(snepshot['bad']);
+    facesheet.add(snepshot['good']);
     facesheet.add(snepshot['face2']);
     facesheet.add(snepshot['notconfident']);
     facesheet.add(snepshot['confident']);
@@ -619,7 +626,7 @@ class _MyHomePageState extends State<MyHomePage> {
     //buildの中に変数書くの良くない
     return Scaffold(
       appBar: AppBar(
-        title: Text('第${i + 1}問'), //i+1
+        title: Text('第${i + 1}問'),
         automaticallyImplyLeading: false,
       ),
       body: Stack(
@@ -1022,15 +1029,16 @@ class _MyHomePageState extends State<MyHomePage> {
                               SliderPage(slider[2], facesheet[6], facesheet[7],
                                   facesheet[8], slidernum3),
                               FloatingActionButton.extended(
+                                heroTag: "homebtn",
                                 onPressed: () {
                                   stopsound();
+                                  firewrite();
                                   final now = new DateTime.now();
                                   serviceTime.add({'NextButton': '$now'});
                                   i++;
                                   print(slidernum.length);
                                   print(
                                       'カレンと${slidernum[slidernum.length - 1]}');
-                                  firewrite();
                                   _page++;
                                   counta++;
                                   passend();

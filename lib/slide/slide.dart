@@ -82,7 +82,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            '$_currentSliderValue',
+            '$face2',
           ),
           Text(
             '$face3',
