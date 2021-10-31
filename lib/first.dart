@@ -28,8 +28,8 @@ class _FirstPageState extends State<FirstPage> {
   bool _isEnded3;
   final num;
   //final num = List<int>.generate(3, (i) => i + 0);
-  final sound = ['sound', 'sound2', 'sound3'];
-  final question = ['question', 'question2', 'question3'];
+  final sound = ['ssound4', 'ssound5', 'ssound6'];
+  final question = ['question4', 'question5', 'question6'];
 
   @override
   Widget build(BuildContext context) {

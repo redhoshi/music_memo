@@ -3,6 +3,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/rendering/object.dart';
@@ -57,6 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
   //問題と正解データを格納するリスト
   final dlist = []; //初期値設定問題文初期値を2個以上つけたらエラーでない
   final ans_url = []; //ansリストのurl
+  final ansAudioUrl = [];
   final selist = []; //選択肢のリスト
   final quelist = []; //問題のリスト
   final ans_file = []; //dri_tp,画像データのファイル名指定
@@ -129,9 +131,12 @@ class _MyHomePageState extends State<MyHomePage> {
       _currentSliderValue2 = 50;*/
 
   //slider初期値
-  final slider = [50.0, 50.0, 50.0];
+  final slider = [50.0, 50.0, 50.0, 50.0];
   //user値
-  List slidernum = [50], slidernum2 = [50], slidernum3 = [50];
+  List slidernum = [50],
+      slidernum2 = [50],
+      slidernum3 = [50],
+      slidernum4 = [50];
   final facesheet = [];
 
   //showdialog用のbool
@@ -245,9 +250,21 @@ class _MyHomePageState extends State<MyHomePage> {
       print('aa${queli[i]}');
       String que = '${snepshot['que']}'; //問題文
       String ans = '${snepshot['audio']}'; //正解のファイル名
+      String ansaudio = '${snepshot['ansaudio']}'; //正解のファイル名
       print(que);
-      print('${docList[queli[i]]}');
-      print('$ans');
+      print('docリスト${docList[queli[i]]}');
+      print('annsu$ans');
+      print('ansaudio$ansaudio');
+      //問題の音url
+      final audio_ = await firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('toisound')
+          .child(ansaudio)
+          .getDownloadURL();
+      ansAudioUrl.add(audio_);
+      print('$ansAudioUrl');
+      print('doxlist$docList');
+      print('ど${docList[i]},$sound');
       //正解データのURL取得
       final audio_data = await firebase_storage.FirebaseStorage.instance
           .ref()
@@ -267,7 +284,7 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {});
     }
     countslist.add(dlist[counta]); //countsのlistを提示
-    soundSet(ans_url[counta]); //queli[aio]
+    soundSet(ansAudioUrl[counta]); //ans_url[counta]
   }
 
   //2回目以降にsoundDataを呼び出す関数
@@ -306,8 +323,8 @@ class _MyHomePageState extends State<MyHomePage> {
       final ji = await firebase_storage.FirebaseStorage.instance
           .ref(ref.fullPath)
           .fullPath; //パスを取得
-
-      final uu = ji.substring(doc[counta].length + 7); //ファイル名だけ抽出
+      print('どくどく${doc[counta]},$ji');
+      final uu = ji.substring(doc[counta].length + 8); //ファイル名だけ抽出
       selist.add(uu); //usse_org.mp3
       if (selist.length > 3) audiodata(selist, doc);
       setState(() {});
@@ -413,6 +430,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ansjudge.add(true);
       }
     }
+    print('アンスジャッジ$ansjudge');
   }
 
   Future<void> getText() async {
@@ -429,6 +447,7 @@ class _MyHomePageState extends State<MyHomePage> {
     facesheet.add(snepshot['face3']);
     facesheet.add(snepshot['unknown']);
     facesheet.add(snepshot['know']);
+    facesheet.add(snepshot['face4']);
     setState(() {});
   }
 
@@ -507,9 +526,39 @@ class _MyHomePageState extends State<MyHomePage> {
       '実験主観難易度': [
         slidernum[slidernum.length - 1],
         slidernum2[slidernum2.length - 1],
-        slidernum3[slidernum3.length - 1]
+        slidernum3[slidernum3.length - 1],
+        slidernum4[slidernum4.length - 1],
       ]
     });
+  }
+
+  Future<bool> cupertino(BuildContext context, bool show) async {
+    //確認画面
+    showDialog(
+      context: context,
+      builder: (context) {
+        return CupertinoAlertDialog(
+          title: Text("確認"),
+          content: Text("この回答でよろしいですか？"),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              child: Text("Return"),
+              isDestructiveAction: true,
+              onPressed: () => Navigator.pop(context),
+            ),
+            CupertinoDialogAction(
+                child: Text("OK"),
+                onPressed: () {
+                  //@override
+                  _diaEnabled = true;
+                  setState(() {});
+                  Navigator.pop(context);
+                }),
+          ],
+        );
+      },
+    );
+    return _diaEnabled;
   }
 
   //audiocacheクラスの初期化
@@ -664,7 +713,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                 player3.stop();
                                 player4.stop();
                                 player5.stop();
-                                player1.play(ans_url[counta]);
+                                player1.play(ansAudioUrl[counta]);
+                                //player1.play(ans_url[counta]);
                                 !_diaEnabled ? count1++ : print(''); //何回押したか
                                 _diaEnabled ? out1++ : print('');
                               },
@@ -740,8 +790,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                         ansuser = 1;
                                         //urlを返す
                                         answer(list[0]);
-                                        _diaEnabled = true;
+                                        //_diaEnabled = true;
                                         setState(() {});
+                                        cupertino(context, _diaEnabled);
                                         /*追加
                                         return showAlert(
                                             context, show); //showdialog*/
@@ -771,30 +822,29 @@ class _MyHomePageState extends State<MyHomePage> {
                           width: deviceheight * 0.085,
                           height: deviceheight * 0.085,
                           child: FloatingActionButton(
-                            backgroundColor: Colors.orangeAccent,
-                            child: Icon(
-                              Icons.volume_up,
-                              size: deviceheight * 0.04,
-                            ),
-                            heroTag: "btn3",
-                            onPressed: ans_url.length > 2
-                                ? () {
-                                    print("pre2"); //音を鳴らす
-                                    final now = new DateTime.now();
-                                    serviceTime.add({'btn3': '$now'});
-                                    print(list[1]);
-                                    player1.stop();
-                                    player2.stop();
-                                    player4.stop();
-                                    player5.stop();
-                                    player3.play(list[1]);
-                                    !_diaEnabled
-                                        ? count3++
-                                        : print(''); //何回押したか
-                                    _diaEnabled ? out3++ : print('');
-                                  }
-                                : null,
-                          ),
+                              backgroundColor: Colors.orangeAccent,
+                              child: Icon(
+                                Icons.volume_up,
+                                size: deviceheight * 0.04,
+                              ),
+                              heroTag: "btn3",
+                              onPressed: !_isEnabled
+                                  ? null
+                                  : () {
+                                      print("pre2"); //音を鳴らす
+                                      final now = new DateTime.now();
+                                      serviceTime.add({'btn3': '$now'});
+                                      print(list[1]);
+                                      player1.stop();
+                                      player2.stop();
+                                      player4.stop();
+                                      player5.stop();
+                                      player3.play(list[1]);
+                                      !_diaEnabled
+                                          ? count3++
+                                          : print(''); //何回押したか
+                                      _diaEnabled ? out3++ : print('');
+                                    }),
                         ),
                       ]),
                       !_diaEnabled
@@ -802,8 +852,9 @@ class _MyHomePageState extends State<MyHomePage> {
                               height: deviceheight * 0.059,
                               width: devicewidth * 0.54,
                               child: ElevatedButton(
-                                onPressed: ans_url.length > 2
-                                    ? () {
+                                onPressed: !_isEnabled
+                                    ? null
+                                    : () {
                                         shape:
                                         OutlineInputBorder(
                                           borderRadius: BorderRadius.all(
@@ -816,14 +867,16 @@ class _MyHomePageState extends State<MyHomePage> {
                                             .add({'elevatedbtn2': '$now'});
                                         ansuser = 2;
                                         answer(list[1]);
-                                        _diaEnabled = true;
+                                        //_diaEnabled = true;
                                         setState(() {});
                                         print('${ansjudge[1]}');
+                                        print('cupertino$_diaEnabled');
+                                        cupertino(context, _diaEnabled);
+                                        print('cupertinzo$_diaEnabled');
                                         /*追加
                                         return showAlert(
                                             context, show); //showdialog*/
-                                      }
-                                    : null,
+                                      },
                                 style: ElevatedButton.styleFrom(
                                   primary: Colors.lightGreen,
                                   onPrimary: Colors.white,
@@ -859,18 +912,22 @@ class _MyHomePageState extends State<MyHomePage> {
                               size: deviceheight * 0.04,
                             ),
                             heroTag: "btn4",
-                            onPressed: () {
-                              print(list[2]);
-                              final now = new DateTime.now();
-                              serviceTime.add({'btn4': '$now'});
-                              player1.stop();
-                              player2.stop();
-                              player3.stop();
-                              player5.stop();
-                              player4.play(list[2]);
-                              !_diaEnabled ? count4++ : print(''); //何回押したか
-                              _diaEnabled ? out4++ : print('');
-                            },
+                            onPressed: !_isEnabled
+                                ? null
+                                : () {
+                                    print(list[2]);
+                                    final now = new DateTime.now();
+                                    serviceTime.add({'btn4': '$now'});
+                                    player1.stop();
+                                    player2.stop();
+                                    player3.stop();
+                                    player5.stop();
+                                    player4.play(list[2]);
+                                    !_diaEnabled
+                                        ? count4++
+                                        : print(''); //何回押したか
+                                    _diaEnabled ? out4++ : print('');
+                                  },
                           ),
                         ),
                       ]),
@@ -896,8 +953,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                           ansuser = 3;
                                           answer(list[2]);
                                           print('正解または不正解$show');
-                                          _diaEnabled = true;
-                                          /*追加
+                                          //_diaEnabled = true;
+                                          cupertino(context, _diaEnabled);
+                                          /*追
                                           return showAlert(context, show);*/
                                         },
                                   style: ElevatedButton.styleFrom(
@@ -934,18 +992,22 @@ class _MyHomePageState extends State<MyHomePage> {
                               size: deviceheight * 0.036,
                             ),
                             heroTag: "btn5",
-                            onPressed: () {
-                              print(list[3]);
-                              final now = new DateTime.now();
-                              serviceTime.add({'btn5': '$now'});
-                              player1.stop();
-                              player2.stop();
-                              player3.stop();
-                              player4.stop();
-                              player5.play(list[3]);
-                              !_diaEnabled ? count5++ : print(''); //何回押したか
-                              _diaEnabled ? out5++ : print('');
-                            },
+                            onPressed: !_isEnabled
+                                ? null
+                                : () {
+                                    print(list[3]);
+                                    final now = new DateTime.now();
+                                    serviceTime.add({'btn5': '$now'});
+                                    player1.stop();
+                                    player2.stop();
+                                    player3.stop();
+                                    player4.stop();
+                                    player5.play(list[3]);
+                                    !_diaEnabled
+                                        ? count5++
+                                        : print(''); //何回押したか
+                                    _diaEnabled ? out5++ : print('');
+                                  },
                           ),
                         ),
                       ]),
@@ -956,7 +1018,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               child: ElevatedButton(
                                   onPressed: !_isEnabled
                                       ? null
-                                      : () {
+                                      : () async {
                                           shape:
                                           OutlineInputBorder(
                                             borderRadius: BorderRadius.all(
@@ -969,7 +1031,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                               .add({'elevatedbtn4': '$now'});
                                           ansuser = 4;
                                           answer(list[3]);
-                                          _diaEnabled = true;
+                                          //_diaEnabled = true;
+                                          print('di$_diaEnabled');
+                                          await cupertino(context, show);
+                                          print('ss$_diaEnabled');
                                           /*追加
                                           return showAlert(context, show);*/
                                         },
@@ -996,16 +1061,18 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: [
                     _diaEnabled
                         ? FloatingActionButton.extended(
-                            onPressed: () {
-                              stopsound();
-                              final now = new DateTime.now();
-                              serviceTime.add({'NextButton': '$now'});
-                              i++;
-                              firewrite();
-                              _page++;
-                              counta++;
-                              passend();
-                            },
+                            onPressed: !_isEnabled
+                                ? null
+                                : () {
+                                    stopsound();
+                                    final now = new DateTime.now();
+                                    serviceTime.add({'NextButton': '$now'});
+                                    i++;
+                                    firewrite();
+                                    _page++;
+                                    counta++;
+                                    passend();
+                                  },
                             label: Text('Next'),
                             icon: Icon(Icons.arrow_forward_sharp),
                           )
@@ -1028,6 +1095,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                   facesheet[5], slidernum2),
                               SliderPage(slider[2], facesheet[6], facesheet[7],
                                   facesheet[8], slidernum3),
+                              SliderPage(slider[3], facesheet[9], facesheet[7],
+                                  facesheet[8], slidernum4),
                               FloatingActionButton.extended(
                                 heroTag: "homebtn",
                                 onPressed: () {

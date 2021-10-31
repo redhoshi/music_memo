@@ -55,9 +55,12 @@ class TutoPagePage extends State<TutoPage> {
   Stopwatch stime4 = Stopwatch();
   Stopwatch stime5 = Stopwatch();
   //slider初期値
-  final slider = [50.0, 50.0, 50.0];
+  final slider = [50.0, 50.0, 50.0, 50.0];
 
-  List slidernum = [50], slidernum2 = [50], slidernum3 = [50];
+  List slidernum = [50],
+      slidernum2 = [50],
+      slidernum3 = [50],
+      slidernum4 = [50];
   final facesheet = [];
   //いつなんのボタンを押したか
   final List<Map<String, dynamic>> serviceTime = [];
@@ -141,6 +144,7 @@ class TutoPagePage extends State<TutoPage> {
     facesheet.add(snepshot['face3']);
     facesheet.add(snepshot['unknown']);
     facesheet.add(snepshot['know']);
+    facesheet.add(snepshot['face4']);
     setState(() {});
   }
 
@@ -278,7 +282,8 @@ class TutoPagePage extends State<TutoPage> {
       'アンケート': [
         slidernum[slidernum.length - 1],
         slidernum2[slidernum2.length - 1],
-        slidernum3[slidernum3.length - 1]
+        slidernum3[slidernum3.length - 1],
+        slidernum4[slidernum4.length - 1]
       ],
     });
   }
@@ -443,7 +448,7 @@ class TutoPagePage extends State<TutoPage> {
                             height: deviceheight * 0.059,
                             width: devicewidth * 0.54,
                             child: ElevatedButton(
-                              child: Text('select3'),
+                              child: Text('select2'),
                               onPressed: () {
                                 shape:
                                 OutlineInputBorder(
@@ -636,6 +641,8 @@ class TutoPagePage extends State<TutoPage> {
                               facesheet[5], slidernum2),
                           SliderPage(slider[2], facesheet[6], facesheet[7],
                               facesheet[8], slidernum3),
+                          SliderPage(slider[3], facesheet[9], facesheet[7],
+                              facesheet[8], slidernum4),
                           FloatingActionButton.extended(
                             heroTag: "homebtn",
                             onPressed: () {
