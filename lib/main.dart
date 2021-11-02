@@ -58,6 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
   //問題と正解データを格納するリスト
   final dlist = []; //初期値設定問題文初期値を2個以上つけたらエラーでない
   final ans_url = []; //ansリストのurl
+  final ansAudioUrlList = []; //変更した問題音urlリスト
   final ansAudioUrl = [];
   final selist = []; //選択肢のリスト
   final quelist = []; //問題のリスト
@@ -225,6 +226,7 @@ class _MyHomePageState extends State<MyHomePage> {
     slidernum = [50];
     slidernum2 = [50];
     slidernum3 = [50];
+    slidernum4 = [50];
   }
 
   //問題データ(文)と正解データ---1回読み込めば良いデータ
@@ -255,19 +257,15 @@ class _MyHomePageState extends State<MyHomePage> {
       String que = '${snepshot['que']}'; //問題文
       String ans = '${snepshot['audio']}'; //正解のファイル名
       String ansaudio = '${snepshot['ansaudio']}'; //正解のファイル名
-      //print(que);
-      //print('docリスト${docList[queli[i]]}');
-      //問題の音url
+      ansAudioUrlList.add(ansaudio);
+      //違うメロディーの問題音url
       final audio_ = await firebase_storage.FirebaseStorage.instance
           .ref()
           .child('toisound')
           .child(ansaudio)
           .getDownloadURL();
       ansAudioUrl.add(audio_);
-      //print('$ansAudioUrl');
-      //print('doxlist$docList');
-      //print('ど${docList[i]},$sound');
-      //正解データのURL取得
+      //正解データのURL取得answer関数で使用
       final audio_data = await firebase_storage.FirebaseStorage.instance
           .ref()
           .child('$sound')
@@ -499,6 +497,7 @@ class _MyHomePageState extends State<MyHomePage> {
       '選んだ選択肢': ansuser,
       'ボタンを押した時間': serviceTime,
       'que': '${docList[counta]}',
+      'ansaudio': '${ansAudioUrlList[counta]}',
       'ans': '${result[counta]}',
       'inst': ['${selist[0]}', '${selist[1]}', '${selist[2]}', '${selist[3]}'],
       'soundbtn': [count1, count2, count3, count4, count5],
@@ -545,16 +544,23 @@ class _MyHomePageState extends State<MyHomePage> {
           content: Text("この回答でよろしいですか？"),
           actions: <Widget>[
             CupertinoDialogAction(
-              child: Text("Return"),
-              isDestructiveAction: true,
-              onPressed: () => Navigator.pop(context),
-            ),
+                child: Text("Return"),
+                isDestructiveAction: true,
+                onPressed: () {
+                  final now = new DateTime.now();
+                  serviceTime.add({'cancelbtn': '$now'});
+                  Navigator.pop(context);
+                }
+                //=> Navigator.pop(context),
+                ),
             CupertinoDialogAction(
                 child: Text("OK"),
                 onPressed: () {
                   //@override
                   _diaEnabled = true;
                   answer(url);
+                  final now = new DateTime.now();
+                  serviceTime.add({'okbtn': '$now'});
                   setState(() {});
                   Navigator.pop(context);
                 }),
@@ -1122,6 +1128,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   counta++;
                                   end.add(i);
                                   passend();
+                                  print('slidernum4$slidernum4');
                                 },
                                 label: Text('Next'),
                                 icon: Icon(Icons.arrow_forward_sharp),
