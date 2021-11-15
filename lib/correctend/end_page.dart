@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:music_memo/Login/login.dart';
 import 'package:music_memo/first.dart';
 import 'package:music_memo/main.dart';
 import 'package:music_memo/pie_chart/pie.dart';
@@ -83,6 +84,8 @@ class EndPagePage extends State<EndPage> {
       last = true;
       print('lastがtrueになる$last');
     }
+    //もしtrueだったら別のカウントをつける,isendedをfalseにする
+    //別のカウントが全部trueになったらlastを動かす
   }
 
   //画面が作られたときに一度だけ呼ばれる
@@ -151,7 +154,7 @@ class EndPagePage extends State<EndPage> {
                 onPressed: () {
                   last
                       ? Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => ThanksPage()))
+                          MaterialPageRoute(builder: (context) => LoginPage()))
                       : Navigator.push(
                           //push→pop
                           context,

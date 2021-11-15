@@ -114,7 +114,7 @@ class _FirstPageState extends State<FirstPage> {
                               ? null
                               : () async {
                                   print('$num');
-                                  _isEnded1 = true;
+                                  // _isEnded1 = true;
                                   await Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -158,7 +158,7 @@ class _FirstPageState extends State<FirstPage> {
                         onPressed: _isEnded2
                             ? null
                             : () {
-                                _isEnded2 = true;
+                                //  _isEnded2 = true;
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -193,7 +193,7 @@ class _FirstPageState extends State<FirstPage> {
                       onPressed: _isEnded3
                           ? null
                           : () {
-                              _isEnded3 = true;
+                              // _isEnded3 = true;
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(

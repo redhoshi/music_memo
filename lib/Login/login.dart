@@ -150,6 +150,7 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(
         title: Text('ログインページ'),
         centerTitle: true,
+        automaticallyImplyLeading: false,
       ),
       backgroundColor: NeumorphicTheme.baseColor(context),
       body: Center(

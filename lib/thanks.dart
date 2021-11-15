@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:music_memo/Login/login.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,6 +22,7 @@ class ThanksPagePage extends State<ThanksPage> {
       firebase_storage.FirebaseStorage.instance;
   Future<void> PhotoData() async {
     //awaitがないと読み込まれない
+    /*
     final photo_data = await firebase_storage.FirebaseStorage.instance //url
         .ref()
         .child('photo') //que_1とか
@@ -30,7 +32,7 @@ class ThanksPagePage extends State<ThanksPage> {
     final image = new Image(image: new CachedNetworkImageProvider(photo_data));
     setState(() {
       _image = image;
-    });
+    });*/
   }
 
   //画面が作られたときに一度だけ呼ばれる
@@ -38,9 +40,10 @@ class ThanksPagePage extends State<ThanksPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    /*photo
     PhotoData().whenComplete(() {
       setState(() {});
-    });
+    });*/
   }
 
   @override
@@ -54,10 +57,17 @@ class ThanksPagePage extends State<ThanksPage> {
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
+          FloatingActionButton(onPressed: () {
+            Navigator.push(
+                //push→pop
+                context,
+                MaterialPageRoute(builder: (context) => LoginPage()));
+          })
+          /*photo
           _image ?? SizedBox(),
           new SizedBox(
             height: 30,
-          ),
+          ),*/
         ],
       ),
     );
