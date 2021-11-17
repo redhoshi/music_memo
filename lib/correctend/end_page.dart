@@ -18,27 +18,29 @@ Future<void> main() async {
 
 class EndPage extends StatefulWidget {
   EndPage(this.a, this.i, this.u, this.e, this.o, this.isended1, this.isended2,
-      this.isended3, this.num);
+      this.isended3, this.num, this.countPage);
   String a = '';
   List i = []; //問題番号
   List u = []; //問題のテキスト
   List e = []; //正解か不正解かaiu
   int o = 0;
+  List countPage = []; //3つ終わったら終了画面
   bool isended1, isended2, isended3;
   final num; //list3つ格納用
   EndPagePage createState() =>
-      EndPagePage(a, i, u, e, o, isended1, isended2, isended3, num);
+      EndPagePage(a, i, u, e, o, isended1, isended2, isended3, num, countPage);
 }
 
 class EndPagePage extends State<EndPage> {
   EndPagePage(this.name, this.e, this.text, this.re, this.val, this._isEnded1,
-      this._isEnded2, this._isEnded3, this.num);
+      this._isEnded2, this._isEnded3, this.num, this._countPage);
   String name;
   List e = []; //問題番号
   List text = []; //問題のテキスト
   List re = []; //正解か不正解かaiu
   int val = 0;
   bool _isEnded1, _isEnded2, _isEnded3;
+
   bool last = false;
   int per_c = 0;
   int per_i = 0;
@@ -46,6 +48,7 @@ class EndPagePage extends State<EndPage> {
   double per_i1 = 0.0;
   final num; //section3つ
   get child => null; //result
+  List _countPage;
 
   //円グラフの正解・不正解の割合を求める
   Future<void> perChange() async {
@@ -80,10 +83,26 @@ class EndPagePage extends State<EndPage> {
   }
 
   Future<void> checkEnded() async {
+    //1個にして色々渡す
+    if (_isEnded1 == true) {
+      _countPage.add(0);
+      _isEnded1 = false;
+    } else if (_isEnded2 == true) {
+      _countPage.add(0);
+      _isEnded2 = false;
+    } else if (_isEnded3 == true) {
+      _countPage.add(0);
+      _isEnded3 = false;
+    }
+    if (_countPage.length > 2) {
+      last = true;
+    }
+    print('1:$_countPage');
+    /*
     if (_isEnded1 == true && _isEnded2 == true && _isEnded3 == true) {
       last = true;
       print('lastがtrueになる$last');
-    }
+    }*/
     //もしtrueだったら別のカウントをつける,isendedをfalseにする
     //別のカウントが全部trueになったらlastを動かす
   }
@@ -103,9 +122,11 @@ class EndPagePage extends State<EndPage> {
     final double deviceheight = MediaQuery.of(context).size.height;
     final double devicewidth = MediaQuery.of(context).size.width;
     // TODO: implement buildsss
+    //return MaterialApp(
     return Scaffold(
       appBar: AppBar(
         title: Text('$nameさんの結果'),
+        automaticallyImplyLeading: false,
       ),
       body: Column(
         mainAxisSize: MainAxisSize.max,
@@ -159,13 +180,19 @@ class EndPagePage extends State<EndPage> {
                           //push→pop
                           context,
                           MaterialPageRoute(
-                              builder: (context) => FirstPage(name, _isEnded1,
-                                  _isEnded2, _isEnded3, num))); //first.dartにいく
+                              builder: (context) => FirstPage(
+                                  name,
+                                  _isEnded1,
+                                  _isEnded2,
+                                  _isEnded3,
+                                  num,
+                                  _countPage))); //first.dartにいく
                 },
                 label: last ? Text('終了する') : Text('Homeへ戻る')),
           ),
         ],
       ),
     );
+    //)
   }
 }

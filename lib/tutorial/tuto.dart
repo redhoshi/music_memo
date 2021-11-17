@@ -21,15 +21,17 @@ firebase_storage.FirebaseStorage storage =
 
 class TutoPage extends StatefulWidget {
   //TutoPage();
-  TutoPage(this.user, this.num);
+  TutoPage(this.user, this.num, this.countPage);
   String user;
   final num;
-  TutoPagePage createState() => TutoPagePage(user, num);
+  List countPage;
+  TutoPagePage createState() => TutoPagePage(user, num, countPage);
 }
 
 class TutoPagePage extends State<TutoPage> {
-  TutoPagePage(this.user, this.num);
+  TutoPagePage(this.user, this.num, this.countPage);
   String user;
+  List countPage;
   //問題リスト
   String quelist = 'aiu';
   //答えのリスト
@@ -619,7 +621,12 @@ class TutoPagePage extends State<TutoPage> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => FirstPage(
-                                          user, false, false, false, num)));
+                                          user,
+                                          false,
+                                          false,
+                                          false,
+                                          num,
+                                          countPage)));
                             },
                             label: Text('Homeに戻る'),
                             icon: Icon(Icons.arrow_back_sharp),
@@ -655,7 +662,12 @@ class TutoPagePage extends State<TutoPage> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => FirstPage(
-                                          user, false, false, false, num)));
+                                          user,
+                                          false,
+                                          false,
+                                          false,
+                                          num,
+                                          countPage)));
                             },
                             label: Text('Homeに戻る'),
                             icon: Icon(Icons.arrow_back_sharp),
