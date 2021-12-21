@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/rendering/object.dart';
 import 'package:music_memo/Login/login.dart';
+import 'package:music_memo/Login/test.dart';
 import 'package:music_memo/correctend/end_page.dart';
 import 'package:music_memo/slide/slide.dart';
 import 'dart:math' as math;
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         title: 'Flutter Demo',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.indigo,
         ),
@@ -39,22 +41,24 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   //const MyHomePage({Key? key}) : super(key: key);
   MyHomePage(this.user, this.sound, this.question, this.isended1, this.isended2,
-      this.isended3, this.num);
+      this.isended3, this.num, this.countPage);
   String user, sound, question;
   bool isended1, isended2, isended3;
+  List countPage;
   final num;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState(
-      user, sound, question, isended1, isended2, isended3, num);
+      user, sound, question, isended1, isended2, isended3, num, countPage);
 }
 
 class _MyHomePageState extends State<MyHomePage> {
   //ここで変数とか関数を定義
   _MyHomePageState(this.user, this.sound, this.question, this._isEnded1,
-      this._isEnded2, this._isEnded3, this.num);
+      this._isEnded2, this._isEnded3, this.num, this.countPage);
   String user, sound, question;
   bool _isEnded1, _isEnded2, _isEnded3;
+  List countPage; //3つ終わったら終了
   //問題と正解データを格納するリスト
   final dlist = []; //初期値設定問題文初期値を2個以上つけたらエラーでない
   final ans_url = []; //ansリストのurl
@@ -171,8 +175,17 @@ class _MyHomePageState extends State<MyHomePage> {
 
             context,
             MaterialPageRoute(
-                builder: (context) => EndPage('$user', end, countslist, result,
-                    value, _isEnded1, _isEnded2, _isEnded3, num))) //nowに名前を入れる
+                builder: (context) => EndPage(
+                    '$user',
+                    end,
+                    countslist,
+                    result,
+                    value,
+                    _isEnded1,
+                    _isEnded2,
+                    _isEnded3,
+                    num,
+                    countPage))) //nowに名前を入れる
         : reload();
   }
 
@@ -701,7 +714,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     height: devicewidth * 0.049, //18.0
                     child: Text(
                       dlist.length > 2 ? dlist[counta] : '', //これが一番遅いかな
-                      style: TextStyle(fontSize: deviceheight * 0.017),
+                      style: TextStyle(
+                        fontSize: deviceheight * 0.02,
+                        //fontWeight: FontWeight.bold,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -781,7 +797,13 @@ class _MyHomePageState extends State<MyHomePage> {
                               width: devicewidth * 0.54,
                               child: ElevatedButton(
                                 child: ans_url.length > 2
-                                    ? Text('select1')
+                                    ? Text(
+                                        'select1',
+                                        style: TextStyle(
+                                          // fontWeight: FontWeight.bold,
+                                          fontSize: deviceheight * 0.028,
+                                        ),
+                                      )
                                     : Text('loading'),
                                 onPressed: !_isEnabled
                                     ? null
@@ -897,7 +919,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                   onPrimary: Colors.white,
                                 ),
                                 child: (ans_url.length > 2
-                                    ? Text('select 2')
+                                    ? Text(
+                                        'select 2',
+                                        style: TextStyle(
+                                          //fontWeight: FontWeight.bold,
+                                          fontSize: deviceheight * 0.028,
+                                        ),
+                                      )
                                     : Text('loading')),
                               ),
                             )
@@ -979,7 +1007,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                     onPrimary: Colors.white,
                                   ),
                                   child: ans_url.length > 2
-                                      ? Text('select 3')
+                                      ? Text(
+                                          'select 3',
+                                          style: TextStyle(
+                                            //fontWeight: FontWeight.bold,
+                                            fontSize: deviceheight * 0.028,
+                                          ),
+                                        )
                                       : Text('loading')),
                             )
                           : new SizedBox()
@@ -1059,7 +1093,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                   ),
                                   child: !_isEnabled
                                       ? Text('loading')
-                                      : Text('select 4')),
+                                      : Text(
+                                          'select 4',
+                                          style: TextStyle(
+                                            // fontWeight: FontWeight.bold,
+                                            fontSize: deviceheight * 0.028,
+                                          ),
+                                        )),
                             )
                           : new SizedBox()
                       /*: new SizedBox(
@@ -1106,33 +1146,51 @@ class _MyHomePageState extends State<MyHomePage> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              SliderPage(slider[0], facesheet[0], facesheet[1],
-                                  facesheet[2], slidernum),
-                              SliderPage(slider[1], facesheet[3], facesheet[4],
-                                  facesheet[5], slidernum2),
-                              SliderPage(slider[2], facesheet[6], facesheet[7],
-                                  facesheet[8], slidernum3),
-                              SliderPage(slider[3], facesheet[9], facesheet[7],
-                                  facesheet[8], slidernum4),
-                              FloatingActionButton.extended(
-                                heroTag: "homebtn",
-                                onPressed: () {
-                                  stopsound();
-                                  firewrite();
-                                  final now = new DateTime.now();
-                                  serviceTime.add({'NextButton': '$now'});
-                                  print(slidernum.length);
-                                  print(
-                                      'カレンと${slidernum[slidernum.length - 1]}');
-                                  _page++;
-                                  counta++;
-                                  end.add(i);
-                                  passend();
-                                  print('slidernum4$slidernum4');
-                                },
-                                label: Text('Next'),
-                                icon: Icon(Icons.arrow_forward_sharp),
-                              )
+                              new SizedBox(
+                                  height: deviceheight * 0.17,
+                                  width: devicewidth * 0.95,
+                                  child: SliderPage(slider[0], facesheet[0],
+                                      facesheet[1], facesheet[2], slidernum)),
+                              new SizedBox(
+                                  height: deviceheight * 0.17,
+                                  width: devicewidth * 0.95,
+                                  child: SliderPage(slider[1], facesheet[3],
+                                      facesheet[4], facesheet[5], slidernum2)),
+                              new SizedBox(
+                                  height: deviceheight * 0.17,
+                                  width: devicewidth * 0.95,
+                                  child: SliderPage(slider[2], facesheet[6],
+                                      facesheet[7], facesheet[8], slidernum3)),
+                              new SizedBox(
+                                  height: deviceheight * 0.17,
+                                  width: devicewidth * 0.95,
+                                  child: SliderPage(slider[3], facesheet[9],
+                                      facesheet[7], facesheet[8], slidernum4)),
+                              new SizedBox(
+                                  height: deviceheight * 0.1,
+                                  width: devicewidth * 0.7,
+                                  child: FloatingActionButton.extended(
+                                    heroTag: "homebtn",
+                                    onPressed: () {
+                                      stopsound();
+                                      firewrite();
+                                      final now = new DateTime.now();
+                                      serviceTime.add({'NextButton': '$now'});
+                                      print(slidernum.length);
+                                      print(
+                                          'カレンと${slidernum[slidernum.length - 1]}');
+                                      _page++;
+                                      counta++;
+                                      end.add(i);
+                                      passend();
+                                      print('slidernum4$slidernum4');
+                                    },
+                                    label: Text('Next',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: devicewidth * 0.04)),
+                                    icon: Icon(Icons.arrow_forward_sharp),
+                                  ))
                             ],
                           ))
                       : Text('sasa'),
@@ -1157,7 +1215,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     fontWeight: FontWeight.w100),
                 child: !_isEnabled
                     ? AnimatedTextKit(
-                        animatedTexts: [FadeAnimatedText('Loading...')],
+                        animatedTexts: [
+                          FadeAnimatedText(
+                            'Loading...',
+                          )
+                        ],
                       )
                     : Text(''),
               ),

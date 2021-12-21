@@ -8,25 +8,34 @@ import 'tutorial/tuto.dart';
 
 class FirstPage extends StatefulWidget {
   //const FirstPage({Key? key}) : super(key: key);
-  FirstPage(this.user, this.isEnded1, this.isEnded2, this.isEnded3, this.num);
+  FirstPage(this.user, this.isEnded1, this.isEnded2, this.isEnded3, this.num,
+      this.countPage);
   String user;
   bool isEnded1, isEnded2, isEnded3;
+  List countPage;
   final num;
 
   @override
   State<FirstPage> createState() =>
-      _FirstPageState(user, isEnded1, isEnded2, isEnded3, num);
+      _FirstPageState(user, isEnded1, isEnded2, isEnded3, num, countPage);
 }
 
 class _FirstPageState extends State<FirstPage> {
   _FirstPageState(
-      this.user, this._isEnded1, this._isEnded2, this._isEnded3, this.num);
+    this.user,
+    this._isEnded1,
+    this._isEnded2,
+    this._isEnded3,
+    this.num,
+    this.countPage,
+  );
   String user;
   //ボタンを無効にする
   bool _isEnded1;
   bool _isEnded2;
   bool _isEnded3;
   final num;
+  List countPage;
   //final num = List<int>.generate(3, (i) => i + 0);
   final sound = ['ssound4', 'ssound5', 'ssound6'];
   final question = ['question4', 'question5', 'question6'];
@@ -35,7 +44,7 @@ class _FirstPageState extends State<FirstPage> {
   Widget build(BuildContext context) {
     final double deviceheight = MediaQuery.of(context).size.height;
     final double devicewidth = MediaQuery.of(context).size.width;
-    print(num);
+    print('home画面$num');
     return Scaffold(
       appBar: AppBar(
         title: Text('FirstPage'),
@@ -61,7 +70,7 @@ class _FirstPageState extends State<FirstPage> {
 
           Center(
             child: Text(
-              'Section1-3のボタンを押すと問題が始まります。\nどのSectionから始めても構いません。\n全てのSectionを完了させてください。',
+              'Section1-3のボタンを押すと問題が始まります。\nSection1,2,3の順番に解いてください。\n全てのSectionを完了させてください。',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: deviceheight * 0.02,
@@ -86,12 +95,14 @@ class _FirstPageState extends State<FirstPage> {
                         width: devicewidth * 0.3,
                         height: devicewidth * 0.3,
                         child: NeumorphicFloatingActionButton(
-                          child: Icon(Icons.audiotrack, size: 50),
+                          child:
+                              Icon(Icons.audiotrack, size: devicewidth * 0.15),
                           onPressed: () {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => TutoPage(user, num)));
+                                    builder: (context) =>
+                                        TutoPage(user, num, countPage)));
                           },
                         )),
                   ]),
@@ -103,13 +114,22 @@ class _FirstPageState extends State<FirstPage> {
                           fontSize: deviceheight * 0.03,
                           fontWeight: FontWeight.bold,
                           fontFamily: 'RobotoMono',
+                          color: countPage.length > 0
+                              ? Colors.green
+                              : Colors.black,
                         ),
                       ),
                       new SizedBox(
                         width: devicewidth * 0.3,
                         height: devicewidth * 0.3,
                         child: NeumorphicFloatingActionButton(
-                          child: Icon(Icons.campaign_sharp, size: 50),
+                          child: Icon(
+                            Icons.campaign_sharp,
+                            size: devicewidth * 0.15,
+                            color: countPage.length > 0
+                                ? Colors.green
+                                : Colors.black,
+                          ),
                           onPressed: _isEnded1 //trueなら押せなくする
                               ? null
                               : () async {
@@ -125,7 +145,8 @@ class _FirstPageState extends State<FirstPage> {
                                             _isEnded1,
                                             _isEnded2,
                                             _isEnded3,
-                                            num), //sound
+                                            num,
+                                            countPage), //sound
                                       ));
                                 },
                         ),
@@ -148,13 +169,21 @@ class _FirstPageState extends State<FirstPage> {
                         fontSize: deviceheight * 0.03,
                         fontWeight: FontWeight.bold,
                         fontFamily: 'RobotoMono',
+                        color:
+                            countPage.length > 1 ? Colors.green : Colors.black,
                       ),
                     ),
                     new SizedBox(
                       width: devicewidth * 0.3,
                       height: devicewidth * 0.3,
                       child: NeumorphicFloatingActionButton(
-                        child: Icon(Icons.circle_notifications, size: 50),
+                        child: Icon(
+                          Icons.circle_notifications,
+                          size: devicewidth * 0.15,
+                          color: countPage.length > 1
+                              ? Colors.green
+                              : Colors.black,
+                        ),
                         onPressed: _isEnded2
                             ? null
                             : () {
@@ -169,7 +198,8 @@ class _FirstPageState extends State<FirstPage> {
                                           _isEnded1,
                                           _isEnded2,
                                           _isEnded3,
-                                          num), //sound
+                                          num,
+                                          countPage), //sound
                                     ));
                               }, //audio
                       ),
@@ -183,13 +213,19 @@ class _FirstPageState extends State<FirstPage> {
                       fontSize: deviceheight * 0.03,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'RobotoMono',
+                      color: countPage.length > 2 ? Colors.green : Colors.black,
                     ),
                   ),
                   new SizedBox(
                     width: devicewidth * 0.3,
                     height: devicewidth * 0.3,
                     child: NeumorphicFloatingActionButton(
-                      child: Icon(Icons.contactless_outlined, size: 50),
+                      child: Icon(
+                        Icons.contactless_outlined,
+                        size: devicewidth * 0.15,
+                        color:
+                            countPage.length > 2 ? Colors.green : Colors.black,
+                      ),
                       onPressed: _isEnded3
                           ? null
                           : () {
@@ -204,7 +240,8 @@ class _FirstPageState extends State<FirstPage> {
                                         _isEnded1,
                                         _isEnded2,
                                         _isEnded3,
-                                        num), //sound
+                                        num,
+                                        countPage), //sound
                                   ));
                             }, //sound3
                     ),

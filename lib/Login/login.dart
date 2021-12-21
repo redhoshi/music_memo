@@ -27,6 +27,7 @@ class _LoginPageState extends State<LoginPage> {
   bool _isEnded1 = false;
   bool _isEnded2 = false;
   bool _isEnded3 = false;
+  List countPage = [];
   final num = List<int>.generate(3, (i) => i + 0);
 
   calcurate(aiu) async {
@@ -123,6 +124,16 @@ class _LoginPageState extends State<LoginPage> {
     print(password.length);
     setState(() {});
   }
+
+  Future<void> loginData(user) async {
+    final now = new DateTime.now();
+    await FirebaseFirestore.instance
+        .collection('$userさんのテスト') // コレクションID--->名前入力でも良いかもね
+        .doc('$now') // ここは空欄だと自動でIDが付く
+        .set({
+      '問題順': num,
+    });
+  }
 /*
   Future<void> Init() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -143,37 +154,57 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     calcurate(num);
-    print(num);
+    print('最初の$num');
     final double deviceheight = MediaQuery.of(context).size.height;
     final double devicewidth = MediaQuery.of(context).size.width;
+
+    /* return MaterialApp(
+      title: 'music memory',
+
+      home: Visual(),
+      debugShowCheckedModeBanner: false,
+      Scaffold(
+        appBar: AppBar(
+          title: Text('Welcome to Flutter Igniter!'),
+        ),
+        body: Center(
+          child: Text('Hello World'),
+        ),
+      ), */
+    //debugShowCheckedModeBanner: false,
+
     return Scaffold(
       appBar: AppBar(
         title: Text('ログインページ'),
         centerTitle: true,
+        automaticallyImplyLeading: false,
       ),
       backgroundColor: NeumorphicTheme.baseColor(context),
       body: Center(
         child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
           Text('UserID'),
           new SizedBox(
-            width: deviceheight * 0.3,
-            height: devicewidth * 0.15,
+            width: devicewidth * 0.7,
+            height: deviceheight * 0.1,
             child: Neumorphic(
               style: NeumorphicStyle(depth: -5),
-              child: TextField(
+              child: new SizedBox(
+                  //width: deviceheight * 0.3,
+                  //height: devicewidth * 0.15,
+                  child: TextField(
                 controller: _userController,
                 textAlign: TextAlign.center,
                 decoration: InputDecoration(
                   focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(
                     color: Colors.grey,
-                    width: 2.0,
+                    width: 2, //2にする
                   )),
                   border: InputBorder.none,
                 ),
                 autocorrect: false,
                 autofocus: true,
-              ),
+              )),
             ),
           ),
           new SizedBox(
@@ -181,8 +212,8 @@ class _LoginPageState extends State<LoginPage> {
           ),
           Text('PassWord'),
           new SizedBox(
-            width: deviceheight * 0.3,
-            height: devicewidth * 0.15,
+            width: devicewidth * 0.7,
+            height: deviceheight * 0.1,
             child: Neumorphic(
               style: NeumorphicStyle(depth: -5),
               child: TextField(
@@ -225,6 +256,7 @@ class _LoginPageState extends State<LoginPage> {
                       print(
                           'user:${_userController.text}pass:${_passwordController.text}');
                       print(user_id);
+                      loginData(_userController.text);
                       user_id != true
                           ? setState(() {
                               press_id++;
@@ -237,7 +269,8 @@ class _LoginPageState extends State<LoginPage> {
                                       _isEnded1,
                                       _isEnded2,
                                       _isEnded3,
-                                      num)),
+                                      num,
+                                      countPage)),
                             );
                       print('presss_id:$press_id');
                     },
@@ -253,5 +286,27 @@ class _LoginPageState extends State<LoginPage> {
         ]),
       ),
     );
+    //)
   }
 }
+
+/*　まとめよう
+class Visual extends StatelessWidget {
+  const Visual({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Welcome to Flutter',
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Welcome to Flutter'),
+        ),
+        body: Center(
+            //child: RandomWords(),
+            ),
+      ),
+    );
+  }
+}
+*/

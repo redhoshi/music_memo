@@ -21,15 +21,17 @@ firebase_storage.FirebaseStorage storage =
 
 class TutoPage extends StatefulWidget {
   //TutoPage();
-  TutoPage(this.user, this.num);
+  TutoPage(this.user, this.num, this.countPage);
   String user;
   final num;
-  TutoPagePage createState() => TutoPagePage(user, num);
+  List countPage;
+  TutoPagePage createState() => TutoPagePage(user, num, countPage);
 }
 
 class TutoPagePage extends State<TutoPage> {
-  TutoPagePage(this.user, this.num);
+  TutoPagePage(this.user, this.num, this.countPage);
   String user;
+  List countPage;
   //問題リスト
   String quelist = 'aiu';
   //答えのリスト
@@ -619,7 +621,12 @@ class TutoPagePage extends State<TutoPage> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => FirstPage(
-                                          user, false, false, false, num)));
+                                          user,
+                                          false,
+                                          false,
+                                          false,
+                                          num,
+                                          countPage)));
                             },
                             label: Text('Homeに戻る'),
                             icon: Icon(Icons.arrow_back_sharp),
@@ -635,31 +642,51 @@ class TutoPagePage extends State<TutoPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          SliderPage(slider[0], facesheet[0], facesheet[1],
-                              facesheet[2], slidernum),
-                          SliderPage(slider[1], facesheet[3], facesheet[4],
-                              facesheet[5], slidernum2),
-                          SliderPage(slider[2], facesheet[6], facesheet[7],
-                              facesheet[8], slidernum3),
-                          SliderPage(slider[3], facesheet[9], facesheet[7],
-                              facesheet[8], slidernum4),
-                          FloatingActionButton.extended(
-                            heroTag: "homebtn",
-                            onPressed: () {
-                              print(slidernum3);
-                              stopsound();
-                              writelog();
-                              final now = new DateTime.now(); //いつボタン押したか。
-                              serviceTime.add({'homebtn': '$now'});
-                              Navigator.pop(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => FirstPage(
-                                          user, false, false, false, num)));
-                            },
-                            label: Text('Homeに戻る'),
-                            icon: Icon(Icons.arrow_back_sharp),
-                          )
+                          new SizedBox(
+                              height: deviceheight * 0.17,
+                              width: devicewidth * 0.95,
+                              child: SliderPage(slider[0], facesheet[0],
+                                  facesheet[1], facesheet[2], slidernum)),
+                          new SizedBox(
+                              height: deviceheight * 0.17,
+                              width: devicewidth * 0.95,
+                              child: SliderPage(slider[1], facesheet[3],
+                                  facesheet[4], facesheet[5], slidernum2)),
+                          new SizedBox(
+                              height: deviceheight * 0.17,
+                              width: devicewidth * 0.95,
+                              child: SliderPage(slider[2], facesheet[6],
+                                  facesheet[7], facesheet[8], slidernum3)),
+                          new SizedBox(
+                              height: deviceheight * 0.17,
+                              width: devicewidth * 0.95,
+                              child: SliderPage(slider[3], facesheet[9],
+                                  facesheet[7], facesheet[8], slidernum4)),
+                          new SizedBox(
+                              height: deviceheight * 0.1,
+                              width: devicewidth * 0.7,
+                              child: FloatingActionButton.extended(
+                                heroTag: "homebtn",
+                                onPressed: () {
+                                  print(slidernum3);
+                                  stopsound();
+                                  writelog();
+                                  final now = new DateTime.now(); //いつボタン押したか。
+                                  serviceTime.add({'homebtn': '$now'});
+                                  Navigator.pop(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => FirstPage(
+                                              user,
+                                              false,
+                                              false,
+                                              false,
+                                              num,
+                                              countPage)));
+                                },
+                                label: Text('Homeに戻る'),
+                                icon: Icon(Icons.arrow_back_sharp),
+                              ))
                         ],
                       )),
                 )
