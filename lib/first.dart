@@ -44,7 +44,7 @@ class _FirstPageState extends State<FirstPage> {
   Widget build(BuildContext context) {
     final double deviceheight = MediaQuery.of(context).size.height;
     final double devicewidth = MediaQuery.of(context).size.width;
-    print(num);
+    print('home画面$num');
     return Scaffold(
       appBar: AppBar(
         title: Text('FirstPage'),
@@ -95,7 +95,8 @@ class _FirstPageState extends State<FirstPage> {
                         width: devicewidth * 0.3,
                         height: devicewidth * 0.3,
                         child: NeumorphicFloatingActionButton(
-                          child: Icon(Icons.audiotrack, size: 50),
+                          child:
+                              Icon(Icons.audiotrack, size: devicewidth * 0.15),
                           onPressed: () {
                             Navigator.push(
                                 context,
@@ -124,7 +125,7 @@ class _FirstPageState extends State<FirstPage> {
                         child: NeumorphicFloatingActionButton(
                           child: Icon(
                             Icons.campaign_sharp,
-                            size: 50,
+                            size: devicewidth * 0.15,
                             color: countPage.length > 0
                                 ? Colors.green
                                 : Colors.black,
@@ -178,7 +179,7 @@ class _FirstPageState extends State<FirstPage> {
                       child: NeumorphicFloatingActionButton(
                         child: Icon(
                           Icons.circle_notifications,
-                          size: 50,
+                          size: devicewidth * 0.15,
                           color: countPage.length > 1
                               ? Colors.green
                               : Colors.black,
@@ -221,7 +222,7 @@ class _FirstPageState extends State<FirstPage> {
                     child: NeumorphicFloatingActionButton(
                       child: Icon(
                         Icons.contactless_outlined,
-                        size: 50,
+                        size: devicewidth * 0.15,
                         color:
                             countPage.length > 2 ? Colors.green : Colors.black,
                       ),

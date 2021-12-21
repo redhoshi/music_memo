@@ -55,8 +55,12 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final double deviceheight = MediaQuery.of(context).size.height;
+    final double devicewidth = MediaQuery.of(context).size.width;
     return Column(children: <Widget>[
-      Text('$face1'),
+      Text('$face1',
+          style: TextStyle(
+              fontWeight: FontWeight.bold, fontSize: devicewidth * 0.035)),
       SliderTheme(
         data: SliderTheme.of(context).copyWith(
           activeTickMarkColor: Colors.white,
@@ -81,12 +85,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            '$face2',
-          ),
-          Text(
-            '$face3',
-          ),
+          Text('$face2', style: TextStyle(fontSize: devicewidth * 0.035)),
+          Text('$face3', style: TextStyle(fontSize: devicewidth * 0.035)),
         ],
       ),
     ]);

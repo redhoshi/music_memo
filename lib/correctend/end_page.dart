@@ -169,7 +169,7 @@ class EndPagePage extends State<EndPage> {
             ),
           ),
           new SizedBox(
-            height: deviceheight * 0.07,
+            height: deviceheight * 0.06,
             width: devicewidth * 0.34,
             child: FloatingActionButton.extended(
                 onPressed: () {

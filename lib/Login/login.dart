@@ -154,7 +154,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     calcurate(num);
-    print(num);
+    print('最初の$num');
     final double deviceheight = MediaQuery.of(context).size.height;
     final double devicewidth = MediaQuery.of(context).size.width;
 
@@ -184,24 +184,27 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
           Text('UserID'),
           new SizedBox(
-            width: deviceheight * 0.3,
-            height: devicewidth * 0.15,
+            width: devicewidth * 0.7,
+            height: deviceheight * 0.1,
             child: Neumorphic(
               style: NeumorphicStyle(depth: -5),
-              child: TextField(
+              child: new SizedBox(
+                  //width: deviceheight * 0.3,
+                  //height: devicewidth * 0.15,
+                  child: TextField(
                 controller: _userController,
                 textAlign: TextAlign.center,
                 decoration: InputDecoration(
                   focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(
                     color: Colors.grey,
-                    width: 2.0,
+                    width: 2, //2にする
                   )),
                   border: InputBorder.none,
                 ),
                 autocorrect: false,
                 autofocus: true,
-              ),
+              )),
             ),
           ),
           new SizedBox(
@@ -209,8 +212,8 @@ class _LoginPageState extends State<LoginPage> {
           ),
           Text('PassWord'),
           new SizedBox(
-            width: deviceheight * 0.3,
-            height: devicewidth * 0.15,
+            width: devicewidth * 0.7,
+            height: deviceheight * 0.1,
             child: Neumorphic(
               style: NeumorphicStyle(depth: -5),
               child: TextField(
